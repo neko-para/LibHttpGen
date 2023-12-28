@@ -1,0 +1,2 @@
+add_library(Headeronly INTERFACE)
+target_include_directories(Headeronly INTERFACE include)

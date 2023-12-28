@@ -1,0 +1,6 @@
+build
+maa
+
+.DS_Store
+.vscode
+generated/gen*

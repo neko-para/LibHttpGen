@@ -1,0 +1,3 @@
+add_library(LHGClangCpp INTERFACE)
+target_include_directories(LHGClangCpp INTERFACE include)
+target_link_libraries(LHGClangCpp INTERFACE ClangC)

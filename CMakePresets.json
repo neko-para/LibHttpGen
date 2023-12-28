@@ -1,0 +1,70 @@
+{
+    "version": 5,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 21,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "NinjaMulti",
+            "displayName": "Ninja MultiConfig",
+            "description": "Ninja MultiConfig",
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": {
+                    "type": "FILEPATH",
+                    "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+                }
+            }
+        },
+        {
+            "name": "MSVCMulti",
+            "displayName": "MSVC MultiConfig",
+            "description": "MSVC MultiConfig",
+            "generator": "Visual Studio 17 2022",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": {
+                    "type": "FILEPATH",
+                    "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+                }
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "NinjaDebug",
+            "displayName": "Ninja MultiConfig Debug",
+            "description": "Ninja MultiConfig Debug",
+            "configurePreset": "NinjaMulti",
+            "configuration": "Debug",
+            "jobs": 16
+        },
+        {
+            "name": "NinjaRelease",
+            "displayName": "Ninja MultiConfig Release",
+            "description": "Ninja MultiConfig Release",
+            "configurePreset": "NinjaMulti",
+            "configuration": "Release",
+            "jobs": 16
+        },
+        {
+            "name": "MSVCDebug",
+            "displayName": "MSVC MultiConfig Debug",
+            "description": "MSVC MultiConfig Debug",
+            "configurePreset": "MSVCMulti",
+            "configuration": "Debug",
+            "jobs": 16
+        },
+        {
+            "name": "MSVCRelease",
+            "displayName": "MSVC MultiConfig Release",
+            "description": "MSVC MultiConfig Release",
+            "configurePreset": "MSVCMulti",
+            "configuration": "Release",
+            "jobs": 16
+        }
+    ]
+}

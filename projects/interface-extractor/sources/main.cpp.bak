@@ -1,0 +1,218 @@
+#include "clang-cpp.h"
+
+#include <iostream>
+#include <meojson/json.hpp>
+
+struct Visitor
+{
+    int depth;
+
+    CXChildVisitResult operator()(clangpp::CXXCursor current, clangpp::CXXCursor parent)
+    {
+        if (current.kind() == CXCursor_UnexposedDecl && !current.isLinkageSpec()) {
+            return CXChildVisit_Continue;
+        }
+        std::cout << std::string(depth * 4, ' ') << current.getSpelling() << "[" << current.kind().getSpelling()
+                  << "]: " << current.getType().getSpelling() << "[" << current.getType().kind().getSpelling() << "]"
+                  << std::endl;
+        current.visitChildren(Visitor { depth + 1 });
+        // if (current.kind() == CXCursor_TypeRef) {
+        //     std::cout << "go to under type" << std::endl;
+
+        //     auto refc = current.getReferenced();
+        //     Visitor { depth + 1 }(refc, current);
+        // }
+        return CXChildVisit_Continue;
+    }
+};
+
+int main(int argc, char* argv[])
+{
+    auto index = clangpp::CXXIndex::make();
+    index->create(0, 0);
+    auto unit = clangpp::CXXTranslationUnit::make();
+    unit->parse(index, argv[1],
+                { "-I/opt/local/libexec/llvm-16/lib/clang/16/include",
+                  "-IC:\\Program Files\\LLVM\\lib\\clang\\17\\include", "-std=c++20", "-Wno-pragma-once-outside-header",
+                  "-x", "c++" },
+                CXTranslationUnit_None);
+
+    for (auto& diag : unit->getDiagnostics()) {
+        auto [enable, disable] = diag.getOption();
+        std::cout << diag.getSpelling() << ":" << enable << " " << disable << "\n";
+    }
+
+    auto cursor = unit->getCursor();
+
+    auto decls = clangpp::select(
+        { cursor }, clangpp::sel_recurse,
+        [](const clangpp::CXXCursor& cur) { return cur.kind() == CXCursor_FunctionDecl; },
+        [](const clangpp::CXXCursor& cur) {
+            return clangpp::select({ cur }, clangpp::sel_direct, [](const clangpp::CXXCursor& cur) {
+                       switch (cur.kind().raw_) {
+                       case CXCursor_VisibilityAttr:
+                           return cur.getSpelling() == "default";
+                       case CXCursor_DLLImport:
+                           return true;
+                       default:
+                           return false;
+                       }
+                       return false;
+                   }).size() > 0;
+        });
+
+    json::object types;
+    json::array funcs;
+
+    auto __resolve_type = [&](const auto& self, const clangpp::CXXCursor& cur) {
+        auto cursor = cur;
+        auto name = cursor.getSpelling();
+        if (cursor.kind().isReference()) {
+            cursor = cursor.getReferenced();
+        }
+        if (cursor.kind() != CXCursor_TypedefDecl) {
+            std::cout << "not typedef! " << cur.getSpelling() << "[" << cur.kind().getSpelling() << "]" << std::endl;
+            return;
+        }
+        if (types.contains(name)) {
+            return;
+        }
+        std::cout << "Resolving " << cursor.getSpelling() << std::endl;
+        auto policy = cursor.getPrintingPolicy();
+
+        while (true) {
+            auto target_type = cursor.getTypedefDeclUnderlyingType();
+            auto target_pointee = target_type;
+            json::array const_info;
+            while (target_pointee.kind() == CXType_Pointer) {
+                target_pointee = target_pointee.getPointeeType();
+                const_info.push_back(target_pointee.isConstQualifiedType() > 0);
+            }
+            if (target_pointee.kind().isBuiltin()) {
+                types[name] = { { "name", name },
+                                { "type", "builtin" },
+                                { "const", const_info },
+                                { "builtin", target_pointee.getCanonicalType().getSpelling() } };
+                break;
+            }
+            if (target_pointee.kind() == CXType_FunctionProto) {
+                auto args = clangpp::select({ cursor }, clangpp::sel_direct, [](const clangpp::CXXCursor& cur) {
+                    return cur.kind() == CXCursor_ParmDecl;
+                });
+                json::array args_j;
+                auto ret_type = target_pointee.getResultType();
+                self(self, ret_type.getTypeDeclaration());
+                for (const auto& arg : args) {
+                    auto arg_type = clangpp::select({ arg }, clangpp::sel_direct, [](const clangpp::CXXCursor& cur) {
+                        return cur.kind().isReference();
+                    });
+                    if (arg_type.size() > 0) {
+                        self(self, arg_type[0]);
+                    }
+                    args_j.push_back(
+                        json::object { { "name", arg.getSpelling() }, { "type", arg.getType().getSpelling() } });
+                }
+                types[name] = { { "name", name },
+                                { "type", "func" },
+                                { "const", const_info },
+                                { "ret", ret_type.getSpelling() },
+                                { "args", args_j } };
+                break;
+            }
+            if (cursor.kind() == CXCursor_StructDecl) {
+                auto fields = clangpp::select({ cursor }, clangpp::sel_direct, [](const clangpp::CXXCursor& cur) {
+                    return cur.kind() == CXCursor_FieldDecl;
+                });
+                json::array fields_j;
+                for (const auto& field : fields) {
+                    auto field_type =
+                        clangpp::select({ field }, clangpp::sel_direct,
+                                        [](const clangpp::CXXCursor& cur) { return cur.kind().isReference(); });
+                    if (field_type.size() > 0) {
+                        self(self, field_type[0]);
+                    }
+                    clangpp::CXXType ft = field.getType();
+                    if (ft.kind() == CXType_Pointer && ft.getPointeeType().kind() == CXType_FunctionProto) {
+                        fields_j.push_back(json::object { { "name", field.getSpelling() },
+                                                          { "type", name + "@" + field.getSpelling() } });
+                        {
+                            std::string name2 = name + "@" + field.getSpelling();
+                            auto args =
+                                clangpp::select({ field }, clangpp::sel_direct, [](const clangpp::CXXCursor& cur) {
+                                    return cur.kind() == CXCursor_ParmDecl;
+                                });
+                            json::array args_j;
+                            auto ret_type = ft.getPointeeType().getResultType();
+                            self(self, ret_type.getTypeDeclaration());
+                            for (const auto& arg : args) {
+                                auto arg_type =
+                                    clangpp::select({ arg }, clangpp::sel_direct, [](const clangpp::CXXCursor& cur) {
+                                        return cur.kind().isReference();
+                                    });
+                                if (arg_type.size() > 0) {
+                                    self(self, arg_type[0]);
+                                }
+                                args_j.push_back(json::object { { "name", arg.getSpelling() },
+                                                                { "type", arg.getType().getSpelling() } });
+                            }
+                            types[name2] = { { "name", name2 },
+                                             { "type", "func" },
+                                             { "const", { false } },
+                                             { "ret", ret_type.getSpelling() },
+                                             { "args", args_j } };
+                        }
+                    }
+                    else {
+                        fields_j.push_back(json::object { { "name", field.getSpelling() },
+                                                          { "type", field.getType().getSpelling() } });
+                    }
+                }
+                types[name] = {
+                    { "name", name }, { "type", "struct" }, { "const", const_info }, { "fields", fields_j }
+                };
+                cursor.visitChildren(Visitor { 1 });
+                break;
+            }
+            auto decl = target_pointee.getTypeDeclaration().getDefinition();
+            if (!decl) {
+                types[name] = { { "name", name }, { "type", "opacity" }, { "const", const_info } };
+                break;
+            }
+            auto alias_to = target_pointee.getTypeDeclaration();
+            auto alias_name = alias_to.getSpelling();
+            std::cout << "Alias       " << cursor.getPrettyPrinted(policy) << std::endl;
+            types[name] = { { "name", name }, { "type", "alias" }, { "const", const_info }, { "alias", alias_name } };
+            cursor = alias_to;
+            name = alias_name;
+        }
+    };
+
+    auto resolve_type = [&__resolve_type](const clangpp::CXXCursor& cur) {
+        return __resolve_type(__resolve_type, cur);
+    };
+
+    for (const auto& cur : decls) {
+        json::object func;
+        json::array args;
+
+        auto params = cur.getArguments().value();
+        for (const auto& pr : params) {
+            auto pr_type = clangpp::select({ pr }, clangpp::sel_direct,
+                                           [](const clangpp::CXXCursor& cur) { return cur.kind().isReference(); });
+            if (pr_type.size() > 0) {
+                resolve_type(pr_type[0]);
+            }
+            else {
+                std::cout << "non reference type " << pr.getType().getSpelling() << std::endl;
+            }
+            args.push_back(json::object { { "name", pr.getSpelling() }, { "type", pr.getType().getSpelling() } });
+        }
+        func["args"] = args;
+        func["ret"] = cur.getSpelling() + "@ret";
+        funcs.push_back(func);
+    }
+
+    std::ofstream file("result.json");
+    file << (json::object { { "types", types }, { "funcs", funcs } }).format(2);
+    return 0;
+}
