@@ -19,12 +19,11 @@ endif()
 
 find_package(Boost REQUIRED COMPONENTS system)
 include(cmake/clangc.cmake)
-# include(
-# "${CMAKE_CURRENT_LIST_DIR}/maa/share/cmake/MaaFramework/MaaFramework.cmake")
+include(
+  "${CMAKE_CURRENT_LIST_DIR}/maa/share/cmake/MaaFramework/MaaFramework.cmake")
 
 add_subdirectory(3rdparty)
 add_subdirectory(projects/clang-cpp)
 add_subdirectory(projects/regenerator)
 add_subdirectory(projects/interface-extractor)
-add_subdirectory(projects/interface-builder)
 add_subdirectory(generated)

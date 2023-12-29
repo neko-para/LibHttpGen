@@ -8,6 +8,25 @@
 #include "Helper/HandleManager.hpp"
 #include "Helper/UrlSegments.hpp"
 
+#ifdef LHG_DELETE_NOT_IMPL
+#define LHG_NOT_IMPL_FUNC = delete
+#else
+#define LHG_NOT_IMPL_FUNC            \
+    {                                \
+        throw "not implemented yet"; \
+    }
+#endif
+
+template <typename Type>
+concept json_value_can_as = requires(json::value v) { static_cast<Type>(v); };
+
+template <typename Type>
+concept can_construct_json_value = requires(Type t) {
+    {
+        json::value(std::forward<Type>(t))
+    } -> std::same_as<json::value>;
+};
+
 template <typename Type>
 struct from_json_fix_t
 {
@@ -21,16 +40,18 @@ struct from_json_fix_t<const char*>
 };
 
 template <typename Type>
-typename from_json_fix_t<Type>::from_t from_json(json::value v) = delete;
+typename from_json_fix_t<Type>::from_t from_json(json::value v) LHG_NOT_IMPL_FUNC;
 
-template <>
-inline std::string from_json<const char*>(json::value v)
+template <typename Type>
+inline Type from_json_fix(typename from_json_fix_t<Type>::from_t& v)
 {
-    return v.as_string();
+    return v;
 }
 
 template <typename Type>
-concept json_value_can_as = requires(json::value v) { static_cast<Type>(v); };
+json::value to_json(Type v) LHG_NOT_IMPL_FUNC;
+
+// from_json
 
 template <json_value_can_as Type>
 inline Type from_json(json::value v)
@@ -38,27 +59,21 @@ inline Type from_json(json::value v)
     return v.as<Type>();
 }
 
-template <typename Type>
-inline Type from_json_fix(const typename from_json_fix_t<Type>::from_t& v)
+template <>
+inline std::string from_json<const char*>(json::value v)
 {
-    return v;
+    return v.as_string();
 }
 
+// from_json_fix
+
 template <>
-inline const char* from_json_fix<const char*>(const std::string& v)
+inline const char* from_json_fix<const char*>(std::string& v)
 {
     return v.c_str();
 }
 
-template <typename Type>
-json::value to_json(Type v) = delete;
-
-template <typename Type>
-concept can_construct_json_value = requires(Type t) {
-    {
-        json::value(std::forward<Type>(t))
-    } -> std::same_as<json::value>;
-};
+// to_json
 
 template <can_construct_json_value Type>
 inline json::value to_json(Type v)
@@ -66,11 +81,9 @@ inline json::value to_json(Type v)
     return json::value(v);
 }
 
-// 基本模板声明
 template <typename T>
 struct func_traits;
 
-// 特化版本，用于匹配函数指针类型
 template <typename R, typename... Args>
 struct func_traits<R (*)(Args...)>
 {
@@ -107,16 +120,4 @@ static typename func_traits<F>::return_t __CallbackImpl(Args... arg)
     else {
         return result;
     }
-}
-
-template <size_t C, typename F, typename... Args>
-inline F get_callback_impl_helper(std::type_identity<std::tuple<Args...>>)
-{
-    return &__CallbackImpl<C, F, Args...>;
-}
-
-template <size_t C, typename F>
-inline F get_callback_impl()
-{
-    return get_callback_impl_helper<C, F>(typename func_traits<F>::arguments_t {});
 }
