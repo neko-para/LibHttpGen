@@ -4,25 +4,33 @@
             "name": "MaaAPICallback",
             "pass": 1,
             "self": 2,
-            "all": 2,
+            "all": 3,
             "argn": ["msg", "details_json", ""]
         }
     },
     "opaque": [
         "MaaControllerAPI",
-        "MaaImageBuffer",
         "MaaResourceAPI",
         "MaaInstanceAPI",
+        "MaaImageBuffer",
         "MaaStringBuffer",
-        "MaaSyncContextAPI"
+        "MaaRect"
     ],
+    "opaque_free": {
+        "MaaControllerAPI": ["MaaControllerDestroy"],
+        "MaaResourceAPI": ["MaaResourceDestroy"],
+        "MaaInstanceAPI": ["MaaDestroy"],
+        "MaaImageBuffer": ["MaaDestroyImageBuffer"],
+        "MaaStringBuffer": ["MaaDestroyStringBuffer"],
+        "MaaRect": ["MaaDestroyRectBuffer"]
+    },
     "remove": [
-        "MaaWin32ControllerCreate",
         "MaaCustomControllerCreate",
         "MaaSetImageRawData",
         "MaaRegisterCustomRecognizer",
         "MaaRegisterCustomAction",
         "MaaUnregisterCustomRecognizer",
-        "MaaUnregisterCustomAction"
+        "MaaUnregisterCustomAction",
+        "/MaaSyncContext.*"
     ]
 }

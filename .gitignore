@@ -4,5 +4,3 @@ maa
 .DS_Store
 .vscode
 node_modules
-
-generated/gen*

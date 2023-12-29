@@ -1,4 +1,5 @@
 import fs from 'fs/promises'
+import { existsSync } from 'fs'
 
 export interface SectionConfig {
   end: string
@@ -42,6 +43,10 @@ export class Regenerator {
   }
 
   async load(file: string) {
+    if (!existsSync(file)) {
+      return
+    }
+
     let state: 'idle' | 'process' = 'idle'
     let id: string | null = null
     let content: string[] = []

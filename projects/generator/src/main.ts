@@ -15,6 +15,7 @@ interface Config {
     }
   >
   opaque: string[]
+  opaque_free: Record<string, string[]>
   remove: string[]
 }
 
@@ -55,6 +56,7 @@ async function main() {
     `// clang-format off
 
 #include "helper.h"
+#define LHG_PROCESS
 `
   )
   regen.add_sec('lhg.include', '')
@@ -62,27 +64,38 @@ async function main() {
   regen.add_sec('lhg.custom.global', '')
   regen.add_raw('')
 
-  let callback_counter = 0
-  const callback_ids: Record<string, number> = {}
+  const callback_ids: Record<string, string> = {}
 
   for (const type in cfg.callback) {
-    const id = ++callback_counter
+    const id = cfg.callback[type]!.name
     callback_ids[type] = id
-    regen.add_raw(`static callback_manager<${type}> Callback${id}__Manager;\n`)
+    regen.add_raw(`static callback_manager<${type}> ${id}__Manager;\n`)
   }
 
   for (const type of cfg.opaque) {
     regen.add_raw(`static HandleManager<${type} *> ${type}__OpaqueManager;\n`)
   }
 
-  for (const ic of int.interface) {
-    if (cfg.remove.includes(ic.name)) {
-      continue
+  int.interface = int.interface.filter(x => {
+    for (const rule of cfg.remove) {
+      if (rule.startsWith('/')) {
+        if (new RegExp(rule.slice(1)).exec(x.name)) {
+          return false
+        }
+      } else {
+        if (rule === x.name) {
+          return false
+        }
+      }
     }
+    return true
+  })
+
+  for (const ic of int.interface) {
     regen.add_raw(`std::optional<json::object> ${ic.name}_Wrapper(json::object __param) {`)
 
     // callback
-    let cbId: number | null = null
+    let cbId: string | null = null
     let cbParam: string | null = null
     let ctxPos: number | null = null
     for (const [idx, arg] of ic.argument.entries()) {
@@ -97,7 +110,7 @@ async function main() {
         regen.add_sec(
           `lhg.impl.${ic.name}.arg.${arg.name}`,
           `    auto ${arg.name}_id = __param["${cbParam}"].as_string();
-    auto ${arg.name} = Callback${cbId}__Manager.find(${arg.name}_id).get();`
+    auto ${arg.name} = ${cbId}__Manager.find(${arg.name}_id).get();`
         )
         continue
       } else if (arg.type in callback_ids) {
@@ -116,11 +129,20 @@ async function main() {
       // opacity
       if (arg.type.endsWith(' *') && cfg.opaque.includes(arg.type.slice(0, -2))) {
         const type = arg.type.slice(0, -2)
-        regen.add_sec(
-          `lhg.impl.${ic.name}.arg.${arg.name}`,
-          `    auto ${arg.name}_id = __param["${arg.name}"].as_string();
+        if ((cfg.opaque_free[type] ?? []).includes(ic.name)) {
+          regen.add_sec(
+            `lhg.impl.${ic.name}.arg.${arg.name}`,
+            `    auto ${arg.name}_id = __param["${arg.name}"].as_string();
+    ${type} *${arg.name};
+    ${type}__OpaqueManager.del(${arg.name}_id, ${arg.name});`
+          )
+        } else {
+          regen.add_sec(
+            `lhg.impl.${ic.name}.arg.${arg.name}`,
+            `    auto ${arg.name}_id = __param["${arg.name}"].as_string();
     auto ${arg.name} = ${type}__OpaqueManager.get(${arg.name}_id);`
-        )
+          )
+        }
         continue
       }
 
@@ -172,14 +194,13 @@ async function main() {
   }
   for (const type in cfg.callback) {
     const cc = cfg.callback[type]!
-    const ci = callback_ids[type]!
     const ret = /^(.+) \(\*\)/.exec(type)![1]!
     regen.add_raw(`    // callback ${cc.name}`)
     regen.add_raw(`    segs.reset();
     if (segs.enter_path("${cc.name}")) {
         if (segs.enter_path("add")) {
             std::string id;
-            Callback${ci}__Manager.alloc(id);
+            ${cc.name}__Manager.alloc(id);
             ctx.json_body({ { "id", id } });
             return true;
         }
@@ -187,14 +208,14 @@ async function main() {
             auto body = json::parse(ctx.req_.body());
             auto& obj = body.value().as_object();
             std::string id = obj["id"].as_string();
-            Callback${ci}__Manager.free(id);
+            ${cc.name}__Manager.free(id);
             ctx.json_body({});
             return true;
         }
         std::string id;
         if (segs.enter_path("sub") && segs.enter_id(id)) {
             if (segs.enter_path("pull")) {
-                auto __ctx = Callback${ci}__Manager.find(id);
+                auto __ctx = ${cc.name}__Manager.find(id);
                 std::vector<std::string> cids;
                 __ctx->take(cids);
                 json::array obj_ids;
@@ -208,8 +229,8 @@ async function main() {
                 std::string cid;
                 if (segs.enter_id(cid)) {
                     if (segs.enter_path("request")) {
-                        auto __inst_ctx = Callback${ci}__Manager.find(id);
-                        decltype(Callback${ci}__Manager)::CallbackContext::args_type args;
+                        auto __inst_ctx = ${cc.name}__Manager.find(id);
+                        decltype(${cc.name}__Manager)::CallbackContext::args_type args;
                         __inst_ctx->get_args(cid, args);
 ${Array.from({ length: cc.all }, (_, k) => k)
   .filter(x => x != cc.self)
@@ -225,7 +246,7 @@ ${Array.from({ length: cc.all }, (_, k) => k)
                         return true;
                     }
                     if (segs.enter_path("response")) {
-                        auto __inst_ctx = Callback${ci}__Manager.find(id);
+                        auto __inst_ctx = ${cc.name}__Manager.find(id);
 ${ret === 'void' ? '                        __inst_ctx->resp(cid, 0);' : ''}
                         return true;
                     }
@@ -235,9 +256,6 @@ ${ret === 'void' ? '                        __inst_ctx->resp(cid, 0);' : ''}
     }`)
   }
   for (const ic of int.interface) {
-    if (cfg.remove.includes(ic.name)) {
-      continue
-    }
     const p = convertPath(ic.name)
     regen.add_raw(`    // ${ic.name} /${p.join('/')}
     segs.reset();`)
