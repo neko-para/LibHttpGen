@@ -121,3 +121,59 @@ static typename func_traits<F>::return_t __CallbackImpl(Args... arg)
         return result;
     }
 }
+
+template <typename CM>
+inline bool handle_callback(const char* name, CM& manager, Context& ctx, UrlSegments segs,
+                            std::function<json::object(const typename CM::CallbackContext::args_type&)> convert)
+{
+    segs.reset();
+    if (segs.enter_path(name)) {
+        if (segs.enter_path("add")) {
+            std::string id;
+            manager.alloc(id);
+            ctx.json_body({ { "id", id } });
+            return true;
+        }
+        if (segs.enter_path("del")) {
+            auto body = json::parse(ctx.req_.body());
+            auto& obj = body.value().as_object();
+            std::string id = obj["id"].as_string();
+            manager.free(id);
+            ctx.json_body({});
+            return true;
+        }
+        std::string id;
+        if (segs.enter_path("sub") && segs.enter_id(id)) {
+            if (segs.enter_path("pull")) {
+                auto __ctx = manager.find(id);
+                std::vector<std::string> cids;
+                __ctx->take(cids);
+                json::array obj_ids;
+                for (const auto& cid : cids) {
+                    obj_ids.push_back(cid);
+                }
+                ctx.json_body({ { "ids", obj_ids } });
+                return true;
+            }
+            if (segs.enter_path("ctx")) {
+                std::string cid;
+                if (segs.enter_id(cid)) {
+                    if (segs.enter_path("request")) {
+                        auto __inst_ctx = manager.find(id);
+                        typename CM::CallbackContext::args_type args;
+                        __inst_ctx->get_args(cid, args);
+                        json::object __arg = convert(args);
+                        ctx.json_body(__arg);
+                        return true;
+                    }
+                    if (segs.enter_path("response")) {
+                        auto __inst_ctx = manager.find(id);
+                        __inst_ctx->resp(cid, 0);
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}

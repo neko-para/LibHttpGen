@@ -196,63 +196,21 @@ async function main() {
     const cc = cfg.callback[type]!
     const ret = /^(.+) \(\*\)/.exec(type)![1]!
     regen.add_raw(`    // callback ${cc.name}`)
-    regen.add_raw(`    segs.reset();
-    if (segs.enter_path("${cc.name}")) {
-        if (segs.enter_path("add")) {
-            std::string id;
-            ${cc.name}__Manager.alloc(id);
-            ctx.json_body({ { "id", id } });
-            return true;
-        }
-        if (segs.enter_path("del")) {
-            auto body = json::parse(ctx.req_.body());
-            auto& obj = body.value().as_object();
-            std::string id = obj["id"].as_string();
-            ${cc.name}__Manager.free(id);
-            ctx.json_body({});
-            return true;
-        }
-        std::string id;
-        if (segs.enter_path("sub") && segs.enter_id(id)) {
-            if (segs.enter_path("pull")) {
-                auto __ctx = ${cc.name}__Manager.find(id);
-                std::vector<std::string> cids;
-                __ctx->take(cids);
-                json::array obj_ids;
-                for (const auto& cid: cids) {
-                    obj_ids.push_back(cid);
-                }
-                ctx.json_body({{ "ids", obj_ids }});
-                return true;
-            }
-            if (segs.enter_path("ctx")) {
-                std::string cid;
-                if (segs.enter_id(cid)) {
-                    if (segs.enter_path("request")) {
-                        auto __inst_ctx = ${cc.name}__Manager.find(id);
-                        decltype(${cc.name}__Manager)::CallbackContext::args_type args;
-                        __inst_ctx->get_args(cid, args);
+    regen.add_raw(`    if (handle_callback("${cc.name}", ${
+      cc.name
+    }__Manager, ctx, segs, [](const auto& args) {
 ${Array.from({ length: cc.all }, (_, k) => k)
   .filter(x => x != cc.self)
-  .map(id => `                        auto v${id} = std::get<${id}>(args);`)
+  .map(id => `        auto v${id} = std::get<${id}>(args);`)
   .join('\n')}
-                        json::object __arg = {
+        return json::object {
 ${Array.from({ length: cc.all }, (_, k) => k)
   .filter(x => x != cc.self)
-  .map(id => `                            { "${cc.argn[id]}", v${id} },`)
+  .map(id => `            { "${cc.argn[id]}", v${id} },`)
   .join('\n')}
-                        };
-                        ctx.json_body(__arg);
-                        return true;
-                    }
-                    if (segs.enter_path("response")) {
-                        auto __inst_ctx = ${cc.name}__Manager.find(id);
-${ret === 'void' ? '                        __inst_ctx->resp(cid, 0);' : ''}
-                        return true;
-                    }
-                }
-            }
-        }
+        };
+    })) {
+        return true;
     }`)
   }
   for (const ic of int.interface) {

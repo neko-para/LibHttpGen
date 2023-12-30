@@ -2171,59 +2171,15 @@ std::optional<json::object> MaaToolKitGetCursorWindow_Wrapper(json::object __par
 
 bool handle_request(Context& ctx, UrlSegments segs) {
     // callback MaaAPICallback
-    segs.reset();
-    if (segs.enter_path("MaaAPICallback")) {
-        if (segs.enter_path("add")) {
-            std::string id;
-            MaaAPICallback__Manager.alloc(id);
-            ctx.json_body({ { "id", id } });
-            return true;
-        }
-        if (segs.enter_path("del")) {
-            auto body = json::parse(ctx.req_.body());
-            auto& obj = body.value().as_object();
-            std::string id = obj["id"].as_string();
-            MaaAPICallback__Manager.free(id);
-            ctx.json_body({});
-            return true;
-        }
-        std::string id;
-        if (segs.enter_path("sub") && segs.enter_id(id)) {
-            if (segs.enter_path("pull")) {
-                auto __ctx = MaaAPICallback__Manager.find(id);
-                std::vector<std::string> cids;
-                __ctx->take(cids);
-                json::array obj_ids;
-                for (const auto& cid: cids) {
-                    obj_ids.push_back(cid);
-                }
-                ctx.json_body({{ "ids", obj_ids }});
-                return true;
-            }
-            if (segs.enter_path("ctx")) {
-                std::string cid;
-                if (segs.enter_id(cid)) {
-                    if (segs.enter_path("request")) {
-                        auto __inst_ctx = MaaAPICallback__Manager.find(id);
-                        decltype(MaaAPICallback__Manager)::CallbackContext::args_type args;
-                        __inst_ctx->get_args(cid, args);
-                        auto v0 = std::get<0>(args);
-                        auto v1 = std::get<1>(args);
-                        json::object __arg = {
-                            { "msg", v0 },
-                            { "details_json", v1 },
-                        };
-                        ctx.json_body(__arg);
-                        return true;
-                    }
-                    if (segs.enter_path("response")) {
-                        auto __inst_ctx = MaaAPICallback__Manager.find(id);
-                        __inst_ctx->resp(cid, 0);
-                        return true;
-                    }
-                }
-            }
-        }
+    if (handle_callback("MaaAPICallback", MaaAPICallback__Manager, ctx, segs, [](const auto& args) {
+        auto v0 = std::get<0>(args);
+        auto v1 = std::get<1>(args);
+        return json::object {
+            { "msg", v0 },
+            { "details_json", v1 },
+        };
+    })) {
+        return true;
     }
     // MaaAdbControllerCreate /maa/adb/controller/create
     segs.reset();
