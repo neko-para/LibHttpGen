@@ -33,12 +33,6 @@ struct from_json_fix_t
     using from_t = Type;
 };
 
-template <>
-struct from_json_fix_t<const char*>
-{
-    using from_t = std::string;
-};
-
 template <typename Type>
 typename from_json_fix_t<Type>::from_t from_json(json::value v) LHG_NOT_IMPL_FUNC;
 
@@ -51,13 +45,31 @@ inline Type from_json_fix(typename from_json_fix_t<Type>::from_t& v)
 template <typename Type>
 json::value to_json(Type v) LHG_NOT_IMPL_FUNC;
 
-// from_json
-
 template <json_value_can_as Type>
 inline Type from_json(json::value v)
 {
     return v.as<Type>();
 }
+
+template <can_construct_json_value Type>
+inline json::value to_json(Type v)
+{
+    return json::value(v);
+}
+
+template <typename Type>
+Type output_prepare() LHG_NOT_IMPL_FUNC;
+
+template <typename Type>
+json::value output_finalize(Type v) LHG_NOT_IMPL_FUNC;
+
+// const char* <-> string
+
+template <>
+struct from_json_fix_t<const char*>
+{
+    using from_t = std::string;
+};
 
 template <>
 inline std::string from_json<const char*>(json::value v)
@@ -65,20 +77,10 @@ inline std::string from_json<const char*>(json::value v)
     return v.as_string();
 }
 
-// from_json_fix
-
 template <>
 inline const char* from_json_fix<const char*>(std::string& v)
 {
     return v.c_str();
-}
-
-// to_json
-
-template <can_construct_json_value Type>
-inline json::value to_json(Type v)
-{
-    return json::value(v);
 }
 
 template <typename T>

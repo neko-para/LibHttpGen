@@ -8,22 +8,14 @@
             "argn": ["msg", "details_json", ""]
         }
     },
-    "opaque": [
-        "MaaControllerAPI",
-        "MaaResourceAPI",
-        "MaaInstanceAPI",
-        "MaaImageBuffer",
-        "MaaStringBuffer",
-        "MaaRect"
-    ],
+    "opaque": ["MaaControllerAPI", "MaaResourceAPI", "MaaInstanceAPI", "MaaImageBuffer"],
     "opaque_free": {
         "MaaControllerAPI": ["MaaControllerDestroy"],
         "MaaResourceAPI": ["MaaResourceDestroy"],
         "MaaInstanceAPI": ["MaaDestroy"],
-        "MaaImageBuffer": ["MaaDestroyImageBuffer"],
-        "MaaStringBuffer": ["MaaDestroyStringBuffer"],
-        "MaaRect": ["MaaDestroyRectBuffer"]
+        "MaaImageBuffer": ["MaaDestroyImageBuffer"]
     },
+    "output": ["MaaStringBuffer"],
     "remove": [
         "MaaCustomControllerCreate",
         "MaaSetImageRawData",
@@ -31,6 +23,8 @@
         "MaaRegisterCustomAction",
         "MaaUnregisterCustomRecognizer",
         "MaaUnregisterCustomAction",
-        "/MaaSyncContext.*"
+        "/MaaSyncContext.+",
+        "/Maa.+Rect.*",
+        "/Maa.+String.*"
     ]
 }

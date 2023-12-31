@@ -16,6 +16,7 @@ interface Config {
   >
   opaque: string[]
   opaque_free: Record<string, string[]>
+  output: string[]
   remove: string[]
 }
 
@@ -98,6 +99,7 @@ async function main() {
     let cbId: string | null = null
     let cbParam: string | null = null
     let ctxPos: number | null = null
+    const outputCache: string[] = []
     for (const [idx, arg] of ic.argument.entries()) {
       if (arg.type in callback_ids) {
         ctxPos = idx + cfg.callback[arg.type]!.pass
@@ -146,6 +148,16 @@ async function main() {
         continue
       }
 
+      if (arg.type.endsWith(' *') && cfg.output.includes(arg.type.slice(0, -2))) {
+        const type = arg.type.slice(0, -2)
+        regen.add_sec(
+          `lhg.impl.${ic.name}.arg.${arg.name}`,
+          `    auto ${arg.name} = output_prepare<${type} *>();`
+        )
+        outputCache.push(arg.name)
+        continue
+      }
+
       regen.add_sec(
         `lhg.impl.${ic.name}.arg.${arg.name}`,
         `    auto ${arg.name}_temp = from_json<${arg.type}>(__param["${arg.name}"]);
@@ -172,18 +184,18 @@ async function main() {
         regen.add_sec(`lhg.impl.${ic.name}.return`, '    auto __ret = __return;')
       }
     }
-    if (ic.return === 'void') {
-      regen.add_sec(`lhg.impl.${ic.name}.final`, '    return json::object {};')
-    } else {
-      regen.add_sec(
-        `lhg.impl.${ic.name}.final`,
-        '    return json::object { { "return", to_json(__ret) } };'
-      )
-    }
+    const outputDic = outputCache.map(name => `{ "${name}", output_finalize(${name}) }`).join(', ')
+    regen.add_sec(
+      `lhg.impl.${ic.name}.final`,
+      `    return json::object { { "return", ${
+        ic.return === 'void' ? 'json::value(json::value::value_type::null)' : 'to_json(__ret)'
+      } }, ${outputDic} };`
+    )
     regen.add_raw('}\n')
   }
 
-  regen.add_raw('bool handle_request(Context& ctx, UrlSegments segs) {')
+  regen.add_raw(`bool handle_request(Context& ctx, UrlSegments segs) {
+    auto obj = json::parse(ctx.req_.body()).value_or(json::object {}).as_object();`)
   const convertPath = (str: string) => {
     return str
       .replace(/^./, match => match.toLowerCase())
@@ -194,7 +206,6 @@ async function main() {
   }
   for (const type in cfg.callback) {
     const cc = cfg.callback[type]!
-    const ret = /^(.+) \(\*\)/.exec(type)![1]!
     regen.add_raw(`    // callback ${cc.name}`)
     regen.add_raw(`    if (handle_callback("${cc.name}", ${
       cc.name
@@ -218,9 +229,7 @@ ${Array.from({ length: cc.all }, (_, k) => k)
     regen.add_raw(`    // ${ic.name} /${p.join('/')}
     segs.reset();`)
     regen.add_raw(`    if (${p.map(k => `segs.enter_path("${k}")`).join(' && ')} && segs.end()) {`)
-    regen.add_raw(`        auto body = json::parse(ctx.req_.body());
-        auto& obj = body.value().as_object();
-        auto ret = ${ic.name}_Wrapper(obj);
+    regen.add_raw(`        auto ret = ${ic.name}_Wrapper(obj);
         ctx.json_body(ret.value());
         return true;`)
     regen.add_raw('    }')
