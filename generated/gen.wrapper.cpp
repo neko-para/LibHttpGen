@@ -3284,657 +3284,575 @@ bool handle_request(Context& ctx, UrlSegments segs) {
     })) {
         return true;
     }
-    // MaaAdbControllerCreate /maa/adb/controller/create
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("adb") && segs.enter_path("controller") && segs.enter_path("create") && segs.end()) {
+    // MaaAdbControllerCreate
+    if (segs.enter_path("MaaAdbControllerCreate") && segs.end()) {
         std::string err;
         auto ret = MaaAdbControllerCreate_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaWin32ControllerCreate /maa/win32/controller/create
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("win32") && segs.enter_path("controller") && segs.enter_path("create") && segs.end()) {
+    // MaaWin32ControllerCreate
+    if (segs.enter_path("MaaWin32ControllerCreate") && segs.end()) {
         std::string err;
         auto ret = MaaWin32ControllerCreate_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaAdbControllerCreateV2 /maa/adb/controller/create/v2
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("adb") && segs.enter_path("controller") && segs.enter_path("create") && segs.enter_path("v2") && segs.end()) {
+    // MaaAdbControllerCreateV2
+    if (segs.enter_path("MaaAdbControllerCreateV2") && segs.end()) {
         std::string err;
         auto ret = MaaAdbControllerCreateV2_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaThriftControllerCreate /maa/thrift/controller/create
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("thrift") && segs.enter_path("controller") && segs.enter_path("create") && segs.end()) {
+    // MaaThriftControllerCreate
+    if (segs.enter_path("MaaThriftControllerCreate") && segs.end()) {
         std::string err;
         auto ret = MaaThriftControllerCreate_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaDbgControllerCreate /maa/dbg/controller/create
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("dbg") && segs.enter_path("controller") && segs.enter_path("create") && segs.end()) {
+    // MaaDbgControllerCreate
+    if (segs.enter_path("MaaDbgControllerCreate") && segs.end()) {
         std::string err;
         auto ret = MaaDbgControllerCreate_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaControllerDestroy /maa/controller/destroy
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("controller") && segs.enter_path("destroy") && segs.end()) {
+    // MaaControllerDestroy
+    if (segs.enter_path("MaaControllerDestroy") && segs.end()) {
         std::string err;
         auto ret = MaaControllerDestroy_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaControllerSetOption /maa/controller/set/option
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("controller") && segs.enter_path("set") && segs.enter_path("option") && segs.end()) {
+    // MaaControllerSetOption
+    if (segs.enter_path("MaaControllerSetOption") && segs.end()) {
         std::string err;
         auto ret = MaaControllerSetOption_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaControllerPostConnection /maa/controller/post/connection
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("controller") && segs.enter_path("post") && segs.enter_path("connection") && segs.end()) {
+    // MaaControllerPostConnection
+    if (segs.enter_path("MaaControllerPostConnection") && segs.end()) {
         std::string err;
         auto ret = MaaControllerPostConnection_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaControllerPostClick /maa/controller/post/click
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("controller") && segs.enter_path("post") && segs.enter_path("click") && segs.end()) {
+    // MaaControllerPostClick
+    if (segs.enter_path("MaaControllerPostClick") && segs.end()) {
         std::string err;
         auto ret = MaaControllerPostClick_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaControllerPostSwipe /maa/controller/post/swipe
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("controller") && segs.enter_path("post") && segs.enter_path("swipe") && segs.end()) {
+    // MaaControllerPostSwipe
+    if (segs.enter_path("MaaControllerPostSwipe") && segs.end()) {
         std::string err;
         auto ret = MaaControllerPostSwipe_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaControllerPostPressKey /maa/controller/post/press/key
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("controller") && segs.enter_path("post") && segs.enter_path("press") && segs.enter_path("key") && segs.end()) {
+    // MaaControllerPostPressKey
+    if (segs.enter_path("MaaControllerPostPressKey") && segs.end()) {
         std::string err;
         auto ret = MaaControllerPostPressKey_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaControllerPostInputText /maa/controller/post/input/text
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("controller") && segs.enter_path("post") && segs.enter_path("input") && segs.enter_path("text") && segs.end()) {
+    // MaaControllerPostInputText
+    if (segs.enter_path("MaaControllerPostInputText") && segs.end()) {
         std::string err;
         auto ret = MaaControllerPostInputText_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaControllerPostTouchDown /maa/controller/post/touch/down
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("controller") && segs.enter_path("post") && segs.enter_path("touch") && segs.enter_path("down") && segs.end()) {
+    // MaaControllerPostTouchDown
+    if (segs.enter_path("MaaControllerPostTouchDown") && segs.end()) {
         std::string err;
         auto ret = MaaControllerPostTouchDown_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaControllerPostTouchMove /maa/controller/post/touch/move
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("controller") && segs.enter_path("post") && segs.enter_path("touch") && segs.enter_path("move") && segs.end()) {
+    // MaaControllerPostTouchMove
+    if (segs.enter_path("MaaControllerPostTouchMove") && segs.end()) {
         std::string err;
         auto ret = MaaControllerPostTouchMove_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaControllerPostTouchUp /maa/controller/post/touch/up
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("controller") && segs.enter_path("post") && segs.enter_path("touch") && segs.enter_path("up") && segs.end()) {
+    // MaaControllerPostTouchUp
+    if (segs.enter_path("MaaControllerPostTouchUp") && segs.end()) {
         std::string err;
         auto ret = MaaControllerPostTouchUp_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaControllerPostScreencap /maa/controller/post/screencap
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("controller") && segs.enter_path("post") && segs.enter_path("screencap") && segs.end()) {
+    // MaaControllerPostScreencap
+    if (segs.enter_path("MaaControllerPostScreencap") && segs.end()) {
         std::string err;
         auto ret = MaaControllerPostScreencap_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaControllerStatus /maa/controller/status
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("controller") && segs.enter_path("status") && segs.end()) {
+    // MaaControllerStatus
+    if (segs.enter_path("MaaControllerStatus") && segs.end()) {
         std::string err;
         auto ret = MaaControllerStatus_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaControllerWait /maa/controller/wait
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("controller") && segs.enter_path("wait") && segs.end()) {
+    // MaaControllerWait
+    if (segs.enter_path("MaaControllerWait") && segs.end()) {
         std::string err;
         auto ret = MaaControllerWait_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaControllerConnected /maa/controller/connected
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("controller") && segs.enter_path("connected") && segs.end()) {
+    // MaaControllerConnected
+    if (segs.enter_path("MaaControllerConnected") && segs.end()) {
         std::string err;
         auto ret = MaaControllerConnected_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaControllerGetImage /maa/controller/get/image
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("controller") && segs.enter_path("get") && segs.enter_path("image") && segs.end()) {
+    // MaaControllerGetImage
+    if (segs.enter_path("MaaControllerGetImage") && segs.end()) {
         std::string err;
         auto ret = MaaControllerGetImage_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaControllerGetUUID /maa/controller/get/uuid
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("controller") && segs.enter_path("get") && segs.enter_path("uuid") && segs.end()) {
+    // MaaControllerGetUUID
+    if (segs.enter_path("MaaControllerGetUUID") && segs.end()) {
         std::string err;
         auto ret = MaaControllerGetUUID_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaCreate /maa/create
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("create") && segs.end()) {
+    // MaaCreate
+    if (segs.enter_path("MaaCreate") && segs.end()) {
         std::string err;
         auto ret = MaaCreate_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaDestroy /maa/destroy
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("destroy") && segs.end()) {
+    // MaaDestroy
+    if (segs.enter_path("MaaDestroy") && segs.end()) {
         std::string err;
         auto ret = MaaDestroy_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaSetOption /maa/set/option
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("set") && segs.enter_path("option") && segs.end()) {
+    // MaaSetOption
+    if (segs.enter_path("MaaSetOption") && segs.end()) {
         std::string err;
         auto ret = MaaSetOption_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaBindResource /maa/bind/resource
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("bind") && segs.enter_path("resource") && segs.end()) {
+    // MaaBindResource
+    if (segs.enter_path("MaaBindResource") && segs.end()) {
         std::string err;
         auto ret = MaaBindResource_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaBindController /maa/bind/controller
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("bind") && segs.enter_path("controller") && segs.end()) {
+    // MaaBindController
+    if (segs.enter_path("MaaBindController") && segs.end()) {
         std::string err;
         auto ret = MaaBindController_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaInited /maa/inited
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("inited") && segs.end()) {
+    // MaaInited
+    if (segs.enter_path("MaaInited") && segs.end()) {
         std::string err;
         auto ret = MaaInited_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaClearCustomRecognizer /maa/clear/custom/recognizer
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("clear") && segs.enter_path("custom") && segs.enter_path("recognizer") && segs.end()) {
+    // MaaClearCustomRecognizer
+    if (segs.enter_path("MaaClearCustomRecognizer") && segs.end()) {
         std::string err;
         auto ret = MaaClearCustomRecognizer_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaClearCustomAction /maa/clear/custom/action
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("clear") && segs.enter_path("custom") && segs.enter_path("action") && segs.end()) {
+    // MaaClearCustomAction
+    if (segs.enter_path("MaaClearCustomAction") && segs.end()) {
         std::string err;
         auto ret = MaaClearCustomAction_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaPostTask /maa/post/task
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("post") && segs.enter_path("task") && segs.end()) {
+    // MaaPostTask
+    if (segs.enter_path("MaaPostTask") && segs.end()) {
         std::string err;
         auto ret = MaaPostTask_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaSetTaskParam /maa/set/task/param
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("set") && segs.enter_path("task") && segs.enter_path("param") && segs.end()) {
+    // MaaSetTaskParam
+    if (segs.enter_path("MaaSetTaskParam") && segs.end()) {
         std::string err;
         auto ret = MaaSetTaskParam_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaTaskStatus /maa/task/status
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("task") && segs.enter_path("status") && segs.end()) {
+    // MaaTaskStatus
+    if (segs.enter_path("MaaTaskStatus") && segs.end()) {
         std::string err;
         auto ret = MaaTaskStatus_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaWaitTask /maa/wait/task
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("wait") && segs.enter_path("task") && segs.end()) {
+    // MaaWaitTask
+    if (segs.enter_path("MaaWaitTask") && segs.end()) {
         std::string err;
         auto ret = MaaWaitTask_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaTaskAllFinished /maa/task/all/finished
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("task") && segs.enter_path("all") && segs.enter_path("finished") && segs.end()) {
+    // MaaTaskAllFinished
+    if (segs.enter_path("MaaTaskAllFinished") && segs.end()) {
         std::string err;
         auto ret = MaaTaskAllFinished_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaPostStop /maa/post/stop
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("post") && segs.enter_path("stop") && segs.end()) {
+    // MaaPostStop
+    if (segs.enter_path("MaaPostStop") && segs.end()) {
         std::string err;
         auto ret = MaaPostStop_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaStop /maa/stop
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("stop") && segs.end()) {
+    // MaaStop
+    if (segs.enter_path("MaaStop") && segs.end()) {
         std::string err;
         auto ret = MaaStop_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaGetResource /maa/get/resource
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("get") && segs.enter_path("resource") && segs.end()) {
+    // MaaGetResource
+    if (segs.enter_path("MaaGetResource") && segs.end()) {
         std::string err;
         auto ret = MaaGetResource_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaGetController /maa/get/controller
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("get") && segs.enter_path("controller") && segs.end()) {
+    // MaaGetController
+    if (segs.enter_path("MaaGetController") && segs.end()) {
         std::string err;
         auto ret = MaaGetController_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaResourceCreate /maa/resource/create
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("resource") && segs.enter_path("create") && segs.end()) {
+    // MaaResourceCreate
+    if (segs.enter_path("MaaResourceCreate") && segs.end()) {
         std::string err;
         auto ret = MaaResourceCreate_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaResourceDestroy /maa/resource/destroy
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("resource") && segs.enter_path("destroy") && segs.end()) {
+    // MaaResourceDestroy
+    if (segs.enter_path("MaaResourceDestroy") && segs.end()) {
         std::string err;
         auto ret = MaaResourceDestroy_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaResourcePostPath /maa/resource/post/path
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("resource") && segs.enter_path("post") && segs.enter_path("path") && segs.end()) {
+    // MaaResourcePostPath
+    if (segs.enter_path("MaaResourcePostPath") && segs.end()) {
         std::string err;
         auto ret = MaaResourcePostPath_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaResourceStatus /maa/resource/status
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("resource") && segs.enter_path("status") && segs.end()) {
+    // MaaResourceStatus
+    if (segs.enter_path("MaaResourceStatus") && segs.end()) {
         std::string err;
         auto ret = MaaResourceStatus_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaResourceWait /maa/resource/wait
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("resource") && segs.enter_path("wait") && segs.end()) {
+    // MaaResourceWait
+    if (segs.enter_path("MaaResourceWait") && segs.end()) {
         std::string err;
         auto ret = MaaResourceWait_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaResourceLoaded /maa/resource/loaded
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("resource") && segs.enter_path("loaded") && segs.end()) {
+    // MaaResourceLoaded
+    if (segs.enter_path("MaaResourceLoaded") && segs.end()) {
         std::string err;
         auto ret = MaaResourceLoaded_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaResourceSetOption /maa/resource/set/option
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("resource") && segs.enter_path("set") && segs.enter_path("option") && segs.end()) {
+    // MaaResourceSetOption
+    if (segs.enter_path("MaaResourceSetOption") && segs.end()) {
         std::string err;
         auto ret = MaaResourceSetOption_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaResourceGetHash /maa/resource/get/hash
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("resource") && segs.enter_path("get") && segs.enter_path("hash") && segs.end()) {
+    // MaaResourceGetHash
+    if (segs.enter_path("MaaResourceGetHash") && segs.end()) {
         std::string err;
         auto ret = MaaResourceGetHash_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaResourceGetTaskList /maa/resource/get/task/list
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("resource") && segs.enter_path("get") && segs.enter_path("task") && segs.enter_path("list") && segs.end()) {
+    // MaaResourceGetTaskList
+    if (segs.enter_path("MaaResourceGetTaskList") && segs.end()) {
         std::string err;
         auto ret = MaaResourceGetTaskList_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaCreateImageBuffer /maa/create/image/buffer
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("create") && segs.enter_path("image") && segs.enter_path("buffer") && segs.end()) {
+    // MaaCreateImageBuffer
+    if (segs.enter_path("MaaCreateImageBuffer") && segs.end()) {
         std::string err;
         auto ret = MaaCreateImageBuffer_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaDestroyImageBuffer /maa/destroy/image/buffer
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("destroy") && segs.enter_path("image") && segs.enter_path("buffer") && segs.end()) {
+    // MaaDestroyImageBuffer
+    if (segs.enter_path("MaaDestroyImageBuffer") && segs.end()) {
         std::string err;
         auto ret = MaaDestroyImageBuffer_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaIsImageEmpty /maa/is/image/empty
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("is") && segs.enter_path("image") && segs.enter_path("empty") && segs.end()) {
+    // MaaIsImageEmpty
+    if (segs.enter_path("MaaIsImageEmpty") && segs.end()) {
         std::string err;
         auto ret = MaaIsImageEmpty_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaClearImage /maa/clear/image
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("clear") && segs.enter_path("image") && segs.end()) {
+    // MaaClearImage
+    if (segs.enter_path("MaaClearImage") && segs.end()) {
         std::string err;
         auto ret = MaaClearImage_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaGetImageRawData /maa/get/image/raw/data
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("get") && segs.enter_path("image") && segs.enter_path("raw") && segs.enter_path("data") && segs.end()) {
+    // MaaGetImageRawData
+    if (segs.enter_path("MaaGetImageRawData") && segs.end()) {
         std::string err;
         auto ret = MaaGetImageRawData_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaGetImageWidth /maa/get/image/width
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("get") && segs.enter_path("image") && segs.enter_path("width") && segs.end()) {
+    // MaaGetImageWidth
+    if (segs.enter_path("MaaGetImageWidth") && segs.end()) {
         std::string err;
         auto ret = MaaGetImageWidth_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaGetImageHeight /maa/get/image/height
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("get") && segs.enter_path("image") && segs.enter_path("height") && segs.end()) {
+    // MaaGetImageHeight
+    if (segs.enter_path("MaaGetImageHeight") && segs.end()) {
         std::string err;
         auto ret = MaaGetImageHeight_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaGetImageType /maa/get/image/type
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("get") && segs.enter_path("image") && segs.enter_path("type") && segs.end()) {
+    // MaaGetImageType
+    if (segs.enter_path("MaaGetImageType") && segs.end()) {
         std::string err;
         auto ret = MaaGetImageType_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaGetImageEncoded /maa/get/image/encoded
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("get") && segs.enter_path("image") && segs.enter_path("encoded") && segs.end()) {
+    // MaaGetImageEncoded
+    if (segs.enter_path("MaaGetImageEncoded") && segs.end()) {
         std::string err;
         auto ret = MaaGetImageEncoded_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaGetImageEncodedSize /maa/get/image/encoded/size
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("get") && segs.enter_path("image") && segs.enter_path("encoded") && segs.enter_path("size") && segs.end()) {
+    // MaaGetImageEncodedSize
+    if (segs.enter_path("MaaGetImageEncodedSize") && segs.end()) {
         std::string err;
         auto ret = MaaGetImageEncodedSize_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaSetImageEncoded /maa/set/image/encoded
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("set") && segs.enter_path("image") && segs.enter_path("encoded") && segs.end()) {
+    // MaaSetImageEncoded
+    if (segs.enter_path("MaaSetImageEncoded") && segs.end()) {
         std::string err;
         auto ret = MaaSetImageEncoded_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaVersion /maa/version
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("version") && segs.end()) {
+    // MaaVersion
+    if (segs.enter_path("MaaVersion") && segs.end()) {
         std::string err;
         auto ret = MaaVersion_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaSetGlobalOption /maa/set/global/option
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("set") && segs.enter_path("global") && segs.enter_path("option") && segs.end()) {
+    // MaaSetGlobalOption
+    if (segs.enter_path("MaaSetGlobalOption") && segs.end()) {
         std::string err;
         auto ret = MaaSetGlobalOption_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitInit /maa/tool/kit/init
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("init") && segs.end()) {
+    // MaaToolKitInit
+    if (segs.enter_path("MaaToolKitInit") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitInit_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitUninit /maa/tool/kit/uninit
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("uninit") && segs.end()) {
+    // MaaToolKitUninit
+    if (segs.enter_path("MaaToolKitUninit") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitUninit_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitFindDevice /maa/tool/kit/find/device
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("find") && segs.enter_path("device") && segs.end()) {
+    // MaaToolKitFindDevice
+    if (segs.enter_path("MaaToolKitFindDevice") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitFindDevice_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitFindDeviceWithAdb /maa/tool/kit/find/device/with/adb
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("find") && segs.enter_path("device") && segs.enter_path("with") && segs.enter_path("adb") && segs.end()) {
+    // MaaToolKitFindDeviceWithAdb
+    if (segs.enter_path("MaaToolKitFindDeviceWithAdb") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitFindDeviceWithAdb_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitPostFindDevice /maa/tool/kit/post/find/device
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("post") && segs.enter_path("find") && segs.enter_path("device") && segs.end()) {
+    // MaaToolKitPostFindDevice
+    if (segs.enter_path("MaaToolKitPostFindDevice") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitPostFindDevice_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitPostFindDeviceWithAdb /maa/tool/kit/post/find/device/with/adb
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("post") && segs.enter_path("find") && segs.enter_path("device") && segs.enter_path("with") && segs.enter_path("adb") && segs.end()) {
+    // MaaToolKitPostFindDeviceWithAdb
+    if (segs.enter_path("MaaToolKitPostFindDeviceWithAdb") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitPostFindDeviceWithAdb_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitIsFindDeviceCompleted /maa/tool/kit/is/find/device/completed
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("is") && segs.enter_path("find") && segs.enter_path("device") && segs.enter_path("completed") && segs.end()) {
+    // MaaToolKitIsFindDeviceCompleted
+    if (segs.enter_path("MaaToolKitIsFindDeviceCompleted") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitIsFindDeviceCompleted_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitWaitForFindDeviceToComplete /maa/tool/kit/wait/for/find/device/to/complete
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("wait") && segs.enter_path("for") && segs.enter_path("find") && segs.enter_path("device") && segs.enter_path("to") && segs.enter_path("complete") && segs.end()) {
+    // MaaToolKitWaitForFindDeviceToComplete
+    if (segs.enter_path("MaaToolKitWaitForFindDeviceToComplete") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitWaitForFindDeviceToComplete_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitGetDeviceCount /maa/tool/kit/get/device/count
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("get") && segs.enter_path("device") && segs.enter_path("count") && segs.end()) {
+    // MaaToolKitGetDeviceCount
+    if (segs.enter_path("MaaToolKitGetDeviceCount") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitGetDeviceCount_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitGetDeviceName /maa/tool/kit/get/device/name
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("get") && segs.enter_path("device") && segs.enter_path("name") && segs.end()) {
+    // MaaToolKitGetDeviceName
+    if (segs.enter_path("MaaToolKitGetDeviceName") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitGetDeviceName_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitGetDeviceAdbPath /maa/tool/kit/get/device/adb/path
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("get") && segs.enter_path("device") && segs.enter_path("adb") && segs.enter_path("path") && segs.end()) {
+    // MaaToolKitGetDeviceAdbPath
+    if (segs.enter_path("MaaToolKitGetDeviceAdbPath") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitGetDeviceAdbPath_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitGetDeviceAdbSerial /maa/tool/kit/get/device/adb/serial
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("get") && segs.enter_path("device") && segs.enter_path("adb") && segs.enter_path("serial") && segs.end()) {
+    // MaaToolKitGetDeviceAdbSerial
+    if (segs.enter_path("MaaToolKitGetDeviceAdbSerial") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitGetDeviceAdbSerial_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitGetDeviceAdbControllerType /maa/tool/kit/get/device/adb/controller/type
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("get") && segs.enter_path("device") && segs.enter_path("adb") && segs.enter_path("controller") && segs.enter_path("type") && segs.end()) {
+    // MaaToolKitGetDeviceAdbControllerType
+    if (segs.enter_path("MaaToolKitGetDeviceAdbControllerType") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitGetDeviceAdbControllerType_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitGetDeviceAdbConfig /maa/tool/kit/get/device/adb/config
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("get") && segs.enter_path("device") && segs.enter_path("adb") && segs.enter_path("config") && segs.end()) {
+    // MaaToolKitGetDeviceAdbConfig
+    if (segs.enter_path("MaaToolKitGetDeviceAdbConfig") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitGetDeviceAdbConfig_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitRegisterCustomRecognizerExecutor /maa/tool/kit/register/custom/recognizer/executor
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("register") && segs.enter_path("custom") && segs.enter_path("recognizer") && segs.enter_path("executor") && segs.end()) {
+    // MaaToolKitRegisterCustomRecognizerExecutor
+    if (segs.enter_path("MaaToolKitRegisterCustomRecognizerExecutor") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitRegisterCustomRecognizerExecutor_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitUnregisterCustomRecognizerExecutor /maa/tool/kit/unregister/custom/recognizer/executor
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("unregister") && segs.enter_path("custom") && segs.enter_path("recognizer") && segs.enter_path("executor") && segs.end()) {
+    // MaaToolKitUnregisterCustomRecognizerExecutor
+    if (segs.enter_path("MaaToolKitUnregisterCustomRecognizerExecutor") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitUnregisterCustomRecognizerExecutor_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitRegisterCustomActionExecutor /maa/tool/kit/register/custom/action/executor
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("register") && segs.enter_path("custom") && segs.enter_path("action") && segs.enter_path("executor") && segs.end()) {
+    // MaaToolKitRegisterCustomActionExecutor
+    if (segs.enter_path("MaaToolKitRegisterCustomActionExecutor") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitRegisterCustomActionExecutor_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitUnregisterCustomActionExecutor /maa/tool/kit/unregister/custom/action/executor
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("unregister") && segs.enter_path("custom") && segs.enter_path("action") && segs.enter_path("executor") && segs.end()) {
+    // MaaToolKitUnregisterCustomActionExecutor
+    if (segs.enter_path("MaaToolKitUnregisterCustomActionExecutor") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitUnregisterCustomActionExecutor_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitFindWindow /maa/tool/kit/find/window
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("find") && segs.enter_path("window") && segs.end()) {
+    // MaaToolKitFindWindow
+    if (segs.enter_path("MaaToolKitFindWindow") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitFindWindow_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitSearchWindow /maa/tool/kit/search/window
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("search") && segs.enter_path("window") && segs.end()) {
+    // MaaToolKitSearchWindow
+    if (segs.enter_path("MaaToolKitSearchWindow") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitSearchWindow_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitGetWindow /maa/tool/kit/get/window
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("get") && segs.enter_path("window") && segs.end()) {
+    // MaaToolKitGetWindow
+    if (segs.enter_path("MaaToolKitGetWindow") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitGetWindow_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
-    // MaaToolKitGetCursorWindow /maa/tool/kit/get/cursor/window
-    segs.reset();
-    if (segs.enter_path("maa") && segs.enter_path("tool") && segs.enter_path("kit") && segs.enter_path("get") && segs.enter_path("cursor") && segs.enter_path("window") && segs.end()) {
+    // MaaToolKitGetCursorWindow
+    if (segs.enter_path("MaaToolKitGetCursorWindow") && segs.end()) {
         std::string err;
         auto ret = MaaToolKitGetCursorWindow_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));

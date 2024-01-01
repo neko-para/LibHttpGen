@@ -242,14 +242,6 @@ async function main() {
 
   regen.add_raw(`bool handle_request(Context& ctx, UrlSegments segs) {
     auto obj = json::parse(ctx.req_.body()).value_or(json::object {}).as_object();`)
-  const convertPath = (str: string) => {
-    return str
-      .replace(/^./, match => match.toLowerCase())
-      .replace(/([A-Z][a-z]+)/g, ' $1')
-      .replace(/([A-Z]+)(?![A-Z])/g, ' $1')
-      .split(/ +/)
-      .map(part => part.toLowerCase())
-  }
   for (const type in cfg.callback) {
     const cc = cfg.callback[type]!
     regen.add_raw(`    // callback ${cc.name}`)
@@ -271,10 +263,8 @@ ${Array.from({ length: cc.all }, (_, k) => k)
     }`)
   }
   for (const ic of int.interface) {
-    const p = convertPath(ic.name)
-    regen.add_raw(`    // ${ic.name} /${p.join('/')}
-    segs.reset();`)
-    regen.add_raw(`    if (${p.map(k => `segs.enter_path("${k}")`).join(' && ')} && segs.end()) {`)
+    regen.add_raw(`    // ${ic.name}`)
+    regen.add_raw(`    if (segs.enter_path("${ic.name}") && segs.end()) {`)
     regen.add_raw(`        std::string err;
         auto ret = ${ic.name}_Wrapper(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
