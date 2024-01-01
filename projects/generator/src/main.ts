@@ -262,15 +262,24 @@ ${Array.from({ length: cc.all }, (_, k) => k)
         return true;
     }`)
   }
+  regen.add_raw(
+    `    const static std::map<std::string, std::optional<json::object> (*)(json::object, std::string&)> wrappers = {`
+  )
   for (const ic of int.interface) {
-    regen.add_raw(`    // ${ic.name}`)
-    regen.add_raw(`    if (segs.enter_path("${ic.name}") && segs.end()) {`)
-    regen.add_raw(`        std::string err;
-        auto ret = ${ic.name}_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;`)
-    regen.add_raw('    }')
+    regen.add_raw(`        { "${ic.name}", &${ic.name}_Wrapper },`)
   }
+  regen.add_raw(`    };
+    std::string api;
+    if (segs.enter_id(api) && segs.end()) {
+        auto it = wrappers.find(api);
+        if (it == wrappers.end()) {
+          return false;
+        }
+        std::string err;
+        auto ret = (it->second)(obj, err);
+        ctx.json_body(ret.value_or(json::object { { "error", err } }));
+        return true;
+    }`)
   regen.add_raw('    return false;\n}')
 
   await regen.save(source_path)

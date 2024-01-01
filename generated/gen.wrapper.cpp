@@ -3284,577 +3284,98 @@ bool handle_request(Context& ctx, UrlSegments segs) {
     })) {
         return true;
     }
-    // MaaAdbControllerCreate
-    if (segs.enter_path("MaaAdbControllerCreate") && segs.end()) {
-        std::string err;
-        auto ret = MaaAdbControllerCreate_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaWin32ControllerCreate
-    if (segs.enter_path("MaaWin32ControllerCreate") && segs.end()) {
-        std::string err;
-        auto ret = MaaWin32ControllerCreate_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaAdbControllerCreateV2
-    if (segs.enter_path("MaaAdbControllerCreateV2") && segs.end()) {
-        std::string err;
-        auto ret = MaaAdbControllerCreateV2_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaThriftControllerCreate
-    if (segs.enter_path("MaaThriftControllerCreate") && segs.end()) {
-        std::string err;
-        auto ret = MaaThriftControllerCreate_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaDbgControllerCreate
-    if (segs.enter_path("MaaDbgControllerCreate") && segs.end()) {
-        std::string err;
-        auto ret = MaaDbgControllerCreate_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaControllerDestroy
-    if (segs.enter_path("MaaControllerDestroy") && segs.end()) {
-        std::string err;
-        auto ret = MaaControllerDestroy_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaControllerSetOption
-    if (segs.enter_path("MaaControllerSetOption") && segs.end()) {
-        std::string err;
-        auto ret = MaaControllerSetOption_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaControllerPostConnection
-    if (segs.enter_path("MaaControllerPostConnection") && segs.end()) {
-        std::string err;
-        auto ret = MaaControllerPostConnection_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaControllerPostClick
-    if (segs.enter_path("MaaControllerPostClick") && segs.end()) {
-        std::string err;
-        auto ret = MaaControllerPostClick_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaControllerPostSwipe
-    if (segs.enter_path("MaaControllerPostSwipe") && segs.end()) {
-        std::string err;
-        auto ret = MaaControllerPostSwipe_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaControllerPostPressKey
-    if (segs.enter_path("MaaControllerPostPressKey") && segs.end()) {
-        std::string err;
-        auto ret = MaaControllerPostPressKey_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaControllerPostInputText
-    if (segs.enter_path("MaaControllerPostInputText") && segs.end()) {
-        std::string err;
-        auto ret = MaaControllerPostInputText_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaControllerPostTouchDown
-    if (segs.enter_path("MaaControllerPostTouchDown") && segs.end()) {
-        std::string err;
-        auto ret = MaaControllerPostTouchDown_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaControllerPostTouchMove
-    if (segs.enter_path("MaaControllerPostTouchMove") && segs.end()) {
-        std::string err;
-        auto ret = MaaControllerPostTouchMove_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaControllerPostTouchUp
-    if (segs.enter_path("MaaControllerPostTouchUp") && segs.end()) {
-        std::string err;
-        auto ret = MaaControllerPostTouchUp_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaControllerPostScreencap
-    if (segs.enter_path("MaaControllerPostScreencap") && segs.end()) {
-        std::string err;
-        auto ret = MaaControllerPostScreencap_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaControllerStatus
-    if (segs.enter_path("MaaControllerStatus") && segs.end()) {
-        std::string err;
-        auto ret = MaaControllerStatus_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaControllerWait
-    if (segs.enter_path("MaaControllerWait") && segs.end()) {
-        std::string err;
-        auto ret = MaaControllerWait_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaControllerConnected
-    if (segs.enter_path("MaaControllerConnected") && segs.end()) {
-        std::string err;
-        auto ret = MaaControllerConnected_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaControllerGetImage
-    if (segs.enter_path("MaaControllerGetImage") && segs.end()) {
-        std::string err;
-        auto ret = MaaControllerGetImage_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaControllerGetUUID
-    if (segs.enter_path("MaaControllerGetUUID") && segs.end()) {
-        std::string err;
-        auto ret = MaaControllerGetUUID_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaCreate
-    if (segs.enter_path("MaaCreate") && segs.end()) {
-        std::string err;
-        auto ret = MaaCreate_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaDestroy
-    if (segs.enter_path("MaaDestroy") && segs.end()) {
-        std::string err;
-        auto ret = MaaDestroy_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaSetOption
-    if (segs.enter_path("MaaSetOption") && segs.end()) {
-        std::string err;
-        auto ret = MaaSetOption_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaBindResource
-    if (segs.enter_path("MaaBindResource") && segs.end()) {
-        std::string err;
-        auto ret = MaaBindResource_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaBindController
-    if (segs.enter_path("MaaBindController") && segs.end()) {
-        std::string err;
-        auto ret = MaaBindController_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaInited
-    if (segs.enter_path("MaaInited") && segs.end()) {
-        std::string err;
-        auto ret = MaaInited_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaClearCustomRecognizer
-    if (segs.enter_path("MaaClearCustomRecognizer") && segs.end()) {
-        std::string err;
-        auto ret = MaaClearCustomRecognizer_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaClearCustomAction
-    if (segs.enter_path("MaaClearCustomAction") && segs.end()) {
-        std::string err;
-        auto ret = MaaClearCustomAction_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaPostTask
-    if (segs.enter_path("MaaPostTask") && segs.end()) {
-        std::string err;
-        auto ret = MaaPostTask_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaSetTaskParam
-    if (segs.enter_path("MaaSetTaskParam") && segs.end()) {
-        std::string err;
-        auto ret = MaaSetTaskParam_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaTaskStatus
-    if (segs.enter_path("MaaTaskStatus") && segs.end()) {
-        std::string err;
-        auto ret = MaaTaskStatus_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaWaitTask
-    if (segs.enter_path("MaaWaitTask") && segs.end()) {
-        std::string err;
-        auto ret = MaaWaitTask_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaTaskAllFinished
-    if (segs.enter_path("MaaTaskAllFinished") && segs.end()) {
-        std::string err;
-        auto ret = MaaTaskAllFinished_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaPostStop
-    if (segs.enter_path("MaaPostStop") && segs.end()) {
-        std::string err;
-        auto ret = MaaPostStop_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaStop
-    if (segs.enter_path("MaaStop") && segs.end()) {
-        std::string err;
-        auto ret = MaaStop_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaGetResource
-    if (segs.enter_path("MaaGetResource") && segs.end()) {
-        std::string err;
-        auto ret = MaaGetResource_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaGetController
-    if (segs.enter_path("MaaGetController") && segs.end()) {
-        std::string err;
-        auto ret = MaaGetController_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaResourceCreate
-    if (segs.enter_path("MaaResourceCreate") && segs.end()) {
-        std::string err;
-        auto ret = MaaResourceCreate_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaResourceDestroy
-    if (segs.enter_path("MaaResourceDestroy") && segs.end()) {
-        std::string err;
-        auto ret = MaaResourceDestroy_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaResourcePostPath
-    if (segs.enter_path("MaaResourcePostPath") && segs.end()) {
-        std::string err;
-        auto ret = MaaResourcePostPath_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaResourceStatus
-    if (segs.enter_path("MaaResourceStatus") && segs.end()) {
-        std::string err;
-        auto ret = MaaResourceStatus_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaResourceWait
-    if (segs.enter_path("MaaResourceWait") && segs.end()) {
-        std::string err;
-        auto ret = MaaResourceWait_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaResourceLoaded
-    if (segs.enter_path("MaaResourceLoaded") && segs.end()) {
-        std::string err;
-        auto ret = MaaResourceLoaded_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaResourceSetOption
-    if (segs.enter_path("MaaResourceSetOption") && segs.end()) {
-        std::string err;
-        auto ret = MaaResourceSetOption_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaResourceGetHash
-    if (segs.enter_path("MaaResourceGetHash") && segs.end()) {
-        std::string err;
-        auto ret = MaaResourceGetHash_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaResourceGetTaskList
-    if (segs.enter_path("MaaResourceGetTaskList") && segs.end()) {
-        std::string err;
-        auto ret = MaaResourceGetTaskList_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaCreateImageBuffer
-    if (segs.enter_path("MaaCreateImageBuffer") && segs.end()) {
-        std::string err;
-        auto ret = MaaCreateImageBuffer_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaDestroyImageBuffer
-    if (segs.enter_path("MaaDestroyImageBuffer") && segs.end()) {
-        std::string err;
-        auto ret = MaaDestroyImageBuffer_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaIsImageEmpty
-    if (segs.enter_path("MaaIsImageEmpty") && segs.end()) {
-        std::string err;
-        auto ret = MaaIsImageEmpty_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaClearImage
-    if (segs.enter_path("MaaClearImage") && segs.end()) {
-        std::string err;
-        auto ret = MaaClearImage_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaGetImageRawData
-    if (segs.enter_path("MaaGetImageRawData") && segs.end()) {
-        std::string err;
-        auto ret = MaaGetImageRawData_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaGetImageWidth
-    if (segs.enter_path("MaaGetImageWidth") && segs.end()) {
-        std::string err;
-        auto ret = MaaGetImageWidth_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaGetImageHeight
-    if (segs.enter_path("MaaGetImageHeight") && segs.end()) {
-        std::string err;
-        auto ret = MaaGetImageHeight_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaGetImageType
-    if (segs.enter_path("MaaGetImageType") && segs.end()) {
-        std::string err;
-        auto ret = MaaGetImageType_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaGetImageEncoded
-    if (segs.enter_path("MaaGetImageEncoded") && segs.end()) {
-        std::string err;
-        auto ret = MaaGetImageEncoded_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaGetImageEncodedSize
-    if (segs.enter_path("MaaGetImageEncodedSize") && segs.end()) {
-        std::string err;
-        auto ret = MaaGetImageEncodedSize_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaSetImageEncoded
-    if (segs.enter_path("MaaSetImageEncoded") && segs.end()) {
-        std::string err;
-        auto ret = MaaSetImageEncoded_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaVersion
-    if (segs.enter_path("MaaVersion") && segs.end()) {
-        std::string err;
-        auto ret = MaaVersion_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaSetGlobalOption
-    if (segs.enter_path("MaaSetGlobalOption") && segs.end()) {
-        std::string err;
-        auto ret = MaaSetGlobalOption_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitInit
-    if (segs.enter_path("MaaToolKitInit") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitInit_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitUninit
-    if (segs.enter_path("MaaToolKitUninit") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitUninit_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitFindDevice
-    if (segs.enter_path("MaaToolKitFindDevice") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitFindDevice_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitFindDeviceWithAdb
-    if (segs.enter_path("MaaToolKitFindDeviceWithAdb") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitFindDeviceWithAdb_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitPostFindDevice
-    if (segs.enter_path("MaaToolKitPostFindDevice") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitPostFindDevice_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitPostFindDeviceWithAdb
-    if (segs.enter_path("MaaToolKitPostFindDeviceWithAdb") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitPostFindDeviceWithAdb_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitIsFindDeviceCompleted
-    if (segs.enter_path("MaaToolKitIsFindDeviceCompleted") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitIsFindDeviceCompleted_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitWaitForFindDeviceToComplete
-    if (segs.enter_path("MaaToolKitWaitForFindDeviceToComplete") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitWaitForFindDeviceToComplete_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitGetDeviceCount
-    if (segs.enter_path("MaaToolKitGetDeviceCount") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitGetDeviceCount_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitGetDeviceName
-    if (segs.enter_path("MaaToolKitGetDeviceName") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitGetDeviceName_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitGetDeviceAdbPath
-    if (segs.enter_path("MaaToolKitGetDeviceAdbPath") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitGetDeviceAdbPath_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitGetDeviceAdbSerial
-    if (segs.enter_path("MaaToolKitGetDeviceAdbSerial") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitGetDeviceAdbSerial_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitGetDeviceAdbControllerType
-    if (segs.enter_path("MaaToolKitGetDeviceAdbControllerType") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitGetDeviceAdbControllerType_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitGetDeviceAdbConfig
-    if (segs.enter_path("MaaToolKitGetDeviceAdbConfig") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitGetDeviceAdbConfig_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitRegisterCustomRecognizerExecutor
-    if (segs.enter_path("MaaToolKitRegisterCustomRecognizerExecutor") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitRegisterCustomRecognizerExecutor_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitUnregisterCustomRecognizerExecutor
-    if (segs.enter_path("MaaToolKitUnregisterCustomRecognizerExecutor") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitUnregisterCustomRecognizerExecutor_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitRegisterCustomActionExecutor
-    if (segs.enter_path("MaaToolKitRegisterCustomActionExecutor") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitRegisterCustomActionExecutor_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitUnregisterCustomActionExecutor
-    if (segs.enter_path("MaaToolKitUnregisterCustomActionExecutor") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitUnregisterCustomActionExecutor_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitFindWindow
-    if (segs.enter_path("MaaToolKitFindWindow") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitFindWindow_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitSearchWindow
-    if (segs.enter_path("MaaToolKitSearchWindow") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitSearchWindow_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitGetWindow
-    if (segs.enter_path("MaaToolKitGetWindow") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitGetWindow_Wrapper(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
-        return true;
-    }
-    // MaaToolKitGetCursorWindow
-    if (segs.enter_path("MaaToolKitGetCursorWindow") && segs.end()) {
-        std::string err;
-        auto ret = MaaToolKitGetCursorWindow_Wrapper(obj, err);
+    const static std::map<std::string, std::optional<json::object> (*)(json::object, std::string&)> wrappers = {
+        { "MaaAdbControllerCreate", &MaaAdbControllerCreate_Wrapper },
+        { "MaaWin32ControllerCreate", &MaaWin32ControllerCreate_Wrapper },
+        { "MaaAdbControllerCreateV2", &MaaAdbControllerCreateV2_Wrapper },
+        { "MaaThriftControllerCreate", &MaaThriftControllerCreate_Wrapper },
+        { "MaaDbgControllerCreate", &MaaDbgControllerCreate_Wrapper },
+        { "MaaControllerDestroy", &MaaControllerDestroy_Wrapper },
+        { "MaaControllerSetOption", &MaaControllerSetOption_Wrapper },
+        { "MaaControllerPostConnection", &MaaControllerPostConnection_Wrapper },
+        { "MaaControllerPostClick", &MaaControllerPostClick_Wrapper },
+        { "MaaControllerPostSwipe", &MaaControllerPostSwipe_Wrapper },
+        { "MaaControllerPostPressKey", &MaaControllerPostPressKey_Wrapper },
+        { "MaaControllerPostInputText", &MaaControllerPostInputText_Wrapper },
+        { "MaaControllerPostTouchDown", &MaaControllerPostTouchDown_Wrapper },
+        { "MaaControllerPostTouchMove", &MaaControllerPostTouchMove_Wrapper },
+        { "MaaControllerPostTouchUp", &MaaControllerPostTouchUp_Wrapper },
+        { "MaaControllerPostScreencap", &MaaControllerPostScreencap_Wrapper },
+        { "MaaControllerStatus", &MaaControllerStatus_Wrapper },
+        { "MaaControllerWait", &MaaControllerWait_Wrapper },
+        { "MaaControllerConnected", &MaaControllerConnected_Wrapper },
+        { "MaaControllerGetImage", &MaaControllerGetImage_Wrapper },
+        { "MaaControllerGetUUID", &MaaControllerGetUUID_Wrapper },
+        { "MaaCreate", &MaaCreate_Wrapper },
+        { "MaaDestroy", &MaaDestroy_Wrapper },
+        { "MaaSetOption", &MaaSetOption_Wrapper },
+        { "MaaBindResource", &MaaBindResource_Wrapper },
+        { "MaaBindController", &MaaBindController_Wrapper },
+        { "MaaInited", &MaaInited_Wrapper },
+        { "MaaClearCustomRecognizer", &MaaClearCustomRecognizer_Wrapper },
+        { "MaaClearCustomAction", &MaaClearCustomAction_Wrapper },
+        { "MaaPostTask", &MaaPostTask_Wrapper },
+        { "MaaSetTaskParam", &MaaSetTaskParam_Wrapper },
+        { "MaaTaskStatus", &MaaTaskStatus_Wrapper },
+        { "MaaWaitTask", &MaaWaitTask_Wrapper },
+        { "MaaTaskAllFinished", &MaaTaskAllFinished_Wrapper },
+        { "MaaPostStop", &MaaPostStop_Wrapper },
+        { "MaaStop", &MaaStop_Wrapper },
+        { "MaaGetResource", &MaaGetResource_Wrapper },
+        { "MaaGetController", &MaaGetController_Wrapper },
+        { "MaaResourceCreate", &MaaResourceCreate_Wrapper },
+        { "MaaResourceDestroy", &MaaResourceDestroy_Wrapper },
+        { "MaaResourcePostPath", &MaaResourcePostPath_Wrapper },
+        { "MaaResourceStatus", &MaaResourceStatus_Wrapper },
+        { "MaaResourceWait", &MaaResourceWait_Wrapper },
+        { "MaaResourceLoaded", &MaaResourceLoaded_Wrapper },
+        { "MaaResourceSetOption", &MaaResourceSetOption_Wrapper },
+        { "MaaResourceGetHash", &MaaResourceGetHash_Wrapper },
+        { "MaaResourceGetTaskList", &MaaResourceGetTaskList_Wrapper },
+        { "MaaCreateImageBuffer", &MaaCreateImageBuffer_Wrapper },
+        { "MaaDestroyImageBuffer", &MaaDestroyImageBuffer_Wrapper },
+        { "MaaIsImageEmpty", &MaaIsImageEmpty_Wrapper },
+        { "MaaClearImage", &MaaClearImage_Wrapper },
+        { "MaaGetImageRawData", &MaaGetImageRawData_Wrapper },
+        { "MaaGetImageWidth", &MaaGetImageWidth_Wrapper },
+        { "MaaGetImageHeight", &MaaGetImageHeight_Wrapper },
+        { "MaaGetImageType", &MaaGetImageType_Wrapper },
+        { "MaaGetImageEncoded", &MaaGetImageEncoded_Wrapper },
+        { "MaaGetImageEncodedSize", &MaaGetImageEncodedSize_Wrapper },
+        { "MaaSetImageEncoded", &MaaSetImageEncoded_Wrapper },
+        { "MaaVersion", &MaaVersion_Wrapper },
+        { "MaaSetGlobalOption", &MaaSetGlobalOption_Wrapper },
+        { "MaaToolKitInit", &MaaToolKitInit_Wrapper },
+        { "MaaToolKitUninit", &MaaToolKitUninit_Wrapper },
+        { "MaaToolKitFindDevice", &MaaToolKitFindDevice_Wrapper },
+        { "MaaToolKitFindDeviceWithAdb", &MaaToolKitFindDeviceWithAdb_Wrapper },
+        { "MaaToolKitPostFindDevice", &MaaToolKitPostFindDevice_Wrapper },
+        { "MaaToolKitPostFindDeviceWithAdb", &MaaToolKitPostFindDeviceWithAdb_Wrapper },
+        { "MaaToolKitIsFindDeviceCompleted", &MaaToolKitIsFindDeviceCompleted_Wrapper },
+        { "MaaToolKitWaitForFindDeviceToComplete", &MaaToolKitWaitForFindDeviceToComplete_Wrapper },
+        { "MaaToolKitGetDeviceCount", &MaaToolKitGetDeviceCount_Wrapper },
+        { "MaaToolKitGetDeviceName", &MaaToolKitGetDeviceName_Wrapper },
+        { "MaaToolKitGetDeviceAdbPath", &MaaToolKitGetDeviceAdbPath_Wrapper },
+        { "MaaToolKitGetDeviceAdbSerial", &MaaToolKitGetDeviceAdbSerial_Wrapper },
+        { "MaaToolKitGetDeviceAdbControllerType", &MaaToolKitGetDeviceAdbControllerType_Wrapper },
+        { "MaaToolKitGetDeviceAdbConfig", &MaaToolKitGetDeviceAdbConfig_Wrapper },
+        { "MaaToolKitRegisterCustomRecognizerExecutor", &MaaToolKitRegisterCustomRecognizerExecutor_Wrapper },
+        { "MaaToolKitUnregisterCustomRecognizerExecutor", &MaaToolKitUnregisterCustomRecognizerExecutor_Wrapper },
+        { "MaaToolKitRegisterCustomActionExecutor", &MaaToolKitRegisterCustomActionExecutor_Wrapper },
+        { "MaaToolKitUnregisterCustomActionExecutor", &MaaToolKitUnregisterCustomActionExecutor_Wrapper },
+        { "MaaToolKitFindWindow", &MaaToolKitFindWindow_Wrapper },
+        { "MaaToolKitSearchWindow", &MaaToolKitSearchWindow_Wrapper },
+        { "MaaToolKitGetWindow", &MaaToolKitGetWindow_Wrapper },
+        { "MaaToolKitGetCursorWindow", &MaaToolKitGetCursorWindow_Wrapper },
+    };
+    std::string api;
+    if (segs.enter_id(api) && segs.end()) {
+        auto it = wrappers.find(api);
+        if (it == wrappers.end()) {
+          return false;
+        }
+        std::string err;
+        auto ret = (it->second)(obj, err);
         ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;
     }
