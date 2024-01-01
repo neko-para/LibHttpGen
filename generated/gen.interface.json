@@ -279,6 +279,20 @@
           "type": "MaaControllerAPI *"
         },
         {
+          "name": "text",
+          "type": "const char *"
+        }
+      ],
+      "name": "MaaControllerPostInputText",
+      "return": "long long"
+    },
+    {
+      "argument": [
+        {
+          "name": "ctrl",
+          "type": "MaaControllerAPI *"
+        },
+        {
           "name": "contact",
           "type": "int"
         },
@@ -671,6 +685,16 @@
           "type": "MaaInstanceAPI *"
         }
       ],
+      "name": "MaaPostStop",
+      "return": "unsigned char"
+    },
+    {
+      "argument": [
+        {
+          "name": "inst",
+          "type": "MaaInstanceAPI *"
+        }
+      ],
       "name": "MaaStop",
       "return": "unsigned char"
     },
@@ -963,6 +987,20 @@
           "type": "MaaSyncContextAPI *"
         },
         {
+          "name": "text",
+          "type": "const char *"
+        }
+      ],
+      "name": "MaaSyncContextInputText",
+      "return": "unsigned char"
+    },
+    {
+      "argument": [
+        {
+          "name": "sync_context",
+          "type": "MaaSyncContextAPI *"
+        },
+        {
           "name": "contact",
           "type": "int"
         },
@@ -1029,7 +1067,7 @@
           "type": "MaaSyncContextAPI *"
         },
         {
-          "name": "buffer",
+          "name": "out_image",
           "type": "MaaImageBuffer *"
         }
       ],
@@ -1047,7 +1085,7 @@
           "type": "const char *"
         },
         {
-          "name": "buffer",
+          "name": "out_task_result",
           "type": "MaaStringBuffer *"
         }
       ],
@@ -1345,6 +1383,32 @@
           "type": "MaaRect *"
         },
         {
+          "name": "x",
+          "type": "int"
+        },
+        {
+          "name": "y",
+          "type": "int"
+        },
+        {
+          "name": "w",
+          "type": "int"
+        },
+        {
+          "name": "h",
+          "type": "int"
+        }
+      ],
+      "name": "MaaSetRect",
+      "return": "unsigned char"
+    },
+    {
+      "argument": [
+        {
+          "name": "handle",
+          "type": "MaaRect *"
+        },
+        {
           "name": "value",
           "type": "int"
         }
@@ -1448,6 +1512,40 @@
     },
     {
       "argument": [
+      ],
+      "name": "MaaToolKitPostFindDevice",
+      "return": "unsigned char"
+    },
+    {
+      "argument": [
+        {
+          "name": "adb_path",
+          "type": "const char *"
+        }
+      ],
+      "name": "MaaToolKitPostFindDeviceWithAdb",
+      "return": "unsigned char"
+    },
+    {
+      "argument": [
+      ],
+      "name": "MaaToolKitIsFindDeviceCompleted",
+      "return": "unsigned char"
+    },
+    {
+      "argument": [
+      ],
+      "name": "MaaToolKitWaitForFindDeviceToComplete",
+      "return": "unsigned long long"
+    },
+    {
+      "argument": [
+      ],
+      "name": "MaaToolKitGetDeviceCount",
+      "return": "unsigned long long"
+    },
+    {
+      "argument": [
         {
           "name": "index",
           "type": "unsigned long long"
@@ -1495,6 +1593,78 @@
       ],
       "name": "MaaToolKitGetDeviceAdbConfig",
       "return": "const char *"
+    },
+    {
+      "argument": [
+        {
+          "name": "handle",
+          "type": "MaaInstanceAPI *"
+        },
+        {
+          "name": "recognizer_name",
+          "type": "const char *"
+        },
+        {
+          "name": "recognizer_exec_path",
+          "type": "const char *"
+        },
+        {
+          "name": "recognizer_exec_param_json",
+          "type": "const char *"
+        }
+      ],
+      "name": "MaaToolKitRegisterCustomRecognizerExecutor",
+      "return": "unsigned char"
+    },
+    {
+      "argument": [
+        {
+          "name": "handle",
+          "type": "MaaInstanceAPI *"
+        },
+        {
+          "name": "recognizer_name",
+          "type": "const char *"
+        }
+      ],
+      "name": "MaaToolKitUnregisterCustomRecognizerExecutor",
+      "return": "unsigned char"
+    },
+    {
+      "argument": [
+        {
+          "name": "handle",
+          "type": "MaaInstanceAPI *"
+        },
+        {
+          "name": "action_name",
+          "type": "const char *"
+        },
+        {
+          "name": "action_exec_path",
+          "type": "const char *"
+        },
+        {
+          "name": "action_exec_param_json",
+          "type": "const char *"
+        }
+      ],
+      "name": "MaaToolKitRegisterCustomActionExecutor",
+      "return": "unsigned char"
+    },
+    {
+      "argument": [
+        {
+          "name": "handle",
+          "type": "MaaInstanceAPI *"
+        },
+        {
+          "name": "action_name",
+          "type": "const char *"
+        }
+      ],
+      "name": "MaaToolKitUnregisterCustomActionExecutor",
+      "return": "unsigned char"
     },
     {
       "argument": [

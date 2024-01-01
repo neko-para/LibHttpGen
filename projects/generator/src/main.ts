@@ -18,6 +18,7 @@ interface Config {
   opaque_free: Record<string, string[]>
   output: string[]
   remove: string[]
+  check: Record<string, string>
 }
 
 interface Interface {
@@ -93,7 +94,9 @@ async function main() {
   })
 
   for (const ic of int.interface) {
-    regen.add_raw(`std::optional<json::object> ${ic.name}_Wrapper(json::object __param) {`)
+    regen.add_raw(
+      `std::optional<json::object> ${ic.name}_Wrapper(json::object __param, std::string &__error) {`
+    )
 
     // callback
     let cbId: string | null = null
@@ -104,6 +107,49 @@ async function main() {
       if (arg.type in callback_ids) {
         ctxPos = idx + cfg.callback[arg.type]!.pass
       }
+    }
+
+    // check
+    for (const [idx, arg] of ic.argument.entries()) {
+      // callback
+      if (ctxPos === idx) {
+        regen.add_sec(
+          `lhg.impl.${ic.name}.arg.${arg.name}.check`,
+          `    if (!check_var<const char*>(__param["${cbParam}"])) {
+        __error = "${cbParam} should be string";
+        return std::nullopt;
+    }`
+        )
+        continue
+      } else if (arg.type in callback_ids) {
+        continue
+      }
+
+      // opacity
+      if (arg.type.endsWith(' *') && cfg.opaque.includes(arg.type.slice(0, -2))) {
+        regen.add_sec(
+          `lhg.impl.${ic.name}.arg.${arg.name}.check`,
+          `    if (!check_var<const char*>(__param["${arg.name}"])) {
+        __error = "${arg.name} should be string";
+        return std::nullopt;
+    }`
+        )
+        continue
+      }
+
+      if (arg.type.endsWith(' *') && cfg.output.includes(arg.type.slice(0, -2))) {
+        continue
+      }
+
+      regen.add_sec(
+        `lhg.impl.${ic.name}.arg.${arg.name}.check`,
+        `    if constexpr (check_var_t<${arg.type}>::value) {
+        if (!check_var<${arg.type}>(__param["${arg.name}"])) {
+            __error = "${arg.name} should be ${cfg.check[arg.type] ?? arg.type}";
+            return std::nullopt;
+        }
+    }`
+      )
     }
 
     for (const [idx, arg] of ic.argument.entries()) {
@@ -229,8 +275,9 @@ ${Array.from({ length: cc.all }, (_, k) => k)
     regen.add_raw(`    // ${ic.name} /${p.join('/')}
     segs.reset();`)
     regen.add_raw(`    if (${p.map(k => `segs.enter_path("${k}")`).join(' && ')} && segs.end()) {`)
-    regen.add_raw(`        auto ret = ${ic.name}_Wrapper(obj);
-        ctx.json_body(ret.value());
+    regen.add_raw(`        std::string err;
+        auto ret = ${ic.name}_Wrapper(obj, err);
+        ctx.json_body(ret.value_or(json::object { { "error", err } }));
         return true;`)
     regen.add_raw('    }')
   }

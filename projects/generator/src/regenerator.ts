@@ -1,5 +1,5 @@
-import fs from 'fs/promises'
 import { existsSync } from 'fs'
+import fs from 'fs/promises'
 
 export interface SectionConfig {
   end: string
@@ -63,10 +63,10 @@ export class Regenerator {
           }
           break
         case 'process':
-          if (row.trim() == this.config.default) {
+          if (row.trim() === this.config.default) {
             def = true
           }
-          if (row.trim() == this.config.end) {
+          if (row.trim() === this.config.end) {
             if (!def) {
               this.sections[id!] = this.sections[id!] ?? {}
               this.sections[id!]!.old = content.join('\n')
@@ -92,7 +92,7 @@ export class Regenerator {
           break
         case 'section':
           result.push(this.config.buildId(row.id))
-          if (this.sections[row.id]?.old) {
+          if (typeof this.sections[row.id]?.old === 'string') {
             result.push(this.sections[row.id]!.old!)
           } else {
             result.push(this.config.default)

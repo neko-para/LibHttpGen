@@ -25,6 +25,12 @@
         "MaaUnregisterCustomAction",
         "/MaaSyncContext.+",
         "/Maa.+Rect.*",
-        "/Maa.+String.*"
-    ]
+        "/Maa.+String.+",
+        "MaaClearString",
+        "MaaGetString",
+        "MaaSetString"
+    ],
+    "check": {
+        "const char *": "string"
+    }
 }

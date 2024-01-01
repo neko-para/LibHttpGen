@@ -1,3 +1,4 @@
+#include <concepts>
 #include <meojson/json.hpp>
 #include <optional>
 #include <string>
@@ -28,10 +29,17 @@ concept can_construct_json_value = requires(Type t) {
 };
 
 template <typename Type>
+struct check_var_t : std::false_type
+{};
+
+template <typename Type>
 struct from_json_fix_t
 {
     using from_t = Type;
 };
+
+template <typename Type>
+typename bool check_var(json::value v) LHG_NOT_IMPL_FUNC;
 
 template <typename Type>
 typename from_json_fix_t<Type>::from_t from_json(json::value v) LHG_NOT_IMPL_FUNC;
@@ -62,6 +70,38 @@ Type output_prepare() LHG_NOT_IMPL_FUNC;
 
 template <typename Type>
 json::value output_finalize(Type v) LHG_NOT_IMPL_FUNC;
+
+// checks
+
+template <std::integral Type>
+struct check_var_t<Type> : std::true_type
+{};
+
+template <std::integral Type>
+typename bool check_var(json::value v)
+{
+    return v.is_number();
+}
+
+template <>
+struct check_var_t<const char*> : std::true_type
+{};
+
+template <>
+typename bool check_var<const char*>(json::value v)
+{
+    return v.is_string();
+}
+
+template <>
+struct check_var_t<bool> : std::true_type
+{};
+
+template <>
+typename bool check_var<bool>(json::value v)
+{
+    return v.is_boolean();
+}
 
 // const char* <-> string
 
