@@ -277,7 +277,11 @@ ${Array.from({ length: cc.all }, (_, k) => k)
         }
         std::string err;
         auto ret = (it->second)(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
+        if (ret.has_value()) {
+            ctx.json_body(json::object { { "data", ret.value() } });
+        } else {
+            ctx.json_body(json::object { { "error", err } });
+        }
         return true;
     }`)
   regen.add_raw('    return false;\n}')

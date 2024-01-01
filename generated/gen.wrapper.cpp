@@ -3376,7 +3376,11 @@ bool handle_request(Context& ctx, UrlSegments segs) {
         }
         std::string err;
         auto ret = (it->second)(obj, err);
-        ctx.json_body(ret.value_or(json::object { { "error", err } }));
+        if (ret.has_value()) {
+            ctx.json_body(json::object { { "data", ret.value() } });
+        } else {
+            ctx.json_body(json::object { { "error", err } });
+        }
         return true;
     }
     return false;
