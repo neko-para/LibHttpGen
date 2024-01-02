@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(CppRestfulToolkit)
+project(LibHttpGen)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,13 +22,19 @@ if(WIN32)
   add_compile_options("/EHsc")
 endif()
 
+option(TARGET_ONLY "only build target" ON)
+
 find_package(Boost REQUIRED COMPONENTS system)
-include(cmake/clangc.cmake)
+if(NOT TARGET_ONLY)
+  include(cmake/clangc.cmake)
+endif()
 include(
   "${CMAKE_CURRENT_LIST_DIR}/maa/share/cmake/MaaFramework/MaaFramework.cmake")
 
 add_subdirectory(3rdparty)
-add_subdirectory(projects/clang-cpp)
-add_subdirectory(projects/regenerator)
-add_subdirectory(projects/interface-extractor)
+if(NOT TARGET_ONLY)
+  add_subdirectory(projects/clang-cpp)
+  add_subdirectory(projects/regenerator)
+  add_subdirectory(projects/interface-extractor)
+endif()
 add_subdirectory(generated)

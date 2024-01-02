@@ -1,5 +1,5 @@
 {
     "name": "lib-http-gen",
     "version-string": "latest",
-    "dependencies": ["boost-beast", "boost-url", "boost-uuid", "llvm"]
+    "dependencies": ["boost-beast", "boost-url", "boost-uuid"]
 }
