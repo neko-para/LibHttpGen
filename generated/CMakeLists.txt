@@ -3,3 +3,9 @@ add_executable(LHGTarget ${srcs})
 target_include_directories(LHGTarget PRIVATE . ../maa/include)
 target_link_libraries(LHGTarget Headeronly Boost::system
                       MaaFramework::MaaFramework MaaFramework::MaaToolKit)
+
+install(
+  TARGETS LHGTarget RUNTIME_DEPENDENCIES
+  RUNTIME DESTINATION .
+  LIBRARY DESTINATION .
+  FRAMEWORK DESTINATION .)
