@@ -36,8 +36,26 @@ async function call<Api extends keyof InterfaceType>(
   ).data
 }
 
+function proxy() {
+  return new Proxy(
+    {},
+    {
+      get<Api extends keyof InterfaceType>(_: any, k: Api) {
+        return (obj: InterfaceType[Api]['input']) => {
+          return call(k, obj ?? {})
+        }
+      }
+    }
+  ) as {
+    [Api in keyof InterfaceType]: {} extends InterfaceType[Api]['input']
+      ? (obj?: {}) => Promise<InterfaceType[Api]['output']>
+      : (obj: InterfaceType[Api]['input']) => Promise<InterfaceType[Api]['output']>
+  }
+}
+
 async function main() {
-  console.log((await call('MaaVersion', {})).data.return)
+  const api = proxy()
+  console.log((await api.MaaVersion()).data.return)
 }
 
 main()
