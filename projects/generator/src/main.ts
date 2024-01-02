@@ -76,6 +76,12 @@ async function main() {
 
   for (const type of cfg.opaque) {
     regen.add_raw(`static HandleManager<${type} *> ${type}__OpaqueManager;\n`)
+    regen.add_raw(`template <>
+struct schema_t<${type} *>
+{
+    static constexpr const char* schema = "string@${type}";
+};
+`)
   }
 
   int.interface = int.interface.filter(x => {
@@ -92,6 +98,77 @@ async function main() {
     }
     return true
   })
+
+  for (const ic of int.interface) {
+    regen.add_raw(`json::object ${ic.name}_HelperInput() {
+    return json::object {`)
+
+    // callback
+    let ctxPos: number | null = null
+    for (const [idx, arg] of ic.argument.entries()) {
+      if (arg.type in callback_ids) {
+        ctxPos = idx + cfg.callback[arg.type]!.pass
+      }
+    }
+
+    for (const [idx, arg] of ic.argument.entries()) {
+      // callback
+      if (ctxPos === idx) {
+        continue
+      } else if (arg.type in callback_ids) {
+        regen.add_sec(
+          `lhg.helper.${ic.name}.input.${arg.name}`,
+          `        { "${arg.name}", "string@${callback_ids[arg.type]!}" },`
+        )
+        continue
+      }
+
+      // opacity
+      if (arg.type.endsWith(' *') && cfg.opaque.includes(arg.type.slice(0, -2))) {
+        regen.add_sec(
+          `lhg.helper.${ic.name}.input.${arg.name}`,
+          `        { "${arg.name}", "string@${arg.type.slice(0, -2)}" },`
+        )
+        continue
+      }
+
+      if (arg.type.endsWith(' *') && cfg.output.includes(arg.type.slice(0, -2))) {
+        continue
+      }
+
+      regen.add_sec(
+        `lhg.helper.${ic.name}.input.${arg.name}`,
+        `        { "${arg.name}", schema_t<${arg.type}>::schema },`
+      )
+    }
+    regen.add_raw(`    };
+}
+`)
+  }
+
+  for (const ic of int.interface) {
+    regen.add_raw(`json::object ${ic.name}_HelperOutput() {
+    return json::object {
+        { "data", {`)
+    regen.add_sec(
+      `lhg.helper.${ic.name}.output.return`,
+      `            { "return", schema_t<${ic.return}>::schema },`
+    )
+    for (const [idx, arg] of ic.argument.entries()) {
+      if (arg.type.endsWith(' *') && cfg.output.includes(arg.type.slice(0, -2))) {
+        regen.add_sec(
+          `lhg.helper.${ic.name}.output.${arg.name}`,
+          `            { "${arg.name}", schema_t<${arg.type}>::schema },`
+        )
+        continue
+      }
+    }
+    regen.add_raw(`        }},
+        { "error", "string" }
+    };
+}
+`)
+  }
 
   for (const ic of int.interface) {
     regen.add_raw(
@@ -116,12 +193,13 @@ async function main() {
         regen.add_sec(
           `lhg.impl.${ic.name}.arg.${arg.name}.check`,
           `    if (!check_var<const char*>(__param["${cbParam}"])) {
-        __error = "${cbParam} should be string";
+        __error = "${cbParam} should be string@${cbId}";
         return std::nullopt;
     }`
         )
         continue
       } else if (arg.type in callback_ids) {
+        cbId = callback_ids[arg.type]!
         continue
       }
 
@@ -130,7 +208,7 @@ async function main() {
         regen.add_sec(
           `lhg.impl.${ic.name}.arg.${arg.name}.check`,
           `    if (!check_var<const char*>(__param["${arg.name}"])) {
-        __error = "${arg.name} should be string";
+        __error = "${arg.name} should be string@${arg.type.slice(0, -2)}";
         return std::nullopt;
     }`
         )
@@ -152,6 +230,9 @@ async function main() {
       )
     }
 
+    cbId = null
+    cbParam = null
+    ctxPos = null
     for (const [idx, arg] of ic.argument.entries()) {
       // callback
       if (ctxPos === idx) {
@@ -263,25 +344,49 @@ ${Array.from({ length: cc.all }, (_, k) => k)
     }`)
   }
   regen.add_raw(
-    `    const static std::map<std::string, std::optional<json::object> (*)(json::object, std::string&)> wrappers = {`
+    `    const static std::map<std::string, std::tuple<
+        std::optional<json::object> (*)(json::object, std::string&),
+        json::object (*)(),
+        json::object (*)()
+    >> wrappers = {`
   )
   for (const ic of int.interface) {
-    regen.add_raw(`        { "${ic.name}", &${ic.name}_Wrapper },`)
+    regen.add_raw(
+      `        { "${ic.name}", std::make_tuple(&${ic.name}_Wrapper, &${ic.name}_HelperInput, &${ic.name}_HelperOutput) },`
+    )
   }
   regen.add_raw(`    };
-    std::string api;
-    if (segs.enter_id(api) && segs.end()) {
-        auto it = wrappers.find(api);
-        if (it == wrappers.end()) {
-          return false;
+    if (segs.enter_path("api")) {
+        std::string api;
+        if (segs.enter_id(api)) {
+            auto it = wrappers.find(api);
+            if (it == wrappers.end()) {
+              return false;
+            }
+            if (segs.end()) {
+                std::string err;
+                auto ret = std::get<0>(it->second)(obj, err);
+                if (ret.has_value()) {
+                    ctx.json_body(json::object { { "data", ret.value() } });
+                } else {
+                    ctx.json_body(json::object { { "error", err } });
+                }
+                return true;
+            } else if (segs.enter_path("help") && segs.end()) {
+                auto input = std::get<1>(it->second)();
+                auto output = std::get<2>(it->second)();
+                ctx.json_body(json::object { { "input", input }, { "output", output } });
+                return true;
+            }
         }
-        std::string err;
-        auto ret = (it->second)(obj, err);
-        if (ret.has_value()) {
-            ctx.json_body(json::object { { "data", ret.value() } });
-        } else {
-            ctx.json_body(json::object { { "error", err } });
+    } else if (segs.enter_path("help") && segs.end()) {
+        json::object result;
+        for (const auto& [ api, funcs ] : wrappers) {
+            auto input = std::get<1>(funcs)();
+            auto output = std::get<2>(funcs)();
+            result[api] = json::object { { "input", input }, { "output", output } };
         }
+        ctx.json_body(result);
         return true;
     }`)
   regen.add_raw('    return false;\n}')

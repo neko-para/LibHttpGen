@@ -28,7 +28,9 @@
         "/Maa.+String.+",
         "MaaClearString",
         "MaaGetString",
-        "MaaSetString"
+        "MaaSetString",
+        "MaaGetImageEncodedSize",
+        "MaaGetImageRawData"
     ],
     "check": {
         "const char *": "string"

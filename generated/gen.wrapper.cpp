@@ -9,13 +9,6 @@
 // LHG SEC END
 
 // LHG SEC BEGIN lhg.custom.global
-inline std::string to_string_and_del(MaaStringBufferHandle handle) {
-    size_t len = MaaGetStringSize(handle);
-    std::string res(MaaGetString(handle), len);
-    MaaDestroyStringBuffer(handle);
-    return res;
-}
-
 template <>
 inline MaaStringBuffer *output_prepare<MaaStringBuffer *>() {
     return MaaCreateStringBuffer();
@@ -28,17 +21,1984 @@ inline json::value output_finalize<MaaStringBuffer *>(MaaStringBuffer *v) {
     MaaDestroyStringBuffer(v);
     return res;
 }
+
+template <>
+struct schema_t<MaaStringBuffer *>
+{
+    static constexpr const char* schema = "string";
+};
 // LHG SEC END
 
 static callback_manager<void (*)(const char *, const char *, void *)> MaaAPICallback__Manager;
 
 static HandleManager<MaaControllerAPI *> MaaControllerAPI__OpaqueManager;
 
+template <>
+struct schema_t<MaaControllerAPI *>
+{
+    static constexpr const char* schema = "string@MaaControllerAPI";
+};
+
 static HandleManager<MaaResourceAPI *> MaaResourceAPI__OpaqueManager;
+
+template <>
+struct schema_t<MaaResourceAPI *>
+{
+    static constexpr const char* schema = "string@MaaResourceAPI";
+};
 
 static HandleManager<MaaInstanceAPI *> MaaInstanceAPI__OpaqueManager;
 
+template <>
+struct schema_t<MaaInstanceAPI *>
+{
+    static constexpr const char* schema = "string@MaaInstanceAPI";
+};
+
 static HandleManager<MaaImageBuffer *> MaaImageBuffer__OpaqueManager;
+
+template <>
+struct schema_t<MaaImageBuffer *>
+{
+    static constexpr const char* schema = "string@MaaImageBuffer";
+};
+
+json::object MaaAdbControllerCreate_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaAdbControllerCreate.input.adb_path
+// LHG SEC DEF
+        { "adb_path", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaAdbControllerCreate.input.address
+// LHG SEC DEF
+        { "address", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaAdbControllerCreate.input.type
+// LHG SEC DEF
+        { "type", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaAdbControllerCreate.input.config
+// LHG SEC DEF
+        { "config", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaAdbControllerCreate.input.callback
+// LHG SEC DEF
+        { "callback", "string@MaaAPICallback" },
+// LHG SEC END
+    };
+}
+
+json::object MaaWin32ControllerCreate_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaWin32ControllerCreate.input.hWnd
+// LHG SEC DEF
+        { "hWnd", schema_t<unsigned long long>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaWin32ControllerCreate.input.type
+// LHG SEC DEF
+        { "type", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaWin32ControllerCreate.input.callback
+// LHG SEC DEF
+        { "callback", "string@MaaAPICallback" },
+// LHG SEC END
+    };
+}
+
+json::object MaaAdbControllerCreateV2_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaAdbControllerCreateV2.input.adb_path
+// LHG SEC DEF
+        { "adb_path", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaAdbControllerCreateV2.input.address
+// LHG SEC DEF
+        { "address", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaAdbControllerCreateV2.input.type
+// LHG SEC DEF
+        { "type", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaAdbControllerCreateV2.input.config
+// LHG SEC DEF
+        { "config", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaAdbControllerCreateV2.input.agent_path
+// LHG SEC DEF
+        { "agent_path", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaAdbControllerCreateV2.input.callback
+// LHG SEC DEF
+        { "callback", "string@MaaAPICallback" },
+// LHG SEC END
+    };
+}
+
+json::object MaaThriftControllerCreate_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaThriftControllerCreate.input.type
+// LHG SEC DEF
+        { "type", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaThriftControllerCreate.input.host
+// LHG SEC DEF
+        { "host", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaThriftControllerCreate.input.port
+// LHG SEC DEF
+        { "port", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaThriftControllerCreate.input.config
+// LHG SEC DEF
+        { "config", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaThriftControllerCreate.input.callback
+// LHG SEC DEF
+        { "callback", "string@MaaAPICallback" },
+// LHG SEC END
+    };
+}
+
+json::object MaaDbgControllerCreate_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaDbgControllerCreate.input.read_path
+// LHG SEC DEF
+        { "read_path", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaDbgControllerCreate.input.write_path
+// LHG SEC DEF
+        { "write_path", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaDbgControllerCreate.input.type
+// LHG SEC DEF
+        { "type", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaDbgControllerCreate.input.config
+// LHG SEC DEF
+        { "config", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaDbgControllerCreate.input.callback
+// LHG SEC DEF
+        { "callback", "string@MaaAPICallback" },
+// LHG SEC END
+    };
+}
+
+json::object MaaControllerDestroy_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaControllerDestroy.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaControllerSetOption_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaControllerSetOption.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerSetOption.input.key
+// LHG SEC DEF
+        { "key", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerSetOption.input.value
+        { "value", "string|number|boolean" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerSetOption.input.val_size
+
+// LHG SEC END
+    };
+}
+
+json::object MaaControllerPostConnection_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostConnection.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaControllerPostClick_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostClick.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostClick.input.x
+// LHG SEC DEF
+        { "x", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostClick.input.y
+// LHG SEC DEF
+        { "y", schema_t<int>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaControllerPostSwipe_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostSwipe.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostSwipe.input.x1
+// LHG SEC DEF
+        { "x1", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostSwipe.input.y1
+// LHG SEC DEF
+        { "y1", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostSwipe.input.x2
+// LHG SEC DEF
+        { "x2", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostSwipe.input.y2
+// LHG SEC DEF
+        { "y2", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostSwipe.input.duration
+// LHG SEC DEF
+        { "duration", schema_t<int>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaControllerPostPressKey_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostPressKey.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostPressKey.input.keycode
+// LHG SEC DEF
+        { "keycode", schema_t<int>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaControllerPostInputText_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostInputText.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostInputText.input.text
+// LHG SEC DEF
+        { "text", schema_t<const char *>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaControllerPostTouchDown_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostTouchDown.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostTouchDown.input.contact
+// LHG SEC DEF
+        { "contact", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostTouchDown.input.x
+// LHG SEC DEF
+        { "x", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostTouchDown.input.y
+// LHG SEC DEF
+        { "y", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostTouchDown.input.pressure
+// LHG SEC DEF
+        { "pressure", schema_t<int>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaControllerPostTouchMove_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostTouchMove.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostTouchMove.input.contact
+// LHG SEC DEF
+        { "contact", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostTouchMove.input.x
+// LHG SEC DEF
+        { "x", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostTouchMove.input.y
+// LHG SEC DEF
+        { "y", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostTouchMove.input.pressure
+// LHG SEC DEF
+        { "pressure", schema_t<int>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaControllerPostTouchUp_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostTouchUp.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerPostTouchUp.input.contact
+// LHG SEC DEF
+        { "contact", schema_t<int>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaControllerPostScreencap_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostScreencap.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaControllerStatus_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaControllerStatus.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerStatus.input.id
+// LHG SEC DEF
+        { "id", schema_t<long long>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaControllerWait_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaControllerWait.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerWait.input.id
+// LHG SEC DEF
+        { "id", schema_t<long long>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaControllerConnected_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaControllerConnected.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaControllerGetImage_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaControllerGetImage.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerGetImage.input.buffer
+// LHG SEC DEF
+        { "buffer", "string@MaaImageBuffer" },
+// LHG SEC END
+    };
+}
+
+json::object MaaControllerGetUUID_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaControllerGetUUID.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaCreate_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaCreate.input.callback
+// LHG SEC DEF
+        { "callback", "string@MaaAPICallback" },
+// LHG SEC END
+    };
+}
+
+json::object MaaDestroy_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaDestroy.input.inst
+// LHG SEC DEF
+        { "inst", "string@MaaInstanceAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaSetOption_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaSetOption.input.inst
+// LHG SEC DEF
+        { "inst", "string@MaaInstanceAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaSetOption.input.key
+// LHG SEC DEF
+        { "key", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaSetOption.input.value
+        { "value", "string|number|boolean" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaSetOption.input.val_size
+
+// LHG SEC END
+    };
+}
+
+json::object MaaBindResource_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaBindResource.input.inst
+// LHG SEC DEF
+        { "inst", "string@MaaInstanceAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaBindResource.input.res
+// LHG SEC DEF
+        { "res", "string@MaaResourceAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaBindController_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaBindController.input.inst
+// LHG SEC DEF
+        { "inst", "string@MaaInstanceAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaBindController.input.ctrl
+// LHG SEC DEF
+        { "ctrl", "string@MaaControllerAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaInited_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaInited.input.inst
+// LHG SEC DEF
+        { "inst", "string@MaaInstanceAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaClearCustomRecognizer_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaClearCustomRecognizer.input.inst
+// LHG SEC DEF
+        { "inst", "string@MaaInstanceAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaClearCustomAction_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaClearCustomAction.input.inst
+// LHG SEC DEF
+        { "inst", "string@MaaInstanceAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaPostTask_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaPostTask.input.inst
+// LHG SEC DEF
+        { "inst", "string@MaaInstanceAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaPostTask.input.entry
+// LHG SEC DEF
+        { "entry", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaPostTask.input.param
+// LHG SEC DEF
+        { "param", schema_t<const char *>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaSetTaskParam_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaSetTaskParam.input.inst
+// LHG SEC DEF
+        { "inst", "string@MaaInstanceAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaSetTaskParam.input.id
+// LHG SEC DEF
+        { "id", schema_t<long long>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaSetTaskParam.input.param
+// LHG SEC DEF
+        { "param", schema_t<const char *>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaTaskStatus_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaTaskStatus.input.inst
+// LHG SEC DEF
+        { "inst", "string@MaaInstanceAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaTaskStatus.input.id
+// LHG SEC DEF
+        { "id", schema_t<long long>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaWaitTask_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaWaitTask.input.inst
+// LHG SEC DEF
+        { "inst", "string@MaaInstanceAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaWaitTask.input.id
+// LHG SEC DEF
+        { "id", schema_t<long long>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaTaskAllFinished_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaTaskAllFinished.input.inst
+// LHG SEC DEF
+        { "inst", "string@MaaInstanceAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaPostStop_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaPostStop.input.inst
+// LHG SEC DEF
+        { "inst", "string@MaaInstanceAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaStop_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaStop.input.inst
+// LHG SEC DEF
+        { "inst", "string@MaaInstanceAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaGetResource_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaGetResource.input.inst
+// LHG SEC DEF
+        { "inst", "string@MaaInstanceAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaGetController_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaGetController.input.inst
+// LHG SEC DEF
+        { "inst", "string@MaaInstanceAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaResourceCreate_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaResourceCreate.input.callback
+// LHG SEC DEF
+        { "callback", "string@MaaAPICallback" },
+// LHG SEC END
+    };
+}
+
+json::object MaaResourceDestroy_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaResourceDestroy.input.res
+// LHG SEC DEF
+        { "res", "string@MaaResourceAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaResourcePostPath_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaResourcePostPath.input.res
+// LHG SEC DEF
+        { "res", "string@MaaResourceAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaResourcePostPath.input.path
+// LHG SEC DEF
+        { "path", schema_t<const char *>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaResourceStatus_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaResourceStatus.input.res
+// LHG SEC DEF
+        { "res", "string@MaaResourceAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaResourceStatus.input.id
+// LHG SEC DEF
+        { "id", schema_t<long long>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaResourceWait_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaResourceWait.input.res
+// LHG SEC DEF
+        { "res", "string@MaaResourceAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaResourceWait.input.id
+// LHG SEC DEF
+        { "id", schema_t<long long>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaResourceLoaded_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaResourceLoaded.input.res
+// LHG SEC DEF
+        { "res", "string@MaaResourceAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaResourceSetOption_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaResourceSetOption.input.res
+// LHG SEC DEF
+        { "res", "string@MaaResourceAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaResourceSetOption.input.key
+// LHG SEC DEF
+        { "key", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaResourceSetOption.input.value
+        { "value", "string|number|boolean" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaResourceSetOption.input.val_size
+
+// LHG SEC END
+    };
+}
+
+json::object MaaResourceGetHash_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaResourceGetHash.input.res
+// LHG SEC DEF
+        { "res", "string@MaaResourceAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaResourceGetTaskList_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaResourceGetTaskList.input.res
+// LHG SEC DEF
+        { "res", "string@MaaResourceAPI" },
+// LHG SEC END
+    };
+}
+
+json::object MaaCreateImageBuffer_HelperInput() {
+    return json::object {
+    };
+}
+
+json::object MaaDestroyImageBuffer_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaDestroyImageBuffer.input.handle
+// LHG SEC DEF
+        { "handle", "string@MaaImageBuffer" },
+// LHG SEC END
+    };
+}
+
+json::object MaaIsImageEmpty_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaIsImageEmpty.input.handle
+// LHG SEC DEF
+        { "handle", "string@MaaImageBuffer" },
+// LHG SEC END
+    };
+}
+
+json::object MaaClearImage_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaClearImage.input.handle
+// LHG SEC DEF
+        { "handle", "string@MaaImageBuffer" },
+// LHG SEC END
+    };
+}
+
+json::object MaaGetImageWidth_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaGetImageWidth.input.handle
+// LHG SEC DEF
+        { "handle", "string@MaaImageBuffer" },
+// LHG SEC END
+    };
+}
+
+json::object MaaGetImageHeight_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaGetImageHeight.input.handle
+// LHG SEC DEF
+        { "handle", "string@MaaImageBuffer" },
+// LHG SEC END
+    };
+}
+
+json::object MaaGetImageType_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaGetImageType.input.handle
+// LHG SEC DEF
+        { "handle", "string@MaaImageBuffer" },
+// LHG SEC END
+    };
+}
+
+json::object MaaGetImageEncoded_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaGetImageEncoded.input.handle
+// LHG SEC DEF
+        { "handle", "string@MaaImageBuffer" },
+// LHG SEC END
+    };
+}
+
+json::object MaaSetImageEncoded_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaSetImageEncoded.input.handle
+// LHG SEC DEF
+        { "handle", "string@MaaImageBuffer" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaSetImageEncoded.input.data
+        { "data", "string@buffer" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaSetImageEncoded.input.size
+
+// LHG SEC END
+    };
+}
+
+json::object MaaVersion_HelperInput() {
+    return json::object {
+    };
+}
+
+json::object MaaSetGlobalOption_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaSetGlobalOption.input.key
+// LHG SEC DEF
+        { "key", schema_t<int>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaSetGlobalOption.input.value
+        { "value", "string|number|boolean" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaSetGlobalOption.input.val_size
+
+// LHG SEC END
+    };
+}
+
+json::object MaaToolKitInit_HelperInput() {
+    return json::object {
+    };
+}
+
+json::object MaaToolKitUninit_HelperInput() {
+    return json::object {
+    };
+}
+
+json::object MaaToolKitFindDevice_HelperInput() {
+    return json::object {
+    };
+}
+
+json::object MaaToolKitFindDeviceWithAdb_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaToolKitFindDeviceWithAdb.input.adb_path
+// LHG SEC DEF
+        { "adb_path", schema_t<const char *>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaToolKitPostFindDevice_HelperInput() {
+    return json::object {
+    };
+}
+
+json::object MaaToolKitPostFindDeviceWithAdb_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaToolKitPostFindDeviceWithAdb.input.adb_path
+// LHG SEC DEF
+        { "adb_path", schema_t<const char *>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaToolKitIsFindDeviceCompleted_HelperInput() {
+    return json::object {
+    };
+}
+
+json::object MaaToolKitWaitForFindDeviceToComplete_HelperInput() {
+    return json::object {
+    };
+}
+
+json::object MaaToolKitGetDeviceCount_HelperInput() {
+    return json::object {
+    };
+}
+
+json::object MaaToolKitGetDeviceName_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaToolKitGetDeviceName.input.index
+// LHG SEC DEF
+        { "index", schema_t<unsigned long long>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaToolKitGetDeviceAdbPath_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaToolKitGetDeviceAdbPath.input.index
+// LHG SEC DEF
+        { "index", schema_t<unsigned long long>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaToolKitGetDeviceAdbSerial_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaToolKitGetDeviceAdbSerial.input.index
+// LHG SEC DEF
+        { "index", schema_t<unsigned long long>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaToolKitGetDeviceAdbControllerType_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaToolKitGetDeviceAdbControllerType.input.index
+// LHG SEC DEF
+        { "index", schema_t<unsigned long long>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaToolKitGetDeviceAdbConfig_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaToolKitGetDeviceAdbConfig.input.index
+// LHG SEC DEF
+        { "index", schema_t<unsigned long long>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaToolKitRegisterCustomRecognizerExecutor_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaToolKitRegisterCustomRecognizerExecutor.input.handle
+// LHG SEC DEF
+        { "handle", "string@MaaInstanceAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaToolKitRegisterCustomRecognizerExecutor.input.recognizer_name
+// LHG SEC DEF
+        { "recognizer_name", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaToolKitRegisterCustomRecognizerExecutor.input.recognizer_exec_path
+// LHG SEC DEF
+        { "recognizer_exec_path", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaToolKitRegisterCustomRecognizerExecutor.input.recognizer_exec_param_json
+// LHG SEC DEF
+        { "recognizer_exec_param_json", schema_t<const char *>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaToolKitUnregisterCustomRecognizerExecutor_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaToolKitUnregisterCustomRecognizerExecutor.input.handle
+// LHG SEC DEF
+        { "handle", "string@MaaInstanceAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaToolKitUnregisterCustomRecognizerExecutor.input.recognizer_name
+// LHG SEC DEF
+        { "recognizer_name", schema_t<const char *>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaToolKitRegisterCustomActionExecutor_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaToolKitRegisterCustomActionExecutor.input.handle
+// LHG SEC DEF
+        { "handle", "string@MaaInstanceAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaToolKitRegisterCustomActionExecutor.input.action_name
+// LHG SEC DEF
+        { "action_name", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaToolKitRegisterCustomActionExecutor.input.action_exec_path
+// LHG SEC DEF
+        { "action_exec_path", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaToolKitRegisterCustomActionExecutor.input.action_exec_param_json
+// LHG SEC DEF
+        { "action_exec_param_json", schema_t<const char *>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaToolKitUnregisterCustomActionExecutor_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaToolKitUnregisterCustomActionExecutor.input.handle
+// LHG SEC DEF
+        { "handle", "string@MaaInstanceAPI" },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaToolKitUnregisterCustomActionExecutor.input.action_name
+// LHG SEC DEF
+        { "action_name", schema_t<const char *>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaToolKitFindWindow_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaToolKitFindWindow.input.class_name
+// LHG SEC DEF
+        { "class_name", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaToolKitFindWindow.input.window_name
+// LHG SEC DEF
+        { "window_name", schema_t<const char *>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaToolKitSearchWindow_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaToolKitSearchWindow.input.class_name
+// LHG SEC DEF
+        { "class_name", schema_t<const char *>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaToolKitSearchWindow.input.window_name
+// LHG SEC DEF
+        { "window_name", schema_t<const char *>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaToolKitGetWindow_HelperInput() {
+    return json::object {
+// LHG SEC BEGIN lhg.helper.MaaToolKitGetWindow.input.index
+// LHG SEC DEF
+        { "index", schema_t<unsigned long long>::schema },
+// LHG SEC END
+    };
+}
+
+json::object MaaToolKitGetCursorWindow_HelperInput() {
+    return json::object {
+    };
+}
+
+json::object MaaAdbControllerCreate_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaAdbControllerCreate.output.return
+// LHG SEC DEF
+            { "return", schema_t<MaaControllerAPI *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaWin32ControllerCreate_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaWin32ControllerCreate.output.return
+// LHG SEC DEF
+            { "return", schema_t<MaaControllerAPI *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaAdbControllerCreateV2_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaAdbControllerCreateV2.output.return
+// LHG SEC DEF
+            { "return", schema_t<MaaControllerAPI *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaThriftControllerCreate_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaThriftControllerCreate.output.return
+// LHG SEC DEF
+            { "return", schema_t<MaaControllerAPI *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaDbgControllerCreate_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaDbgControllerCreate.output.return
+// LHG SEC DEF
+            { "return", schema_t<MaaControllerAPI *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaControllerDestroy_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaControllerDestroy.output.return
+// LHG SEC DEF
+            { "return", schema_t<void>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaControllerSetOption_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaControllerSetOption.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaControllerPostConnection_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostConnection.output.return
+// LHG SEC DEF
+            { "return", schema_t<long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaControllerPostClick_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostClick.output.return
+// LHG SEC DEF
+            { "return", schema_t<long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaControllerPostSwipe_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostSwipe.output.return
+// LHG SEC DEF
+            { "return", schema_t<long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaControllerPostPressKey_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostPressKey.output.return
+// LHG SEC DEF
+            { "return", schema_t<long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaControllerPostInputText_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostInputText.output.return
+// LHG SEC DEF
+            { "return", schema_t<long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaControllerPostTouchDown_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostTouchDown.output.return
+// LHG SEC DEF
+            { "return", schema_t<long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaControllerPostTouchMove_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostTouchMove.output.return
+// LHG SEC DEF
+            { "return", schema_t<long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaControllerPostTouchUp_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostTouchUp.output.return
+// LHG SEC DEF
+            { "return", schema_t<long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaControllerPostScreencap_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaControllerPostScreencap.output.return
+// LHG SEC DEF
+            { "return", schema_t<long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaControllerStatus_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaControllerStatus.output.return
+// LHG SEC DEF
+            { "return", schema_t<int>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaControllerWait_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaControllerWait.output.return
+// LHG SEC DEF
+            { "return", schema_t<int>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaControllerConnected_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaControllerConnected.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaControllerGetImage_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaControllerGetImage.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaControllerGetUUID_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaControllerGetUUID.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaControllerGetUUID.output.buffer
+// LHG SEC DEF
+            { "buffer", schema_t<MaaStringBuffer *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaCreate_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaCreate.output.return
+// LHG SEC DEF
+            { "return", schema_t<MaaInstanceAPI *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaDestroy_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaDestroy.output.return
+// LHG SEC DEF
+            { "return", schema_t<void>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaSetOption_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaSetOption.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaBindResource_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaBindResource.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaBindController_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaBindController.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaInited_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaInited.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaClearCustomRecognizer_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaClearCustomRecognizer.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaClearCustomAction_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaClearCustomAction.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaPostTask_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaPostTask.output.return
+// LHG SEC DEF
+            { "return", schema_t<long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaSetTaskParam_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaSetTaskParam.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaTaskStatus_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaTaskStatus.output.return
+// LHG SEC DEF
+            { "return", schema_t<int>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaWaitTask_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaWaitTask.output.return
+// LHG SEC DEF
+            { "return", schema_t<int>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaTaskAllFinished_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaTaskAllFinished.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaPostStop_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaPostStop.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaStop_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaStop.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaGetResource_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaGetResource.output.return
+// LHG SEC DEF
+            { "return", schema_t<MaaResourceAPI *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaGetController_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaGetController.output.return
+// LHG SEC DEF
+            { "return", schema_t<MaaControllerAPI *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaResourceCreate_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaResourceCreate.output.return
+// LHG SEC DEF
+            { "return", schema_t<MaaResourceAPI *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaResourceDestroy_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaResourceDestroy.output.return
+// LHG SEC DEF
+            { "return", schema_t<void>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaResourcePostPath_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaResourcePostPath.output.return
+// LHG SEC DEF
+            { "return", schema_t<long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaResourceStatus_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaResourceStatus.output.return
+// LHG SEC DEF
+            { "return", schema_t<int>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaResourceWait_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaResourceWait.output.return
+// LHG SEC DEF
+            { "return", schema_t<int>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaResourceLoaded_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaResourceLoaded.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaResourceSetOption_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaResourceSetOption.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaResourceGetHash_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaResourceGetHash.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaResourceGetHash.output.buffer
+// LHG SEC DEF
+            { "buffer", schema_t<MaaStringBuffer *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaResourceGetTaskList_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaResourceGetTaskList.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+// LHG SEC BEGIN lhg.helper.MaaResourceGetTaskList.output.buffer
+// LHG SEC DEF
+            { "buffer", schema_t<MaaStringBuffer *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaCreateImageBuffer_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaCreateImageBuffer.output.return
+// LHG SEC DEF
+            { "return", schema_t<MaaImageBuffer *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaDestroyImageBuffer_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaDestroyImageBuffer.output.return
+// LHG SEC DEF
+            { "return", schema_t<void>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaIsImageEmpty_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaIsImageEmpty.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaClearImage_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaClearImage.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaGetImageWidth_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaGetImageWidth.output.return
+// LHG SEC DEF
+            { "return", schema_t<int>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaGetImageHeight_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaGetImageHeight.output.return
+// LHG SEC DEF
+            { "return", schema_t<int>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaGetImageType_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaGetImageType.output.return
+// LHG SEC DEF
+            { "return", schema_t<int>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaGetImageEncoded_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaGetImageEncoded.output.return
+            { "return", "string@buffer" },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaSetImageEncoded_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaSetImageEncoded.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaVersion_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaVersion.output.return
+// LHG SEC DEF
+            { "return", schema_t<const char *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaSetGlobalOption_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaSetGlobalOption.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitInit_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitInit.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitUninit_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitUninit.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitFindDevice_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitFindDevice.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitFindDeviceWithAdb_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitFindDeviceWithAdb.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitPostFindDevice_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitPostFindDevice.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitPostFindDeviceWithAdb_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitPostFindDeviceWithAdb.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitIsFindDeviceCompleted_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitIsFindDeviceCompleted.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitWaitForFindDeviceToComplete_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitWaitForFindDeviceToComplete.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitGetDeviceCount_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitGetDeviceCount.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitGetDeviceName_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitGetDeviceName.output.return
+// LHG SEC DEF
+            { "return", schema_t<const char *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitGetDeviceAdbPath_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitGetDeviceAdbPath.output.return
+// LHG SEC DEF
+            { "return", schema_t<const char *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitGetDeviceAdbSerial_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitGetDeviceAdbSerial.output.return
+// LHG SEC DEF
+            { "return", schema_t<const char *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitGetDeviceAdbControllerType_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitGetDeviceAdbControllerType.output.return
+// LHG SEC DEF
+            { "return", schema_t<int>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitGetDeviceAdbConfig_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitGetDeviceAdbConfig.output.return
+// LHG SEC DEF
+            { "return", schema_t<const char *>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitRegisterCustomRecognizerExecutor_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitRegisterCustomRecognizerExecutor.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitUnregisterCustomRecognizerExecutor_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitUnregisterCustomRecognizerExecutor.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitRegisterCustomActionExecutor_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitRegisterCustomActionExecutor.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitUnregisterCustomActionExecutor_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitUnregisterCustomActionExecutor.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned char>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitFindWindow_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitFindWindow.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitSearchWindow_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitSearchWindow.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitGetWindow_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitGetWindow.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
+
+json::object MaaToolKitGetCursorWindow_HelperOutput() {
+    return json::object {
+        { "data", {
+// LHG SEC BEGIN lhg.helper.MaaToolKitGetCursorWindow.output.return
+// LHG SEC DEF
+            { "return", schema_t<unsigned long long>::schema },
+// LHG SEC END
+        }},
+        { "error", "string" }
+    };
+}
 
 std::optional<json::object> MaaAdbControllerCreate_Wrapper(json::object __param, std::string &__error) {
 // LHG SEC BEGIN lhg.impl.MaaAdbControllerCreate.arg.adb_path.check
@@ -80,7 +2040,7 @@ std::optional<json::object> MaaAdbControllerCreate_Wrapper(json::object __param,
 // LHG SEC BEGIN lhg.impl.MaaAdbControllerCreate.arg.callback_arg.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["null"])) {
-        __error = "null should be string";
+        __error = "null should be string@MaaAPICallback";
         return std::nullopt;
     }
 // LHG SEC END
@@ -110,8 +2070,8 @@ std::optional<json::object> MaaAdbControllerCreate_Wrapper(json::object __param,
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaAdbControllerCreate.arg.callback_arg
 // LHG SEC DEF
-    auto callback_arg_id = __param["callback"].as_string();
-    auto callback_arg = MaaAPICallback__Manager.find(callback_arg_id).get();
+    auto callback_arg_temp = from_json<void *>(__param["callback_arg"]);
+    auto callback_arg = from_json_fix<void *>(callback_arg_temp);
 // LHG SEC END
     auto __return = MaaAdbControllerCreate(
         adb_path,
@@ -153,7 +2113,7 @@ std::optional<json::object> MaaWin32ControllerCreate_Wrapper(json::object __para
 // LHG SEC BEGIN lhg.impl.MaaWin32ControllerCreate.arg.callback_arg.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["null"])) {
-        __error = "null should be string";
+        __error = "null should be string@MaaAPICallback";
         return std::nullopt;
     }
 // LHG SEC END
@@ -173,8 +2133,8 @@ std::optional<json::object> MaaWin32ControllerCreate_Wrapper(json::object __para
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaWin32ControllerCreate.arg.callback_arg
 // LHG SEC DEF
-    auto callback_arg_id = __param["callback"].as_string();
-    auto callback_arg = MaaAPICallback__Manager.find(callback_arg_id).get();
+    auto callback_arg_temp = from_json<void *>(__param["callback_arg"]);
+    auto callback_arg = from_json_fix<void *>(callback_arg_temp);
 // LHG SEC END
     auto __return = MaaWin32ControllerCreate(
         hWnd,
@@ -241,7 +2201,7 @@ std::optional<json::object> MaaAdbControllerCreateV2_Wrapper(json::object __para
 // LHG SEC BEGIN lhg.impl.MaaAdbControllerCreateV2.arg.callback_arg.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["null"])) {
-        __error = "null should be string";
+        __error = "null should be string@MaaAPICallback";
         return std::nullopt;
     }
 // LHG SEC END
@@ -276,8 +2236,8 @@ std::optional<json::object> MaaAdbControllerCreateV2_Wrapper(json::object __para
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaAdbControllerCreateV2.arg.callback_arg
 // LHG SEC DEF
-    auto callback_arg_id = __param["callback"].as_string();
-    auto callback_arg = MaaAPICallback__Manager.find(callback_arg_id).get();
+    auto callback_arg_temp = from_json<void *>(__param["callback_arg"]);
+    auto callback_arg = from_json_fix<void *>(callback_arg_temp);
 // LHG SEC END
     auto __return = MaaAdbControllerCreateV2(
         adb_path,
@@ -338,7 +2298,7 @@ std::optional<json::object> MaaThriftControllerCreate_Wrapper(json::object __par
 // LHG SEC BEGIN lhg.impl.MaaThriftControllerCreate.arg.callback_arg.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["null"])) {
-        __error = "null should be string";
+        __error = "null should be string@MaaAPICallback";
         return std::nullopt;
     }
 // LHG SEC END
@@ -368,8 +2328,8 @@ std::optional<json::object> MaaThriftControllerCreate_Wrapper(json::object __par
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaThriftControllerCreate.arg.callback_arg
 // LHG SEC DEF
-    auto callback_arg_id = __param["callback"].as_string();
-    auto callback_arg = MaaAPICallback__Manager.find(callback_arg_id).get();
+    auto callback_arg_temp = from_json<void *>(__param["callback_arg"]);
+    auto callback_arg = from_json_fix<void *>(callback_arg_temp);
 // LHG SEC END
     auto __return = MaaThriftControllerCreate(
         type,
@@ -429,7 +2389,7 @@ std::optional<json::object> MaaDbgControllerCreate_Wrapper(json::object __param,
 // LHG SEC BEGIN lhg.impl.MaaDbgControllerCreate.arg.callback_arg.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["null"])) {
-        __error = "null should be string";
+        __error = "null should be string@MaaAPICallback";
         return std::nullopt;
     }
 // LHG SEC END
@@ -459,8 +2419,8 @@ std::optional<json::object> MaaDbgControllerCreate_Wrapper(json::object __param,
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaDbgControllerCreate.arg.callback_arg
 // LHG SEC DEF
-    auto callback_arg_id = __param["callback"].as_string();
-    auto callback_arg = MaaAPICallback__Manager.find(callback_arg_id).get();
+    auto callback_arg_temp = from_json<void *>(__param["callback_arg"]);
+    auto callback_arg = from_json_fix<void *>(callback_arg_temp);
 // LHG SEC END
     auto __return = MaaDbgControllerCreate(
         read_path,
@@ -484,7 +2444,7 @@ std::optional<json::object> MaaControllerDestroy_Wrapper(json::object __param, s
 // LHG SEC BEGIN lhg.impl.MaaControllerDestroy.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -511,7 +2471,7 @@ std::optional<json::object> MaaControllerSetOption_Wrapper(json::object __param,
 // LHG SEC BEGIN lhg.impl.MaaControllerSetOption.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -525,22 +2485,34 @@ std::optional<json::object> MaaControllerSetOption_Wrapper(json::object __param,
     }
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaControllerSetOption.arg.value.check
-// LHG SEC DEF
-    if constexpr (check_var_t<void *>::value) {
-        if (!check_var<void *>(__param["value"])) {
-            __error = "value should be void *";
+    switch (__param["key"].as_integer()) {
+        case MaaCtrlOption_DefaultAppPackageEntry:
+        case MaaCtrlOption_DefaultAppPackage:
+            if (!check_var<const char *>(__param["value"])) {
+                __error = "value should be string";
+                return std::nullopt;
+            }
+            break;
+        case MaaCtrlOption_ScreenshotTargetLongSide:
+        case MaaCtrlOption_ScreenshotTargetShortSide:
+            if (!check_var<int>(__param["value"])) {
+                __error = "value should be int";
+                return std::nullopt;
+            }
+            break;
+        case MaaCtrlOption_Recording:
+            if (!check_var<bool>(__param["value"])) {
+                __error = "value should be boolean";
+                return std::nullopt;
+            }
+            break;
+        default:
+            __error = "key outside enum";
             return std::nullopt;
-        }
     }
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaControllerSetOption.arg.val_size.check
-// LHG SEC DEF
-    if constexpr (check_var_t<unsigned long long>::value) {
-        if (!check_var<unsigned long long>(__param["val_size"])) {
-            __error = "val_size should be unsigned long long";
-            return std::nullopt;
-        }
-    }
+
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaControllerSetOption.arg.ctrl
 // LHG SEC DEF
@@ -604,7 +2576,7 @@ std::optional<json::object> MaaControllerPostConnection_Wrapper(json::object __p
 // LHG SEC BEGIN lhg.impl.MaaControllerPostConnection.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -630,7 +2602,7 @@ std::optional<json::object> MaaControllerPostClick_Wrapper(json::object __param,
 // LHG SEC BEGIN lhg.impl.MaaControllerPostClick.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -686,7 +2658,7 @@ std::optional<json::object> MaaControllerPostSwipe_Wrapper(json::object __param,
 // LHG SEC BEGIN lhg.impl.MaaControllerPostSwipe.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -787,7 +2759,7 @@ std::optional<json::object> MaaControllerPostPressKey_Wrapper(json::object __par
 // LHG SEC BEGIN lhg.impl.MaaControllerPostPressKey.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -828,7 +2800,7 @@ std::optional<json::object> MaaControllerPostInputText_Wrapper(json::object __pa
 // LHG SEC BEGIN lhg.impl.MaaControllerPostInputText.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -869,7 +2841,7 @@ std::optional<json::object> MaaControllerPostTouchDown_Wrapper(json::object __pa
 // LHG SEC BEGIN lhg.impl.MaaControllerPostTouchDown.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -955,7 +2927,7 @@ std::optional<json::object> MaaControllerPostTouchMove_Wrapper(json::object __pa
 // LHG SEC BEGIN lhg.impl.MaaControllerPostTouchMove.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1041,7 +3013,7 @@ std::optional<json::object> MaaControllerPostTouchUp_Wrapper(json::object __para
 // LHG SEC BEGIN lhg.impl.MaaControllerPostTouchUp.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1082,7 +3054,7 @@ std::optional<json::object> MaaControllerPostScreencap_Wrapper(json::object __pa
 // LHG SEC BEGIN lhg.impl.MaaControllerPostScreencap.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1108,7 +3080,7 @@ std::optional<json::object> MaaControllerStatus_Wrapper(json::object __param, st
 // LHG SEC BEGIN lhg.impl.MaaControllerStatus.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1149,7 +3121,7 @@ std::optional<json::object> MaaControllerWait_Wrapper(json::object __param, std:
 // LHG SEC BEGIN lhg.impl.MaaControllerWait.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1190,7 +3162,7 @@ std::optional<json::object> MaaControllerConnected_Wrapper(json::object __param,
 // LHG SEC BEGIN lhg.impl.MaaControllerConnected.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1216,14 +3188,14 @@ std::optional<json::object> MaaControllerGetImage_Wrapper(json::object __param, 
 // LHG SEC BEGIN lhg.impl.MaaControllerGetImage.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaControllerGetImage.arg.buffer.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["buffer"])) {
-        __error = "buffer should be string";
+        __error = "buffer should be string@MaaImageBuffer";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1255,7 +3227,7 @@ std::optional<json::object> MaaControllerGetUUID_Wrapper(json::object __param, s
 // LHG SEC BEGIN lhg.impl.MaaControllerGetUUID.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1286,7 +3258,7 @@ std::optional<json::object> MaaCreate_Wrapper(json::object __param, std::string 
 // LHG SEC BEGIN lhg.impl.MaaCreate.arg.callback_arg.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["null"])) {
-        __error = "null should be string";
+        __error = "null should be string@MaaAPICallback";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1296,8 +3268,8 @@ std::optional<json::object> MaaCreate_Wrapper(json::object __param, std::string 
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaCreate.arg.callback_arg
 // LHG SEC DEF
-    auto callback_arg_id = __param["callback"].as_string();
-    auto callback_arg = MaaAPICallback__Manager.find(callback_arg_id).get();
+    auto callback_arg_temp = from_json<void *>(__param["callback_arg"]);
+    auto callback_arg = from_json_fix<void *>(callback_arg_temp);
 // LHG SEC END
     auto __return = MaaCreate(
         callback,
@@ -1317,7 +3289,7 @@ std::optional<json::object> MaaDestroy_Wrapper(json::object __param, std::string
 // LHG SEC BEGIN lhg.impl.MaaDestroy.arg.inst.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["inst"])) {
-        __error = "inst should be string";
+        __error = "inst should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1344,7 +3316,7 @@ std::optional<json::object> MaaSetOption_Wrapper(json::object __param, std::stri
 // LHG SEC BEGIN lhg.impl.MaaSetOption.arg.inst.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["inst"])) {
-        __error = "inst should be string";
+        __error = "inst should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1358,22 +3330,10 @@ std::optional<json::object> MaaSetOption_Wrapper(json::object __param, std::stri
     }
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaSetOption.arg.value.check
-// LHG SEC DEF
-    if constexpr (check_var_t<void *>::value) {
-        if (!check_var<void *>(__param["value"])) {
-            __error = "value should be void *";
-            return std::nullopt;
-        }
-    }
+
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaSetOption.arg.val_size.check
-// LHG SEC DEF
-    if constexpr (check_var_t<unsigned long long>::value) {
-        if (!check_var<unsigned long long>(__param["val_size"])) {
-            __error = "val_size should be unsigned long long";
-            return std::nullopt;
-        }
-    }
+
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaSetOption.arg.inst
 // LHG SEC DEF
@@ -1388,6 +3348,7 @@ std::optional<json::object> MaaSetOption_Wrapper(json::object __param, std::stri
 // LHG SEC BEGIN lhg.impl.MaaSetOption.arg.value
     void *value;
     uint64_t val_size;
+    __error = "no available key";
     return std::nullopt;
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaSetOption.arg.val_size
@@ -1413,14 +3374,14 @@ std::optional<json::object> MaaBindResource_Wrapper(json::object __param, std::s
 // LHG SEC BEGIN lhg.impl.MaaBindResource.arg.inst.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["inst"])) {
-        __error = "inst should be string";
+        __error = "inst should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaBindResource.arg.res.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["res"])) {
-        __error = "res should be string";
+        __error = "res should be string@MaaResourceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1452,14 +3413,14 @@ std::optional<json::object> MaaBindController_Wrapper(json::object __param, std:
 // LHG SEC BEGIN lhg.impl.MaaBindController.arg.inst.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["inst"])) {
-        __error = "inst should be string";
+        __error = "inst should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaBindController.arg.ctrl.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["ctrl"])) {
-        __error = "ctrl should be string";
+        __error = "ctrl should be string@MaaControllerAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1491,7 +3452,7 @@ std::optional<json::object> MaaInited_Wrapper(json::object __param, std::string 
 // LHG SEC BEGIN lhg.impl.MaaInited.arg.inst.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["inst"])) {
-        __error = "inst should be string";
+        __error = "inst should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1517,7 +3478,7 @@ std::optional<json::object> MaaClearCustomRecognizer_Wrapper(json::object __para
 // LHG SEC BEGIN lhg.impl.MaaClearCustomRecognizer.arg.inst.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["inst"])) {
-        __error = "inst should be string";
+        __error = "inst should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1543,7 +3504,7 @@ std::optional<json::object> MaaClearCustomAction_Wrapper(json::object __param, s
 // LHG SEC BEGIN lhg.impl.MaaClearCustomAction.arg.inst.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["inst"])) {
-        __error = "inst should be string";
+        __error = "inst should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1569,7 +3530,7 @@ std::optional<json::object> MaaPostTask_Wrapper(json::object __param, std::strin
 // LHG SEC BEGIN lhg.impl.MaaPostTask.arg.inst.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["inst"])) {
-        __error = "inst should be string";
+        __error = "inst should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1625,7 +3586,7 @@ std::optional<json::object> MaaSetTaskParam_Wrapper(json::object __param, std::s
 // LHG SEC BEGIN lhg.impl.MaaSetTaskParam.arg.inst.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["inst"])) {
-        __error = "inst should be string";
+        __error = "inst should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1681,7 +3642,7 @@ std::optional<json::object> MaaTaskStatus_Wrapper(json::object __param, std::str
 // LHG SEC BEGIN lhg.impl.MaaTaskStatus.arg.inst.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["inst"])) {
-        __error = "inst should be string";
+        __error = "inst should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1722,7 +3683,7 @@ std::optional<json::object> MaaWaitTask_Wrapper(json::object __param, std::strin
 // LHG SEC BEGIN lhg.impl.MaaWaitTask.arg.inst.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["inst"])) {
-        __error = "inst should be string";
+        __error = "inst should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1763,7 +3724,7 @@ std::optional<json::object> MaaTaskAllFinished_Wrapper(json::object __param, std
 // LHG SEC BEGIN lhg.impl.MaaTaskAllFinished.arg.inst.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["inst"])) {
-        __error = "inst should be string";
+        __error = "inst should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1789,7 +3750,7 @@ std::optional<json::object> MaaPostStop_Wrapper(json::object __param, std::strin
 // LHG SEC BEGIN lhg.impl.MaaPostStop.arg.inst.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["inst"])) {
-        __error = "inst should be string";
+        __error = "inst should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1815,7 +3776,7 @@ std::optional<json::object> MaaStop_Wrapper(json::object __param, std::string &_
 // LHG SEC BEGIN lhg.impl.MaaStop.arg.inst.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["inst"])) {
-        __error = "inst should be string";
+        __error = "inst should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1841,7 +3802,7 @@ std::optional<json::object> MaaGetResource_Wrapper(json::object __param, std::st
 // LHG SEC BEGIN lhg.impl.MaaGetResource.arg.inst.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["inst"])) {
-        __error = "inst should be string";
+        __error = "inst should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1867,7 +3828,7 @@ std::optional<json::object> MaaGetController_Wrapper(json::object __param, std::
 // LHG SEC BEGIN lhg.impl.MaaGetController.arg.inst.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["inst"])) {
-        __error = "inst should be string";
+        __error = "inst should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1893,7 +3854,7 @@ std::optional<json::object> MaaResourceCreate_Wrapper(json::object __param, std:
 // LHG SEC BEGIN lhg.impl.MaaResourceCreate.arg.callback_arg.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["null"])) {
-        __error = "null should be string";
+        __error = "null should be string@MaaAPICallback";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1903,8 +3864,8 @@ std::optional<json::object> MaaResourceCreate_Wrapper(json::object __param, std:
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaResourceCreate.arg.callback_arg
 // LHG SEC DEF
-    auto callback_arg_id = __param["callback"].as_string();
-    auto callback_arg = MaaAPICallback__Manager.find(callback_arg_id).get();
+    auto callback_arg_temp = from_json<void *>(__param["callback_arg"]);
+    auto callback_arg = from_json_fix<void *>(callback_arg_temp);
 // LHG SEC END
     auto __return = MaaResourceCreate(
         callback,
@@ -1924,7 +3885,7 @@ std::optional<json::object> MaaResourceDestroy_Wrapper(json::object __param, std
 // LHG SEC BEGIN lhg.impl.MaaResourceDestroy.arg.res.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["res"])) {
-        __error = "res should be string";
+        __error = "res should be string@MaaResourceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1951,7 +3912,7 @@ std::optional<json::object> MaaResourcePostPath_Wrapper(json::object __param, st
 // LHG SEC BEGIN lhg.impl.MaaResourcePostPath.arg.res.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["res"])) {
-        __error = "res should be string";
+        __error = "res should be string@MaaResourceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -1992,7 +3953,7 @@ std::optional<json::object> MaaResourceStatus_Wrapper(json::object __param, std:
 // LHG SEC BEGIN lhg.impl.MaaResourceStatus.arg.res.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["res"])) {
-        __error = "res should be string";
+        __error = "res should be string@MaaResourceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -2033,7 +3994,7 @@ std::optional<json::object> MaaResourceWait_Wrapper(json::object __param, std::s
 // LHG SEC BEGIN lhg.impl.MaaResourceWait.arg.res.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["res"])) {
-        __error = "res should be string";
+        __error = "res should be string@MaaResourceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -2074,7 +4035,7 @@ std::optional<json::object> MaaResourceLoaded_Wrapper(json::object __param, std:
 // LHG SEC BEGIN lhg.impl.MaaResourceLoaded.arg.res.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["res"])) {
-        __error = "res should be string";
+        __error = "res should be string@MaaResourceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -2100,7 +4061,7 @@ std::optional<json::object> MaaResourceSetOption_Wrapper(json::object __param, s
 // LHG SEC BEGIN lhg.impl.MaaResourceSetOption.arg.res.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["res"])) {
-        __error = "res should be string";
+        __error = "res should be string@MaaResourceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -2114,22 +4075,10 @@ std::optional<json::object> MaaResourceSetOption_Wrapper(json::object __param, s
     }
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaResourceSetOption.arg.value.check
-// LHG SEC DEF
-    if constexpr (check_var_t<void *>::value) {
-        if (!check_var<void *>(__param["value"])) {
-            __error = "value should be void *";
-            return std::nullopt;
-        }
-    }
+
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaResourceSetOption.arg.val_size.check
-// LHG SEC DEF
-    if constexpr (check_var_t<unsigned long long>::value) {
-        if (!check_var<unsigned long long>(__param["val_size"])) {
-            __error = "val_size should be unsigned long long";
-            return std::nullopt;
-        }
-    }
+
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaResourceSetOption.arg.res
 // LHG SEC DEF
@@ -2144,6 +4093,7 @@ std::optional<json::object> MaaResourceSetOption_Wrapper(json::object __param, s
 // LHG SEC BEGIN lhg.impl.MaaResourceSetOption.arg.value
     void *value;
     uint64_t val_size;
+    __error = "no available key";
     return std::nullopt;
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaResourceSetOption.arg.val_size
@@ -2169,7 +4119,7 @@ std::optional<json::object> MaaResourceGetHash_Wrapper(json::object __param, std
 // LHG SEC BEGIN lhg.impl.MaaResourceGetHash.arg.res.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["res"])) {
-        __error = "res should be string";
+        __error = "res should be string@MaaResourceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -2200,7 +4150,7 @@ std::optional<json::object> MaaResourceGetTaskList_Wrapper(json::object __param,
 // LHG SEC BEGIN lhg.impl.MaaResourceGetTaskList.arg.res.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["res"])) {
-        __error = "res should be string";
+        __error = "res should be string@MaaResourceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -2245,7 +4195,7 @@ std::optional<json::object> MaaDestroyImageBuffer_Wrapper(json::object __param, 
 // LHG SEC BEGIN lhg.impl.MaaDestroyImageBuffer.arg.handle.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["handle"])) {
-        __error = "handle should be string";
+        __error = "handle should be string@MaaImageBuffer";
         return std::nullopt;
     }
 // LHG SEC END
@@ -2272,7 +4222,7 @@ std::optional<json::object> MaaIsImageEmpty_Wrapper(json::object __param, std::s
 // LHG SEC BEGIN lhg.impl.MaaIsImageEmpty.arg.handle.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["handle"])) {
-        __error = "handle should be string";
+        __error = "handle should be string@MaaImageBuffer";
         return std::nullopt;
     }
 // LHG SEC END
@@ -2298,7 +4248,7 @@ std::optional<json::object> MaaClearImage_Wrapper(json::object __param, std::str
 // LHG SEC BEGIN lhg.impl.MaaClearImage.arg.handle.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["handle"])) {
-        __error = "handle should be string";
+        __error = "handle should be string@MaaImageBuffer";
         return std::nullopt;
     }
 // LHG SEC END
@@ -2320,37 +4270,11 @@ std::optional<json::object> MaaClearImage_Wrapper(json::object __param, std::str
 // LHG SEC END
 }
 
-std::optional<json::object> MaaGetImageRawData_Wrapper(json::object __param, std::string &__error) {
-// LHG SEC BEGIN lhg.impl.MaaGetImageRawData.arg.handle.check
-// LHG SEC DEF
-    if (!check_var<const char*>(__param["handle"])) {
-        __error = "handle should be string";
-        return std::nullopt;
-    }
-// LHG SEC END
-// LHG SEC BEGIN lhg.impl.MaaGetImageRawData.arg.handle
-// LHG SEC DEF
-    auto handle_id = __param["handle"].as_string();
-    auto handle = MaaImageBuffer__OpaqueManager.get(handle_id);
-// LHG SEC END
-    auto __return = MaaGetImageRawData(
-        handle
-    );
-// LHG SEC BEGIN lhg.impl.MaaGetImageRawData.return
-// LHG SEC DEF
-    auto __ret = __return;
-// LHG SEC END
-// LHG SEC BEGIN lhg.impl.MaaGetImageRawData.final
-// LHG SEC DEF
-    return json::object { { "return", to_json(__ret) },  };
-// LHG SEC END
-}
-
 std::optional<json::object> MaaGetImageWidth_Wrapper(json::object __param, std::string &__error) {
 // LHG SEC BEGIN lhg.impl.MaaGetImageWidth.arg.handle.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["handle"])) {
-        __error = "handle should be string";
+        __error = "handle should be string@MaaImageBuffer";
         return std::nullopt;
     }
 // LHG SEC END
@@ -2376,7 +4300,7 @@ std::optional<json::object> MaaGetImageHeight_Wrapper(json::object __param, std:
 // LHG SEC BEGIN lhg.impl.MaaGetImageHeight.arg.handle.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["handle"])) {
-        __error = "handle should be string";
+        __error = "handle should be string@MaaImageBuffer";
         return std::nullopt;
     }
 // LHG SEC END
@@ -2402,7 +4326,7 @@ std::optional<json::object> MaaGetImageType_Wrapper(json::object __param, std::s
 // LHG SEC BEGIN lhg.impl.MaaGetImageType.arg.handle.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["handle"])) {
-        __error = "handle should be string";
+        __error = "handle should be string@MaaImageBuffer";
         return std::nullopt;
     }
 // LHG SEC END
@@ -2428,7 +4352,7 @@ std::optional<json::object> MaaGetImageEncoded_Wrapper(json::object __param, std
 // LHG SEC BEGIN lhg.impl.MaaGetImageEncoded.arg.handle.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["handle"])) {
-        __error = "handle should be string";
+        __error = "handle should be string@MaaImageBuffer";
         return std::nullopt;
     }
 // LHG SEC END
@@ -2441,36 +4365,9 @@ std::optional<json::object> MaaGetImageEncoded_Wrapper(json::object __param, std
         handle
     );
 // LHG SEC BEGIN lhg.impl.MaaGetImageEncoded.return
-// LHG SEC DEF
-    auto __ret = __return;
+    std::string __ret(reinterpret_cast<char*>(__return), MaaGetImageEncodedSize(handle));
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaGetImageEncoded.final
-// LHG SEC DEF
-    return json::object { { "return", to_json(__ret) },  };
-// LHG SEC END
-}
-
-std::optional<json::object> MaaGetImageEncodedSize_Wrapper(json::object __param, std::string &__error) {
-// LHG SEC BEGIN lhg.impl.MaaGetImageEncodedSize.arg.handle.check
-// LHG SEC DEF
-    if (!check_var<const char*>(__param["handle"])) {
-        __error = "handle should be string";
-        return std::nullopt;
-    }
-// LHG SEC END
-// LHG SEC BEGIN lhg.impl.MaaGetImageEncodedSize.arg.handle
-// LHG SEC DEF
-    auto handle_id = __param["handle"].as_string();
-    auto handle = MaaImageBuffer__OpaqueManager.get(handle_id);
-// LHG SEC END
-    auto __return = MaaGetImageEncodedSize(
-        handle
-    );
-// LHG SEC BEGIN lhg.impl.MaaGetImageEncodedSize.return
-// LHG SEC DEF
-    auto __ret = __return;
-// LHG SEC END
-// LHG SEC BEGIN lhg.impl.MaaGetImageEncodedSize.final
 // LHG SEC DEF
     return json::object { { "return", to_json(__ret) },  };
 // LHG SEC END
@@ -2480,27 +4377,18 @@ std::optional<json::object> MaaSetImageEncoded_Wrapper(json::object __param, std
 // LHG SEC BEGIN lhg.impl.MaaSetImageEncoded.arg.handle.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["handle"])) {
-        __error = "handle should be string";
+        __error = "handle should be string@MaaImageBuffer";
         return std::nullopt;
     }
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaSetImageEncoded.arg.data.check
-// LHG SEC DEF
-    if constexpr (check_var_t<unsigned char *>::value) {
-        if (!check_var<unsigned char *>(__param["data"])) {
-            __error = "data should be unsigned char *";
-            return std::nullopt;
-        }
+    if (!check_var<const char *>(__param["data"])) {
+        __error = "data should be string@buffer";
+        return std::nullopt;
     }
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaSetImageEncoded.arg.size.check
-// LHG SEC DEF
-    if constexpr (check_var_t<unsigned long long>::value) {
-        if (!check_var<unsigned long long>(__param["size"])) {
-            __error = "size should be unsigned long long";
-            return std::nullopt;
-        }
-    }
+
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaSetImageEncoded.arg.handle
 // LHG SEC DEF
@@ -2508,14 +4396,12 @@ std::optional<json::object> MaaSetImageEncoded_Wrapper(json::object __param, std
     auto handle = MaaImageBuffer__OpaqueManager.get(handle_id);
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaSetImageEncoded.arg.data
-// LHG SEC DEF
-    auto data_temp = from_json<unsigned char *>(__param["data"]);
-    auto data = from_json_fix<unsigned char *>(data_temp);
+    auto data_temp = __param["data"].as_string();
+    auto data = reinterpret_cast<uint8_t *>(const_cast<char *>(data_temp.c_str()));
+    auto size = data_temp.size();
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaSetImageEncoded.arg.size
-// LHG SEC DEF
-    auto size_temp = from_json<unsigned long long>(__param["size"]);
-    auto size = from_json_fix<unsigned long long>(size_temp);
+
 // LHG SEC END
     auto __return = MaaSetImageEncoded(
         handle,
@@ -2557,22 +4443,34 @@ std::optional<json::object> MaaSetGlobalOption_Wrapper(json::object __param, std
     }
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaSetGlobalOption.arg.value.check
-// LHG SEC DEF
-    if constexpr (check_var_t<void *>::value) {
-        if (!check_var<void *>(__param["value"])) {
-            __error = "value should be void *";
+    switch (__param["key"].as_integer()) {
+        case MaaGlobalOption_LogDir:
+            if (!check_var<const char *>(__param["value"])) {
+                __error = "value should be string";
+                return std::nullopt;
+            }
+            break;
+        case MaaGlobalOption_StdoutLevel:
+            if (!check_var<int>(__param["value"])) {
+                __error = "value should be int";
+                return std::nullopt;
+            }
+            break;
+        case MaaGlobalOption_SaveDraw:
+        case MaaGlobalOption_Recording:
+        case MaaGlobalOption_ShowHitDraw:
+            if (!check_var<bool>(__param["value"])) {
+                __error = "value should be boolean";
+                return std::nullopt;
+            }
+            break;
+        default:
+            __error = "key outside enum";
             return std::nullopt;
-        }
     }
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaSetGlobalOption.arg.val_size.check
-// LHG SEC DEF
-    if constexpr (check_var_t<unsigned long long>::value) {
-        if (!check_var<unsigned long long>(__param["val_size"])) {
-            __error = "val_size should be unsigned long long";
-            return std::nullopt;
-        }
-    }
+
 // LHG SEC END
 // LHG SEC BEGIN lhg.impl.MaaSetGlobalOption.arg.key
 // LHG SEC DEF
@@ -2923,7 +4821,7 @@ std::optional<json::object> MaaToolKitRegisterCustomRecognizerExecutor_Wrapper(j
 // LHG SEC BEGIN lhg.impl.MaaToolKitRegisterCustomRecognizerExecutor.arg.handle.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["handle"])) {
-        __error = "handle should be string";
+        __error = "handle should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -2994,7 +4892,7 @@ std::optional<json::object> MaaToolKitUnregisterCustomRecognizerExecutor_Wrapper
 // LHG SEC BEGIN lhg.impl.MaaToolKitUnregisterCustomRecognizerExecutor.arg.handle.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["handle"])) {
-        __error = "handle should be string";
+        __error = "handle should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -3035,7 +4933,7 @@ std::optional<json::object> MaaToolKitRegisterCustomActionExecutor_Wrapper(json:
 // LHG SEC BEGIN lhg.impl.MaaToolKitRegisterCustomActionExecutor.arg.handle.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["handle"])) {
-        __error = "handle should be string";
+        __error = "handle should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -3106,7 +5004,7 @@ std::optional<json::object> MaaToolKitUnregisterCustomActionExecutor_Wrapper(jso
 // LHG SEC BEGIN lhg.impl.MaaToolKitUnregisterCustomActionExecutor.arg.handle.check
 // LHG SEC DEF
     if (!check_var<const char*>(__param["handle"])) {
-        __error = "handle should be string";
+        __error = "handle should be string@MaaInstanceAPI";
         return std::nullopt;
     }
 // LHG SEC END
@@ -3284,103 +5182,123 @@ bool handle_request(Context& ctx, UrlSegments segs) {
     })) {
         return true;
     }
-    const static std::map<std::string, std::optional<json::object> (*)(json::object, std::string&)> wrappers = {
-        { "MaaAdbControllerCreate", &MaaAdbControllerCreate_Wrapper },
-        { "MaaWin32ControllerCreate", &MaaWin32ControllerCreate_Wrapper },
-        { "MaaAdbControllerCreateV2", &MaaAdbControllerCreateV2_Wrapper },
-        { "MaaThriftControllerCreate", &MaaThriftControllerCreate_Wrapper },
-        { "MaaDbgControllerCreate", &MaaDbgControllerCreate_Wrapper },
-        { "MaaControllerDestroy", &MaaControllerDestroy_Wrapper },
-        { "MaaControllerSetOption", &MaaControllerSetOption_Wrapper },
-        { "MaaControllerPostConnection", &MaaControllerPostConnection_Wrapper },
-        { "MaaControllerPostClick", &MaaControllerPostClick_Wrapper },
-        { "MaaControllerPostSwipe", &MaaControllerPostSwipe_Wrapper },
-        { "MaaControllerPostPressKey", &MaaControllerPostPressKey_Wrapper },
-        { "MaaControllerPostInputText", &MaaControllerPostInputText_Wrapper },
-        { "MaaControllerPostTouchDown", &MaaControllerPostTouchDown_Wrapper },
-        { "MaaControllerPostTouchMove", &MaaControllerPostTouchMove_Wrapper },
-        { "MaaControllerPostTouchUp", &MaaControllerPostTouchUp_Wrapper },
-        { "MaaControllerPostScreencap", &MaaControllerPostScreencap_Wrapper },
-        { "MaaControllerStatus", &MaaControllerStatus_Wrapper },
-        { "MaaControllerWait", &MaaControllerWait_Wrapper },
-        { "MaaControllerConnected", &MaaControllerConnected_Wrapper },
-        { "MaaControllerGetImage", &MaaControllerGetImage_Wrapper },
-        { "MaaControllerGetUUID", &MaaControllerGetUUID_Wrapper },
-        { "MaaCreate", &MaaCreate_Wrapper },
-        { "MaaDestroy", &MaaDestroy_Wrapper },
-        { "MaaSetOption", &MaaSetOption_Wrapper },
-        { "MaaBindResource", &MaaBindResource_Wrapper },
-        { "MaaBindController", &MaaBindController_Wrapper },
-        { "MaaInited", &MaaInited_Wrapper },
-        { "MaaClearCustomRecognizer", &MaaClearCustomRecognizer_Wrapper },
-        { "MaaClearCustomAction", &MaaClearCustomAction_Wrapper },
-        { "MaaPostTask", &MaaPostTask_Wrapper },
-        { "MaaSetTaskParam", &MaaSetTaskParam_Wrapper },
-        { "MaaTaskStatus", &MaaTaskStatus_Wrapper },
-        { "MaaWaitTask", &MaaWaitTask_Wrapper },
-        { "MaaTaskAllFinished", &MaaTaskAllFinished_Wrapper },
-        { "MaaPostStop", &MaaPostStop_Wrapper },
-        { "MaaStop", &MaaStop_Wrapper },
-        { "MaaGetResource", &MaaGetResource_Wrapper },
-        { "MaaGetController", &MaaGetController_Wrapper },
-        { "MaaResourceCreate", &MaaResourceCreate_Wrapper },
-        { "MaaResourceDestroy", &MaaResourceDestroy_Wrapper },
-        { "MaaResourcePostPath", &MaaResourcePostPath_Wrapper },
-        { "MaaResourceStatus", &MaaResourceStatus_Wrapper },
-        { "MaaResourceWait", &MaaResourceWait_Wrapper },
-        { "MaaResourceLoaded", &MaaResourceLoaded_Wrapper },
-        { "MaaResourceSetOption", &MaaResourceSetOption_Wrapper },
-        { "MaaResourceGetHash", &MaaResourceGetHash_Wrapper },
-        { "MaaResourceGetTaskList", &MaaResourceGetTaskList_Wrapper },
-        { "MaaCreateImageBuffer", &MaaCreateImageBuffer_Wrapper },
-        { "MaaDestroyImageBuffer", &MaaDestroyImageBuffer_Wrapper },
-        { "MaaIsImageEmpty", &MaaIsImageEmpty_Wrapper },
-        { "MaaClearImage", &MaaClearImage_Wrapper },
-        { "MaaGetImageRawData", &MaaGetImageRawData_Wrapper },
-        { "MaaGetImageWidth", &MaaGetImageWidth_Wrapper },
-        { "MaaGetImageHeight", &MaaGetImageHeight_Wrapper },
-        { "MaaGetImageType", &MaaGetImageType_Wrapper },
-        { "MaaGetImageEncoded", &MaaGetImageEncoded_Wrapper },
-        { "MaaGetImageEncodedSize", &MaaGetImageEncodedSize_Wrapper },
-        { "MaaSetImageEncoded", &MaaSetImageEncoded_Wrapper },
-        { "MaaVersion", &MaaVersion_Wrapper },
-        { "MaaSetGlobalOption", &MaaSetGlobalOption_Wrapper },
-        { "MaaToolKitInit", &MaaToolKitInit_Wrapper },
-        { "MaaToolKitUninit", &MaaToolKitUninit_Wrapper },
-        { "MaaToolKitFindDevice", &MaaToolKitFindDevice_Wrapper },
-        { "MaaToolKitFindDeviceWithAdb", &MaaToolKitFindDeviceWithAdb_Wrapper },
-        { "MaaToolKitPostFindDevice", &MaaToolKitPostFindDevice_Wrapper },
-        { "MaaToolKitPostFindDeviceWithAdb", &MaaToolKitPostFindDeviceWithAdb_Wrapper },
-        { "MaaToolKitIsFindDeviceCompleted", &MaaToolKitIsFindDeviceCompleted_Wrapper },
-        { "MaaToolKitWaitForFindDeviceToComplete", &MaaToolKitWaitForFindDeviceToComplete_Wrapper },
-        { "MaaToolKitGetDeviceCount", &MaaToolKitGetDeviceCount_Wrapper },
-        { "MaaToolKitGetDeviceName", &MaaToolKitGetDeviceName_Wrapper },
-        { "MaaToolKitGetDeviceAdbPath", &MaaToolKitGetDeviceAdbPath_Wrapper },
-        { "MaaToolKitGetDeviceAdbSerial", &MaaToolKitGetDeviceAdbSerial_Wrapper },
-        { "MaaToolKitGetDeviceAdbControllerType", &MaaToolKitGetDeviceAdbControllerType_Wrapper },
-        { "MaaToolKitGetDeviceAdbConfig", &MaaToolKitGetDeviceAdbConfig_Wrapper },
-        { "MaaToolKitRegisterCustomRecognizerExecutor", &MaaToolKitRegisterCustomRecognizerExecutor_Wrapper },
-        { "MaaToolKitUnregisterCustomRecognizerExecutor", &MaaToolKitUnregisterCustomRecognizerExecutor_Wrapper },
-        { "MaaToolKitRegisterCustomActionExecutor", &MaaToolKitRegisterCustomActionExecutor_Wrapper },
-        { "MaaToolKitUnregisterCustomActionExecutor", &MaaToolKitUnregisterCustomActionExecutor_Wrapper },
-        { "MaaToolKitFindWindow", &MaaToolKitFindWindow_Wrapper },
-        { "MaaToolKitSearchWindow", &MaaToolKitSearchWindow_Wrapper },
-        { "MaaToolKitGetWindow", &MaaToolKitGetWindow_Wrapper },
-        { "MaaToolKitGetCursorWindow", &MaaToolKitGetCursorWindow_Wrapper },
+    const static std::map<std::string, std::tuple<
+        std::optional<json::object> (*)(json::object, std::string&),
+        json::object (*)(),
+        json::object (*)()
+    >> wrappers = {
+        { "MaaAdbControllerCreate", std::make_tuple(&MaaAdbControllerCreate_Wrapper, &MaaAdbControllerCreate_HelperInput, &MaaAdbControllerCreate_HelperOutput) },
+        { "MaaWin32ControllerCreate", std::make_tuple(&MaaWin32ControllerCreate_Wrapper, &MaaWin32ControllerCreate_HelperInput, &MaaWin32ControllerCreate_HelperOutput) },
+        { "MaaAdbControllerCreateV2", std::make_tuple(&MaaAdbControllerCreateV2_Wrapper, &MaaAdbControllerCreateV2_HelperInput, &MaaAdbControllerCreateV2_HelperOutput) },
+        { "MaaThriftControllerCreate", std::make_tuple(&MaaThriftControllerCreate_Wrapper, &MaaThriftControllerCreate_HelperInput, &MaaThriftControllerCreate_HelperOutput) },
+        { "MaaDbgControllerCreate", std::make_tuple(&MaaDbgControllerCreate_Wrapper, &MaaDbgControllerCreate_HelperInput, &MaaDbgControllerCreate_HelperOutput) },
+        { "MaaControllerDestroy", std::make_tuple(&MaaControllerDestroy_Wrapper, &MaaControllerDestroy_HelperInput, &MaaControllerDestroy_HelperOutput) },
+        { "MaaControllerSetOption", std::make_tuple(&MaaControllerSetOption_Wrapper, &MaaControllerSetOption_HelperInput, &MaaControllerSetOption_HelperOutput) },
+        { "MaaControllerPostConnection", std::make_tuple(&MaaControllerPostConnection_Wrapper, &MaaControllerPostConnection_HelperInput, &MaaControllerPostConnection_HelperOutput) },
+        { "MaaControllerPostClick", std::make_tuple(&MaaControllerPostClick_Wrapper, &MaaControllerPostClick_HelperInput, &MaaControllerPostClick_HelperOutput) },
+        { "MaaControllerPostSwipe", std::make_tuple(&MaaControllerPostSwipe_Wrapper, &MaaControllerPostSwipe_HelperInput, &MaaControllerPostSwipe_HelperOutput) },
+        { "MaaControllerPostPressKey", std::make_tuple(&MaaControllerPostPressKey_Wrapper, &MaaControllerPostPressKey_HelperInput, &MaaControllerPostPressKey_HelperOutput) },
+        { "MaaControllerPostInputText", std::make_tuple(&MaaControllerPostInputText_Wrapper, &MaaControllerPostInputText_HelperInput, &MaaControllerPostInputText_HelperOutput) },
+        { "MaaControllerPostTouchDown", std::make_tuple(&MaaControllerPostTouchDown_Wrapper, &MaaControllerPostTouchDown_HelperInput, &MaaControllerPostTouchDown_HelperOutput) },
+        { "MaaControllerPostTouchMove", std::make_tuple(&MaaControllerPostTouchMove_Wrapper, &MaaControllerPostTouchMove_HelperInput, &MaaControllerPostTouchMove_HelperOutput) },
+        { "MaaControllerPostTouchUp", std::make_tuple(&MaaControllerPostTouchUp_Wrapper, &MaaControllerPostTouchUp_HelperInput, &MaaControllerPostTouchUp_HelperOutput) },
+        { "MaaControllerPostScreencap", std::make_tuple(&MaaControllerPostScreencap_Wrapper, &MaaControllerPostScreencap_HelperInput, &MaaControllerPostScreencap_HelperOutput) },
+        { "MaaControllerStatus", std::make_tuple(&MaaControllerStatus_Wrapper, &MaaControllerStatus_HelperInput, &MaaControllerStatus_HelperOutput) },
+        { "MaaControllerWait", std::make_tuple(&MaaControllerWait_Wrapper, &MaaControllerWait_HelperInput, &MaaControllerWait_HelperOutput) },
+        { "MaaControllerConnected", std::make_tuple(&MaaControllerConnected_Wrapper, &MaaControllerConnected_HelperInput, &MaaControllerConnected_HelperOutput) },
+        { "MaaControllerGetImage", std::make_tuple(&MaaControllerGetImage_Wrapper, &MaaControllerGetImage_HelperInput, &MaaControllerGetImage_HelperOutput) },
+        { "MaaControllerGetUUID", std::make_tuple(&MaaControllerGetUUID_Wrapper, &MaaControllerGetUUID_HelperInput, &MaaControllerGetUUID_HelperOutput) },
+        { "MaaCreate", std::make_tuple(&MaaCreate_Wrapper, &MaaCreate_HelperInput, &MaaCreate_HelperOutput) },
+        { "MaaDestroy", std::make_tuple(&MaaDestroy_Wrapper, &MaaDestroy_HelperInput, &MaaDestroy_HelperOutput) },
+        { "MaaSetOption", std::make_tuple(&MaaSetOption_Wrapper, &MaaSetOption_HelperInput, &MaaSetOption_HelperOutput) },
+        { "MaaBindResource", std::make_tuple(&MaaBindResource_Wrapper, &MaaBindResource_HelperInput, &MaaBindResource_HelperOutput) },
+        { "MaaBindController", std::make_tuple(&MaaBindController_Wrapper, &MaaBindController_HelperInput, &MaaBindController_HelperOutput) },
+        { "MaaInited", std::make_tuple(&MaaInited_Wrapper, &MaaInited_HelperInput, &MaaInited_HelperOutput) },
+        { "MaaClearCustomRecognizer", std::make_tuple(&MaaClearCustomRecognizer_Wrapper, &MaaClearCustomRecognizer_HelperInput, &MaaClearCustomRecognizer_HelperOutput) },
+        { "MaaClearCustomAction", std::make_tuple(&MaaClearCustomAction_Wrapper, &MaaClearCustomAction_HelperInput, &MaaClearCustomAction_HelperOutput) },
+        { "MaaPostTask", std::make_tuple(&MaaPostTask_Wrapper, &MaaPostTask_HelperInput, &MaaPostTask_HelperOutput) },
+        { "MaaSetTaskParam", std::make_tuple(&MaaSetTaskParam_Wrapper, &MaaSetTaskParam_HelperInput, &MaaSetTaskParam_HelperOutput) },
+        { "MaaTaskStatus", std::make_tuple(&MaaTaskStatus_Wrapper, &MaaTaskStatus_HelperInput, &MaaTaskStatus_HelperOutput) },
+        { "MaaWaitTask", std::make_tuple(&MaaWaitTask_Wrapper, &MaaWaitTask_HelperInput, &MaaWaitTask_HelperOutput) },
+        { "MaaTaskAllFinished", std::make_tuple(&MaaTaskAllFinished_Wrapper, &MaaTaskAllFinished_HelperInput, &MaaTaskAllFinished_HelperOutput) },
+        { "MaaPostStop", std::make_tuple(&MaaPostStop_Wrapper, &MaaPostStop_HelperInput, &MaaPostStop_HelperOutput) },
+        { "MaaStop", std::make_tuple(&MaaStop_Wrapper, &MaaStop_HelperInput, &MaaStop_HelperOutput) },
+        { "MaaGetResource", std::make_tuple(&MaaGetResource_Wrapper, &MaaGetResource_HelperInput, &MaaGetResource_HelperOutput) },
+        { "MaaGetController", std::make_tuple(&MaaGetController_Wrapper, &MaaGetController_HelperInput, &MaaGetController_HelperOutput) },
+        { "MaaResourceCreate", std::make_tuple(&MaaResourceCreate_Wrapper, &MaaResourceCreate_HelperInput, &MaaResourceCreate_HelperOutput) },
+        { "MaaResourceDestroy", std::make_tuple(&MaaResourceDestroy_Wrapper, &MaaResourceDestroy_HelperInput, &MaaResourceDestroy_HelperOutput) },
+        { "MaaResourcePostPath", std::make_tuple(&MaaResourcePostPath_Wrapper, &MaaResourcePostPath_HelperInput, &MaaResourcePostPath_HelperOutput) },
+        { "MaaResourceStatus", std::make_tuple(&MaaResourceStatus_Wrapper, &MaaResourceStatus_HelperInput, &MaaResourceStatus_HelperOutput) },
+        { "MaaResourceWait", std::make_tuple(&MaaResourceWait_Wrapper, &MaaResourceWait_HelperInput, &MaaResourceWait_HelperOutput) },
+        { "MaaResourceLoaded", std::make_tuple(&MaaResourceLoaded_Wrapper, &MaaResourceLoaded_HelperInput, &MaaResourceLoaded_HelperOutput) },
+        { "MaaResourceSetOption", std::make_tuple(&MaaResourceSetOption_Wrapper, &MaaResourceSetOption_HelperInput, &MaaResourceSetOption_HelperOutput) },
+        { "MaaResourceGetHash", std::make_tuple(&MaaResourceGetHash_Wrapper, &MaaResourceGetHash_HelperInput, &MaaResourceGetHash_HelperOutput) },
+        { "MaaResourceGetTaskList", std::make_tuple(&MaaResourceGetTaskList_Wrapper, &MaaResourceGetTaskList_HelperInput, &MaaResourceGetTaskList_HelperOutput) },
+        { "MaaCreateImageBuffer", std::make_tuple(&MaaCreateImageBuffer_Wrapper, &MaaCreateImageBuffer_HelperInput, &MaaCreateImageBuffer_HelperOutput) },
+        { "MaaDestroyImageBuffer", std::make_tuple(&MaaDestroyImageBuffer_Wrapper, &MaaDestroyImageBuffer_HelperInput, &MaaDestroyImageBuffer_HelperOutput) },
+        { "MaaIsImageEmpty", std::make_tuple(&MaaIsImageEmpty_Wrapper, &MaaIsImageEmpty_HelperInput, &MaaIsImageEmpty_HelperOutput) },
+        { "MaaClearImage", std::make_tuple(&MaaClearImage_Wrapper, &MaaClearImage_HelperInput, &MaaClearImage_HelperOutput) },
+        { "MaaGetImageWidth", std::make_tuple(&MaaGetImageWidth_Wrapper, &MaaGetImageWidth_HelperInput, &MaaGetImageWidth_HelperOutput) },
+        { "MaaGetImageHeight", std::make_tuple(&MaaGetImageHeight_Wrapper, &MaaGetImageHeight_HelperInput, &MaaGetImageHeight_HelperOutput) },
+        { "MaaGetImageType", std::make_tuple(&MaaGetImageType_Wrapper, &MaaGetImageType_HelperInput, &MaaGetImageType_HelperOutput) },
+        { "MaaGetImageEncoded", std::make_tuple(&MaaGetImageEncoded_Wrapper, &MaaGetImageEncoded_HelperInput, &MaaGetImageEncoded_HelperOutput) },
+        { "MaaSetImageEncoded", std::make_tuple(&MaaSetImageEncoded_Wrapper, &MaaSetImageEncoded_HelperInput, &MaaSetImageEncoded_HelperOutput) },
+        { "MaaVersion", std::make_tuple(&MaaVersion_Wrapper, &MaaVersion_HelperInput, &MaaVersion_HelperOutput) },
+        { "MaaSetGlobalOption", std::make_tuple(&MaaSetGlobalOption_Wrapper, &MaaSetGlobalOption_HelperInput, &MaaSetGlobalOption_HelperOutput) },
+        { "MaaToolKitInit", std::make_tuple(&MaaToolKitInit_Wrapper, &MaaToolKitInit_HelperInput, &MaaToolKitInit_HelperOutput) },
+        { "MaaToolKitUninit", std::make_tuple(&MaaToolKitUninit_Wrapper, &MaaToolKitUninit_HelperInput, &MaaToolKitUninit_HelperOutput) },
+        { "MaaToolKitFindDevice", std::make_tuple(&MaaToolKitFindDevice_Wrapper, &MaaToolKitFindDevice_HelperInput, &MaaToolKitFindDevice_HelperOutput) },
+        { "MaaToolKitFindDeviceWithAdb", std::make_tuple(&MaaToolKitFindDeviceWithAdb_Wrapper, &MaaToolKitFindDeviceWithAdb_HelperInput, &MaaToolKitFindDeviceWithAdb_HelperOutput) },
+        { "MaaToolKitPostFindDevice", std::make_tuple(&MaaToolKitPostFindDevice_Wrapper, &MaaToolKitPostFindDevice_HelperInput, &MaaToolKitPostFindDevice_HelperOutput) },
+        { "MaaToolKitPostFindDeviceWithAdb", std::make_tuple(&MaaToolKitPostFindDeviceWithAdb_Wrapper, &MaaToolKitPostFindDeviceWithAdb_HelperInput, &MaaToolKitPostFindDeviceWithAdb_HelperOutput) },
+        { "MaaToolKitIsFindDeviceCompleted", std::make_tuple(&MaaToolKitIsFindDeviceCompleted_Wrapper, &MaaToolKitIsFindDeviceCompleted_HelperInput, &MaaToolKitIsFindDeviceCompleted_HelperOutput) },
+        { "MaaToolKitWaitForFindDeviceToComplete", std::make_tuple(&MaaToolKitWaitForFindDeviceToComplete_Wrapper, &MaaToolKitWaitForFindDeviceToComplete_HelperInput, &MaaToolKitWaitForFindDeviceToComplete_HelperOutput) },
+        { "MaaToolKitGetDeviceCount", std::make_tuple(&MaaToolKitGetDeviceCount_Wrapper, &MaaToolKitGetDeviceCount_HelperInput, &MaaToolKitGetDeviceCount_HelperOutput) },
+        { "MaaToolKitGetDeviceName", std::make_tuple(&MaaToolKitGetDeviceName_Wrapper, &MaaToolKitGetDeviceName_HelperInput, &MaaToolKitGetDeviceName_HelperOutput) },
+        { "MaaToolKitGetDeviceAdbPath", std::make_tuple(&MaaToolKitGetDeviceAdbPath_Wrapper, &MaaToolKitGetDeviceAdbPath_HelperInput, &MaaToolKitGetDeviceAdbPath_HelperOutput) },
+        { "MaaToolKitGetDeviceAdbSerial", std::make_tuple(&MaaToolKitGetDeviceAdbSerial_Wrapper, &MaaToolKitGetDeviceAdbSerial_HelperInput, &MaaToolKitGetDeviceAdbSerial_HelperOutput) },
+        { "MaaToolKitGetDeviceAdbControllerType", std::make_tuple(&MaaToolKitGetDeviceAdbControllerType_Wrapper, &MaaToolKitGetDeviceAdbControllerType_HelperInput, &MaaToolKitGetDeviceAdbControllerType_HelperOutput) },
+        { "MaaToolKitGetDeviceAdbConfig", std::make_tuple(&MaaToolKitGetDeviceAdbConfig_Wrapper, &MaaToolKitGetDeviceAdbConfig_HelperInput, &MaaToolKitGetDeviceAdbConfig_HelperOutput) },
+        { "MaaToolKitRegisterCustomRecognizerExecutor", std::make_tuple(&MaaToolKitRegisterCustomRecognizerExecutor_Wrapper, &MaaToolKitRegisterCustomRecognizerExecutor_HelperInput, &MaaToolKitRegisterCustomRecognizerExecutor_HelperOutput) },
+        { "MaaToolKitUnregisterCustomRecognizerExecutor", std::make_tuple(&MaaToolKitUnregisterCustomRecognizerExecutor_Wrapper, &MaaToolKitUnregisterCustomRecognizerExecutor_HelperInput, &MaaToolKitUnregisterCustomRecognizerExecutor_HelperOutput) },
+        { "MaaToolKitRegisterCustomActionExecutor", std::make_tuple(&MaaToolKitRegisterCustomActionExecutor_Wrapper, &MaaToolKitRegisterCustomActionExecutor_HelperInput, &MaaToolKitRegisterCustomActionExecutor_HelperOutput) },
+        { "MaaToolKitUnregisterCustomActionExecutor", std::make_tuple(&MaaToolKitUnregisterCustomActionExecutor_Wrapper, &MaaToolKitUnregisterCustomActionExecutor_HelperInput, &MaaToolKitUnregisterCustomActionExecutor_HelperOutput) },
+        { "MaaToolKitFindWindow", std::make_tuple(&MaaToolKitFindWindow_Wrapper, &MaaToolKitFindWindow_HelperInput, &MaaToolKitFindWindow_HelperOutput) },
+        { "MaaToolKitSearchWindow", std::make_tuple(&MaaToolKitSearchWindow_Wrapper, &MaaToolKitSearchWindow_HelperInput, &MaaToolKitSearchWindow_HelperOutput) },
+        { "MaaToolKitGetWindow", std::make_tuple(&MaaToolKitGetWindow_Wrapper, &MaaToolKitGetWindow_HelperInput, &MaaToolKitGetWindow_HelperOutput) },
+        { "MaaToolKitGetCursorWindow", std::make_tuple(&MaaToolKitGetCursorWindow_Wrapper, &MaaToolKitGetCursorWindow_HelperInput, &MaaToolKitGetCursorWindow_HelperOutput) },
     };
-    std::string api;
-    if (segs.enter_id(api) && segs.end()) {
-        auto it = wrappers.find(api);
-        if (it == wrappers.end()) {
-          return false;
+    if (segs.enter_path("api")) {
+        std::string api;
+        if (segs.enter_id(api)) {
+            auto it = wrappers.find(api);
+            if (it == wrappers.end()) {
+              return false;
+            }
+            if (segs.end()) {
+                std::string err;
+                auto ret = std::get<0>(it->second)(obj, err);
+                if (ret.has_value()) {
+                    ctx.json_body(json::object { { "data", ret.value() } });
+                } else {
+                    ctx.json_body(json::object { { "error", err } });
+                }
+                return true;
+            } else if (segs.enter_path("help") && segs.end()) {
+                auto input = std::get<1>(it->second)();
+                auto output = std::get<2>(it->second)();
+                ctx.json_body(json::object { { "input", input }, { "output", output } });
+                return true;
+            }
         }
-        std::string err;
-        auto ret = (it->second)(obj, err);
-        if (ret.has_value()) {
-            ctx.json_body(json::object { { "data", ret.value() } });
-        } else {
-            ctx.json_body(json::object { { "error", err } });
+    } else if (segs.enter_path("help") && segs.end()) {
+        json::object result;
+        for (const auto& [ api, funcs ] : wrappers) {
+            auto input = std::get<1>(funcs)();
+            auto output = std::get<2>(funcs)();
+            result[api] = json::object { { "input", input }, { "output", output } };
         }
+        ctx.json_body(result);
         return true;
     }
     return false;

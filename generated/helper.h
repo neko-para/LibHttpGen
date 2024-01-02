@@ -33,6 +33,12 @@ struct check_var_t : std::false_type
 {};
 
 template <typename Type>
+struct schema_t
+{
+    static constexpr const char* schema = "unknown";
+};
+
+template <typename Type>
 struct from_json_fix_t
 {
     using from_t = Type;
@@ -73,6 +79,12 @@ json::value output_finalize(Type v) LHG_NOT_IMPL_FUNC;
 
 // checks
 
+template <>
+struct schema_t<void>
+{
+    static constexpr const char* schema = "never";
+};
+
 template <std::integral Type>
 struct check_var_t<Type> : std::true_type
 {};
@@ -82,6 +94,12 @@ bool check_var(json::value v)
 {
     return v.is_number();
 }
+
+template <std::integral Type>
+struct schema_t<Type>
+{
+    static constexpr const char* schema = "number";
+};
 
 template <>
 struct check_var_t<const char*> : std::true_type
@@ -94,6 +112,12 @@ bool check_var<const char*>(json::value v)
 }
 
 template <>
+struct schema_t<const char*>
+{
+    static constexpr const char* schema = "string";
+};
+
+template <>
 struct check_var_t<bool> : std::true_type
 {};
 
@@ -102,6 +126,12 @@ bool check_var<bool>(json::value v)
 {
     return v.is_boolean();
 }
+
+template <>
+struct schema_t<bool>
+{
+    static constexpr const char* schema = "boolean";
+};
 
 // const char* <-> string
 
