@@ -39,7 +39,7 @@ struct from_json_fix_t
 };
 
 template <typename Type>
-typename bool check_var(json::value v) LHG_NOT_IMPL_FUNC;
+bool check_var(json::value v) LHG_NOT_IMPL_FUNC;
 
 template <typename Type>
 typename from_json_fix_t<Type>::from_t from_json(json::value v) LHG_NOT_IMPL_FUNC;
@@ -78,7 +78,7 @@ struct check_var_t<Type> : std::true_type
 {};
 
 template <std::integral Type>
-typename bool check_var(json::value v)
+bool check_var(json::value v)
 {
     return v.is_number();
 }
@@ -88,7 +88,7 @@ struct check_var_t<const char*> : std::true_type
 {};
 
 template <>
-typename bool check_var<const char*>(json::value v)
+bool check_var<const char*>(json::value v)
 {
     return v.is_string();
 }
@@ -98,7 +98,7 @@ struct check_var_t<bool> : std::true_type
 {};
 
 template <>
-typename bool check_var<bool>(json::value v)
+bool check_var<bool>(json::value v)
 {
     return v.is_boolean();
 }
