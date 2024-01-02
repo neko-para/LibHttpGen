@@ -5,7 +5,15 @@ target_link_libraries(LHGTarget Headeronly Boost::system
                       MaaFramework::MaaFramework MaaFramework::MaaToolKit)
 
 install(
-  TARGETS LHGTarget RUNTIME_DEPENDENCIES
+  TARGETS LHGTarget
+          RUNTIME_DEPENDENCIES
+          PRE_EXCLUDE_REGEXES
+          "api-ms-"
+          "ext-ms-"
+          POST_EXCLUDE_REGEXES
+          ".*system32/.*\\.dll"
+          DIRECTORIES
+          maa/bin
   RUNTIME DESTINATION .
   LIBRARY DESTINATION .
   FRAMEWORK DESTINATION .)
