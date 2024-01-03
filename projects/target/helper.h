@@ -1,5 +1,3 @@
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
 #include <concepts>
 #include <meojson/json.hpp>
 #include <optional>
@@ -188,10 +186,7 @@ static typename func_traits<F>::return_t __CallbackImpl(Args... arg)
     std::string cid = __ctx_ptr->push(arg...);
     typename manager::CallbackContext::return_type result;
     __ctx_ptr->wait(cid, result);
-    if constexpr (std::is_same_v<typename func_traits<F>::return_t, void>) {
-        std::ignore = result;
-    }
-    else {
+    if constexpr (!std::is_same_v<typename func_traits<F>::return_t, void>) {
         return result;
     }
 }
