@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef USE_FMTLIB
+#ifdef LHG_USE_FMTLIB
 
 #define FMT_HEADER_ONLY
 #include <fmt/format.h>

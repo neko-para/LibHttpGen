@@ -1,3 +1,5 @@
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 #include <concepts>
 #include <meojson/json.hpp>
 #include <optional>

@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
     }
 
     json::object output = { { "interface", result } };
-    std::ofstream file("./generated/gen.interface.json");
+    std::ofstream file("../interface.json");
     file << output.format(2);
     return 0;
 }

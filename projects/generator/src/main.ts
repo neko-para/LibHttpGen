@@ -33,10 +33,10 @@ interface Interface {
 }
 
 async function main() {
-  const root = 'generated'
-  const source_path = path.join(root, 'gen.wrapper.cpp')
+  const root = '..'
+  const source_path = path.join(root, 'wrapper.cpp')
   const config_path = path.join(root, 'config.json')
-  const interface_path = path.join(root, 'gen.interface.json')
+  const interface_path = path.join(root, 'interface.json')
   const cfg: Config = JSON.parse(await fs.readFile(config_path, 'utf-8'))
   const int: Interface = JSON.parse(await fs.readFile(interface_path, 'utf-8'))
 
