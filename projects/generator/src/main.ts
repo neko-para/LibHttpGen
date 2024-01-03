@@ -262,7 +262,7 @@ struct schema_t<${type} *>
           regen.add_sec(
             `lhg.impl.${ic.name}.arg.${arg.name}`,
             `    auto ${arg.name}_id = __param["${arg.name}"].as_string();
-    ${type} *${arg.name};
+    ${type} *${arg.name} = 0;
     ${type}__OpaqueManager.del(${arg.name}_id, ${arg.name});`
           )
         } else {
@@ -272,6 +272,10 @@ struct schema_t<${type} *>
     auto ${arg.name} = ${type}__OpaqueManager.get(${arg.name}_id);`
           )
         }
+        regen.add_raw(`    if (!${arg.name}) {
+        __error = "${arg.name} not found in manager.";
+        return std::nullopt;
+    }`)
         continue
       }
 
