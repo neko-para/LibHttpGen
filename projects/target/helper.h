@@ -90,6 +90,7 @@ struct check_var_t<Type> : std::true_type
 {};
 
 template <std::integral Type>
+requires (!std::is_same_v<Type, bool>)
 bool check_var(json::value v)
 {
     return v.is_number();
