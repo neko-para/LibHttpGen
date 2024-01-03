@@ -20,18 +20,32 @@ std::string read_file(std::filesystem::path path)
 
 int main(int argc, char* argv[])
 {
+    if (argc < 2) {
+        std::cerr << "No source provided.";
+        return 1;
+    }
+    std::vector<const char*> options;
+    for (int i = 2; i < argc; i++) {
+        options.push_back(argv[i]);
+    }
+
     auto index = clangpp::CXXIndex::make();
     index->create(0, 0);
     auto unit = clangpp::CXXTranslationUnit::make();
-    unit->parse(index, argv[1],
-                { "-I/opt/local/libexec/llvm-16/lib/clang/16/include",
-                  "-IC:\\Program Files\\LLVM\\lib\\clang\\17\\include", "-Imaa/include", "-DLHG_PROCESS", "-std=c++20",
-                  "-Wno-pragma-once-outside-header", "-x", "c++" },
-                CXTranslationUnit_None);
+    options.push_back("-DLHG_PROCESS");
+    options.push_back("-Wno-pragma-once-outside-header");
+    options.push_back("-std=c++20");
+    options.push_back("-x");
+    options.push_back("c++");
+    auto err = unit->parse(index, argv[1], options, CXTranslationUnit_None);
 
     for (auto& diag : unit->getDiagnostics()) {
         auto [enable, disable] = diag.getOption();
         std::cout << diag.getSpelling() << ":" << enable << " " << disable << "\n";
+    }
+
+    if (err) {
+        return 1;
     }
 
     auto cursor = unit->getCursor();
