@@ -57,7 +57,9 @@ async function main() {
   regen.add_raw(
     `// clang-format off
 
-#include "helper.h"
+#include <optional>
+
+#include "Utils.h"
 #define LHG_PROCESS
 `
   )
@@ -71,15 +73,15 @@ async function main() {
   for (const type in cfg.callback) {
     const id = cfg.callback[type]!.name
     callback_ids[type] = id
-    regen.add_raw(`static callback_manager<${type}> ${id}__Manager;\n`)
+    regen.add_raw(`static lhg::callback_manager<${type}> ${id}__Manager;\n`)
   }
 
   for (const type of cfg.opaque) {
-    regen.add_raw(`static HandleManager<${type} *> ${type}__OpaqueManager;\n`)
+    regen.add_raw(`static lhg::opaque_manager<${type} *> ${type}__OpaqueManager;\n`)
     regen.add_raw(`template <>
-struct schema_t<${type} *>
+struct lhg::schema_t<${type} *>
 {
-    static constexpr const char* schema = "string@${type}";
+    static constexpr const char* const schema = "string@${type}";
 };
 `)
   }
@@ -138,7 +140,7 @@ struct schema_t<${type} *>
 
       regen.add_sec(
         `lhg.helper.${ic.name}.input.${arg.name}`,
-        `        { "${arg.name}", schema_t<${arg.type}>::schema },`
+        `        { "${arg.name}", lhg::schema_t<${arg.type}>::schema },`
       )
     }
     regen.add_raw(`    };
@@ -152,13 +154,13 @@ struct schema_t<${type} *>
         { "data", {`)
     regen.add_sec(
       `lhg.helper.${ic.name}.output.return`,
-      `            { "return", schema_t<${ic.return}>::schema },`
+      `            { "return", lhg::schema_t<${ic.return}>::schema },`
     )
     for (const [idx, arg] of ic.argument.entries()) {
       if (arg.type.endsWith(' *') && cfg.output.includes(arg.type.slice(0, -2))) {
         regen.add_sec(
           `lhg.helper.${ic.name}.output.${arg.name}`,
-          `            { "${arg.name}", schema_t<${arg.type}>::schema },`
+          `            { "${arg.name}", lhg::schema_t<${arg.type}>::schema },`
         )
         continue
       }
@@ -192,7 +194,7 @@ struct schema_t<${type} *>
       if (ctxPos === idx) {
         regen.add_sec(
           `lhg.impl.${ic.name}.arg.${arg.name}.check`,
-          `    if (!check_var<const char*>(__param["${cbParam}"])) {
+          `    if (!lhg::check_var<const char*>(__param["${cbParam}"])) {
         __error = "${cbParam} should be string@${cbId}";
         return std::nullopt;
     }`
@@ -207,7 +209,7 @@ struct schema_t<${type} *>
       if (arg.type.endsWith(' *') && cfg.opaque.includes(arg.type.slice(0, -2))) {
         regen.add_sec(
           `lhg.impl.${ic.name}.arg.${arg.name}.check`,
-          `    if (!check_var<const char*>(__param["${arg.name}"])) {
+          `    if (!lhg::check_var<const char*>(__param["${arg.name}"])) {
         __error = "${arg.name} should be string@${arg.type.slice(0, -2)}";
         return std::nullopt;
     }`
@@ -221,8 +223,8 @@ struct schema_t<${type} *>
 
       regen.add_sec(
         `lhg.impl.${ic.name}.arg.${arg.name}.check`,
-        `    if constexpr (check_var_t<${arg.type}>::value) {
-        if (!check_var<${arg.type}>(__param["${arg.name}"])) {
+        `    if constexpr (lhg::check_t<${arg.type}>::enable) {
+        if (!lhg::check_var<${arg.type}>(__param["${arg.name}"])) {
             __error = "${arg.name} should be ${cfg.check[arg.type] ?? arg.type}";
             return std::nullopt;
         }
@@ -230,9 +232,6 @@ struct schema_t<${type} *>
       )
     }
 
-    cbId = null
-    cbParam = null
-    ctxPos = null
     for (const [idx, arg] of ic.argument.entries()) {
       // callback
       if (ctxPos === idx) {
@@ -248,9 +247,9 @@ struct schema_t<${type} *>
         cbParam = arg.name
         regen.add_sec(
           `lhg.impl.${ic.name}.arg.${arg.name}`,
-          `    auto ${arg.name} = &__CallbackImpl<${cfg.callback[arg.type]!.self}, ${arg.type}, ${
-            m![1]
-          }>;`
+          `    auto ${arg.name} = &lhg::callback_implementation<${cfg.callback[arg.type]!.self}, ${
+            arg.type
+          }, ${m![1]}>;`
         )
         continue
       }
@@ -283,7 +282,7 @@ struct schema_t<${type} *>
         const type = arg.type.slice(0, -2)
         regen.add_sec(
           `lhg.impl.${ic.name}.arg.${arg.name}`,
-          `    auto ${arg.name} = output_prepare<${type} *>();`
+          `    auto ${arg.name} = lhg::output_prepare<${type} *>();`
         )
         outputCache.push(arg.name)
         continue
@@ -291,8 +290,8 @@ struct schema_t<${type} *>
 
       regen.add_sec(
         `lhg.impl.${ic.name}.arg.${arg.name}`,
-        `    auto ${arg.name}_temp = from_json<${arg.type}>(__param["${arg.name}"]);
-    auto ${arg.name} = from_json_fix<${arg.type}>(${arg.name}_temp);`
+        `    auto ${arg.name}_temp = lhg::from_json<${arg.type}>(__param["${arg.name}"]);
+    auto ${arg.name} = lhg::from_json_fix<${arg.type}>(${arg.name}_temp);`
       )
     }
     if (ic.return === 'void') {
@@ -315,11 +314,13 @@ struct schema_t<${type} *>
         regen.add_sec(`lhg.impl.${ic.name}.return`, '    auto __ret = __return;')
       }
     }
-    const outputDic = outputCache.map(name => `{ "${name}", output_finalize(${name}) }`).join(', ')
+    const outputDic = outputCache
+      .map(name => `{ "${name}", lhg::output_finalize(${name}) }`)
+      .join(', ')
     regen.add_sec(
       `lhg.impl.${ic.name}.final`,
       `    return json::object { { "return", ${
-        ic.return === 'void' ? 'json::value(json::value::value_type::null)' : 'to_json(__ret)'
+        ic.return === 'void' ? 'json::value(json::value::value_type::null)' : 'lhg::to_json(__ret)'
       } }, ${outputDic} };`
     )
     regen.add_raw('}\n')
@@ -330,9 +331,9 @@ struct schema_t<${type} *>
   for (const type in cfg.callback) {
     const cc = cfg.callback[type]!
     regen.add_raw(`    // callback ${cc.name}`)
-    regen.add_raw(`    if (handle_callback("${cc.name}", ${
+    regen.add_raw(`    if (lhg::handle_callback("${cc.name}", ${
       cc.name
-    }__Manager, ctx, segs, [](const auto& args) {
+    }__Manager, ctx, segs, obj, [](const auto& args) {
 ${Array.from({ length: cc.all }, (_, k) => k)
   .filter(x => x != cc.self)
   .map(id => `        auto v${id} = std::get<${id}>(args);`)
@@ -347,53 +348,18 @@ ${Array.from({ length: cc.all }, (_, k) => k)
         return true;
     }`)
   }
-  regen.add_raw(
-    `    const static std::map<std::string, std::tuple<
-        std::optional<json::object> (*)(json::object, std::string&),
-        json::object (*)(),
-        json::object (*)()
-    >> wrappers = {`
-  )
+  regen.add_raw(`    const static lhg::api_info_map wrappers = {`)
   for (const ic of int.interface) {
     regen.add_raw(
-      `        { "${ic.name}", std::make_tuple(&${ic.name}_Wrapper, &${ic.name}_HelperInput, &${ic.name}_HelperOutput) },`
+      `        { "${ic.name}", { &${ic.name}_Wrapper, &${ic.name}_HelperInput, &${ic.name}_HelperOutput } },`
     )
   }
   regen.add_raw(`    };
-    if (segs.enter_path("api")) {
-        std::string api;
-        if (segs.enter_id(api)) {
-            auto it = wrappers.find(api);
-            if (it == wrappers.end()) {
-              return false;
-            }
-            if (segs.end()) {
-                std::string err;
-                auto ret = std::get<0>(it->second)(obj, err);
-                if (ret.has_value()) {
-                    ctx.json_body(json::object { { "data", ret.value() } });
-                } else {
-                    ctx.json_body(json::object { { "error", err } });
-                }
-                return true;
-            } else if (segs.enter_path("help") && segs.end()) {
-                auto input = std::get<1>(it->second)();
-                auto output = std::get<2>(it->second)();
-                ctx.json_body(json::object { { "input", input }, { "output", output } });
-                return true;
-            }
-        }
-    } else if (segs.enter_path("help") && segs.end()) {
-        json::object result;
-        for (const auto& [ api, funcs ] : wrappers) {
-            auto input = std::get<1>(funcs)();
-            auto output = std::get<2>(funcs)();
-            result[api] = json::object { { "input", input }, { "output", output } };
-        }
-        ctx.json_body(result);
+    if (lhg::handle_api(ctx, segs, obj, wrappers)) {
         return true;
-    }`)
-  regen.add_raw('    return false;\n}')
+    }
+    return false;
+}`)
 
   await regen.save(source_path)
 }
