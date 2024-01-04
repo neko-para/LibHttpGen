@@ -2,6 +2,7 @@ import fs from 'fs/promises'
 import path from 'path'
 
 import { Regenerator } from './regenerator'
+import { expressionItem, objectEntryToJson, objectToJson } from './utils'
 
 interface Config {
   callback: Record<
@@ -118,7 +119,7 @@ struct lhg::schema_t<${type} *>
       } else if (arg.type in callback_ids) {
         regen.add_sec(
           `lhg.helper.${ic.name}.input.${arg.name}`,
-          `        { "${arg.name}", "string@${callback_ids[arg.type]!}" },`
+          `        ${objectEntryToJson(arg.name, `string@${callback_ids[arg.type]!}`)},`
         )
         continue
       }
@@ -395,9 +396,18 @@ ${Object.keys(cfg.callback).map(type => {
   const m = /(.*?) *\(\*\)\(.*\)$/.exec(type)
   const rt = m[1]!
   return `            // ${name}
-            result["/callback/${name}/add"] = { { "body", json::object {} }, { "response", { { "data", { { "id", "string" } } } } } };
-            result["/callback/${name}/:id/del"] = { { "body", json::object {} }, { "response", { { "data", json::object {} }, { "error", "string" } } } };
-            result["/callback/${name}/:id/pull"] = { { "body", json::object {} }, { "response", { { "data", json::object { { "ids", "string[]" } } }, { "error", "string" } } } };
+            result["/callback/${name}/add"] = ${objectToJson({
+              body: {},
+              response: { data: { id: 'string' } }
+            })};
+            result["/callback/${name}/:id/del"] = ${objectToJson({
+              body: {},
+              response: { data: {}, error: 'string' }
+            })};
+            result["/callback/${name}/:id/pull"] = ${objectToJson({
+              body: {},
+              response: { data: { ids: 'string[]' } }
+            })};
             result["/callback/${name}/:id/:cid/request"] = { { "body", json::object {} }, { "response", { { "data", json::object {
 ${Array.from({ length: cc.all }, (_, k) => k)
   .filter(x => x != cc.self)
@@ -407,9 +417,15 @@ ${Array.from({ length: cc.all }, (_, k) => k)
   )
   .join('\n')}
             } }, { "error", "string" } } } };
-            result["/callback/${name}/:id/:cid/response"] = { { "body", json::object {${
-              rt === 'void' ? '' : ' { "return", lhg::schema_t<${rt}>::schema } '
-            }} }, { "response", { { "data", json::object {} }, { "error", "string" } } } };
+            result["/callback/${name}/:id/:cid/response"] = ${objectToJson({
+              body:
+                rt === 'void'
+                  ? {}
+                  : {
+                      return: new expressionItem('lhg::schema_t<${rt}>::schema')
+                    },
+              response: { data: {}, error: 'string' }
+            })};
 `
 })}
     })) {
