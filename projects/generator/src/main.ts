@@ -1,59 +1,10 @@
-import fs from 'fs/promises'
-import path from 'path'
-
-import { Regenerator } from './regenerator'
+import { deinitRegenerator, initRegenerator, loadConfig, loadInterface } from './config'
 import { expressionItem, objectEntryToJson, objectToJson } from './utils'
 
-interface Config {
-  callback: Record<
-    string,
-    {
-      name: string
-      pass: number
-      self: number
-      all: number
-      argn: string[]
-    }
-  >
-  opaque: string[]
-  opaque_free: Record<string, string[]>
-  output: string[]
-  remove: string[]
-  check: Record<string, string>
-}
-
-interface Interface {
-  interface: {
-    name: string
-    return: string
-    argument: {
-      name: string
-      type: string
-    }[]
-  }[]
-}
-
 async function main() {
-  const root = '..'
-  const source_path = path.join(root, 'wrapper.cpp')
-  const config_path = path.join(root, 'config.json')
-  const interface_path = path.join(root, 'interface.json')
-  const cfg: Config = JSON.parse(await fs.readFile(config_path, 'utf-8'))
-  const int: Interface = JSON.parse(await fs.readFile(interface_path, 'utf-8'))
-
-  const regen = new Regenerator({
-    end: '// LHG SEC END',
-    default: '// LHG SEC DEF',
-    parseId: row => {
-      const m = /\/\/ LHG SEC BEGIN (\S+)/.exec(row.trim())
-      return m ? m[1]! : null
-    },
-    buildId: id => {
-      return `// LHG SEC BEGIN ${id}`
-    }
-  })
-
-  await regen.load(source_path)
+  const cfg = await loadConfig()
+  const int = await loadInterface()
+  const regen = await initRegenerator()
 
   regen.add_raw(
     `// clang-format off
@@ -75,7 +26,7 @@ async function main() {
     regen.add_raw(`static lhg::callback_manager<${type}> ${id}__Manager;\n`)
   }
 
-  for (const type of cfg.opaque) {
+  for (const type in cfg.opaque) {
     regen.add_raw(`static lhg::opaque_manager<${type} *> ${type}__OpaqueManager;\n`)
     regen.add_raw(`template <>
 struct lhg::schema_t<${type} *>
@@ -125,7 +76,7 @@ struct lhg::schema_t<${type} *>
       }
 
       // opacity
-      if (arg.type.endsWith(' *') && cfg.opaque.includes(arg.type.slice(0, -2))) {
+      if (arg.type.endsWith(' *') && cfg.opaque[arg.type.slice(0, -2)]) {
         regen.add_sec(
           `lhg.helper.${ic.name}.input.${arg.name}`,
           `        { "${arg.name}", "string@${arg.type.slice(0, -2)}" },`
@@ -205,7 +156,7 @@ struct lhg::schema_t<${type} *>
       }
 
       // opacity
-      if (arg.type.endsWith(' *') && cfg.opaque.includes(arg.type.slice(0, -2))) {
+      if (arg.type.endsWith(' *') && cfg.opaque[arg.type.slice(0, -2)]) {
         regen.add_sec(
           `lhg.impl.${ic.name}.arg.${arg.name}.check`,
           `    if (!lhg::check_var<const char*>(__param["${arg.name}"])) {
@@ -258,9 +209,9 @@ struct lhg::schema_t<${type} *>
       }
 
       // opacity
-      if (arg.type.endsWith(' *') && cfg.opaque.includes(arg.type.slice(0, -2))) {
+      if (arg.type.endsWith(' *') && cfg.opaque[arg.type.slice(0, -2)]) {
         const type = arg.type.slice(0, -2)
-        if ((cfg.opaque_free[type] ?? []).includes(ic.name)) {
+        if ((cfg.opaque[type]!.free ?? []).includes(ic.name)) {
           regen.add_sec(
             `lhg.impl.${ic.name}.arg.${arg.name}`,
             `    auto ${arg.name}_id = __param["${arg.name}"].as_string();
@@ -307,7 +258,7 @@ struct lhg::schema_t<${type} *>
     if (ic.return === 'void') {
       regen.add_sec(`lhg.impl.${ic.name}.return`, '')
     } else {
-      if (ic.return.endsWith(' *') && cfg.opaque.includes(ic.return.slice(0, -2))) {
+      if (ic.return.endsWith(' *') && cfg.opaque[ic.return.slice(0, -2)]) {
         const type = ic.return.slice(0, -2)
         regen.add_sec(
           `lhg.impl.${ic.name}.return`,
@@ -334,7 +285,7 @@ struct lhg::schema_t<${type} *>
 
   for (const type in cfg.callback) {
     const cc = cfg.callback[type]!
-    const m = /(.*?) *\(\*\)\(.*\)$/.exec(type)
+    const m = /(.*?) *\(\*\)\(.*\)$/.exec(type)!
     const rt = m[1]!
     regen.add_raw(`    // callback ${cc.name}`)
     regen.add_raw(`    if (lhg::handle_callback("${cc.name}", ${
@@ -347,7 +298,7 @@ ${Array.from({ length: cc.all }, (_, k) => k)
         return json::object {
 ${Array.from({ length: cc.all }, (_, k) => k)
   .filter(x => x != cc.self)
-  .map(id => `            { "${cc.argn[id]}", v${id} },`)
+  .map(id => `            { "${cc.arg_name[id]}", v${id} },`)
   .join('\n')}
         };
     }, [](const auto& ret) {
@@ -367,7 +318,7 @@ ${
 `)
   }
 
-  for (const type of cfg.opaque) {
+  for (const type in cfg.opaque) {
     regen.add_raw(`    // opaque ${type}`)
     regen.add_raw(`    if (lhg::handle_opaque("${type}", ${type}__OpaqueManager, ctx, segs, obj)) {
         return true;
@@ -387,13 +338,13 @@ ${
     }
 `)
 
-  regen.add_raw(`    if (lhg::handle_help(ctx, segs, wrappers, { ${cfg.opaque
+  regen.add_raw(`    if (lhg::handle_help(ctx, segs, wrappers, { ${Object.keys(cfg.opaque)
     .map(x => `"${x}"`)
     .join(', ')} }, [](json::object& result) {
 ${Object.keys(cfg.callback).map(type => {
   const name = callback_ids[type]!
   const cc = cfg.callback[type]!
-  const m = /(.*?) *\(\*\)\(.*\)$/.exec(type)
+  const m = /(.*?) *\(\*\)\(.*\)$/.exec(type)!
   const rt = m[1]!
   return `            // ${name}
             result["/callback/${name}/add"] = ${objectToJson({
@@ -413,7 +364,7 @@ ${Array.from({ length: cc.all }, (_, k) => k)
   .filter(x => x != cc.self)
   .map(
     id =>
-      `                { "${cc.argn[id]}", lhg::schema_t<decltype(std::get<${id}>(lhg::callback_manager<${type}>::CallbackContext::args_type {}))>::schema },`
+      `                { "${cc.arg_name[id]}", lhg::schema_t<decltype(std::get<${id}>(lhg::callback_manager<${type}>::CallbackContext::args_type {}))>::schema },`
   )
   .join('\n')}
             } }, { "error", "string" } } } };
@@ -435,7 +386,7 @@ ${Array.from({ length: cc.all }, (_, k) => k)
 
   regen.add_raw('    return false;\n}')
 
-  await regen.save(source_path)
+  await deinitRegenerator(regen)
 }
 
 main()
