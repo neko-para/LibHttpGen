@@ -71,4 +71,10 @@ struct HandleManager
         }
         return index_[handle];
     }
+
+    std::map<std::string, Handle> dump() {
+        std::unique_lock<std::mutex> lock(mtx_);
+
+        return handles_;
+    }
 };

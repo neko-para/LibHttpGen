@@ -327,7 +327,8 @@ struct lhg::schema_t<${type} *>
   }
 
   regen.add_raw(`bool handle_request(Context& ctx, UrlSegments segs) {
-    auto obj = json::parse(ctx.req_.body()).value_or(json::object {}).as_object();`)
+    auto obj = json::parse(ctx.req_.body()).value_or(json::object {}).as_object();\n`)
+
   for (const type in cfg.callback) {
     const cc = cfg.callback[type]!
     regen.add_raw(`    // callback ${cc.name}`)
@@ -346,8 +347,18 @@ ${Array.from({ length: cc.all }, (_, k) => k)
         };
     })) {
         return true;
-    }`)
+    }
+`)
   }
+
+  for (const type of cfg.opaque) {
+    regen.add_raw(`    // opaque ${type}`)
+    regen.add_raw(`    if (lhg::handle_opaque("${type}", ${type}__OpaqueManager, ctx, segs, obj)) {
+        return true;
+    }
+`)
+  }
+
   regen.add_raw(`    const static lhg::api_info_map wrappers = {`)
   for (const ic of int.interface) {
     regen.add_raw(
