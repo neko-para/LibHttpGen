@@ -1,40 +1,56 @@
 import { deinitRegenerator, initRegenerator, loadConfig, loadInterface } from './config'
-import { expressionItem, objectEntryToJson, objectToJson } from './utils'
+import { Regenerator } from './regenerator'
+import { LHGConfig, LHGInterfaceArgumentInfo } from './types'
+import { ExprItem, JsonValue, objectEntryToJson, objectToJson } from './utils'
+
+function declareSchema(regen: Regenerator, type: string, schema: string) {
+  regen.add_raw(`template<>
+struct lhg::schema_t<${type}>
+{
+    static constexpr const char* const schema = ${JSON.stringify(schema)};
+};`)
+}
+
+function schemaOf(type: string) {
+  return new ExprItem(`lhg::schema_t<${type}>::schema`)
+}
+
+function processArguments(cfg: Required<LHGConfig>, args: LHGInterfaceArgumentInfo[]) {
+  for (const [idx, arg] of args.entries()) {
+    if (arg.type in cfg.callback) {
+      arg.special = {
+        type: 'callback',
+        name: arg.type,
+        refer: cfg.callback[arg.type]!
+      }
+      args[idx + cfg.callback[arg.type]!.pass]!.special = {
+        type: 'callback_context',
+        refer: cfg.callback[arg.type]!,
+        param: arg.name
+      }
+    } else if (arg.type.endsWith(' *')) {
+      const pt = arg.type.slice(0, -2)
+      if (pt in cfg.opaque) {
+        arg.special = {
+          type: 'opaque',
+          name: pt,
+          refer: cfg.opaque[pt]!
+        }
+      } else if (cfg.output.includes(pt)) {
+        arg.special = {
+          type: 'output',
+          name: pt
+        }
+      }
+    }
+  }
+  return args
+}
 
 async function main() {
   const cfg = await loadConfig()
   const int = await loadInterface()
   const regen = await initRegenerator()
-
-  regen.add_raw(
-    `// clang-format off
-
-#include "Utils.h"
-#define LHG_PROCESS
-`
-  )
-  regen.add_sec('lhg.include', '')
-  regen.add_raw('')
-  regen.add_sec('lhg.custom.global', '')
-  regen.add_raw('')
-
-  const callback_ids: Record<string, string> = {}
-
-  for (const type in cfg.callback) {
-    const id = cfg.callback[type]!.name
-    callback_ids[type] = id
-    regen.add_raw(`static lhg::callback_manager<${type}> ${id}__Manager;\n`)
-  }
-
-  for (const type in cfg.opaque) {
-    regen.add_raw(`static lhg::opaque_manager<${type} *> ${type}__OpaqueManager;\n`)
-    regen.add_raw(`template <>
-struct lhg::schema_t<${type} *>
-{
-    static constexpr const char* const schema = "string@${type}";
-};
-`)
-  }
 
   int.interface = int.interface.filter(x => {
     for (const rule of cfg.remove) {
@@ -51,68 +67,74 @@ struct lhg::schema_t<${type} *>
     return true
   })
 
-  for (const ic of int.interface) {
-    regen.add_raw(`json::object ${ic.name}_HelperInput() {
-    return json::object {`)
+  regen.add_raw(
+    `// clang-format off
 
-    // callback
-    let ctxPos: number | null = null
-    for (const [idx, arg] of ic.argument.entries()) {
-      if (arg.type in callback_ids) {
-        ctxPos = idx + cfg.callback[arg.type]!.pass
-      }
-    }
+#include "LHGUtils.h"
+#define LHG_PROCESS
+`
+  )
+  regen.add_sec('lhg.include', '')
+  regen.add_raw('')
+  regen.add_sec('lhg.custom.global', '')
+  regen.add_raw('')
 
-    for (const [idx, arg] of ic.argument.entries()) {
-      // callback
-      if (ctxPos === idx) {
-        continue
-      } else if (arg.type in callback_ids) {
-        regen.add_sec(
-          `lhg.helper.${ic.name}.input.${arg.name}`,
-          `        ${objectEntryToJson(arg.name, `string@${callback_ids[arg.type]!}`)},`
-        )
-        continue
-      }
+  for (const type in cfg.callback) {
+    const name = cfg.callback[type]!.name
+    regen.add_raw(`static lhg::callback_manager<${type}> ${name}__Manager;\n`)
+  }
 
-      // opacity
-      if (arg.type.endsWith(' *') && cfg.opaque[arg.type.slice(0, -2)]) {
-        regen.add_sec(
-          `lhg.helper.${ic.name}.input.${arg.name}`,
-          `        { "${arg.name}", "string@${arg.type.slice(0, -2)}" },`
-        )
-        continue
-      }
-
-      if (arg.type.endsWith(' *') && cfg.output.includes(arg.type.slice(0, -2))) {
-        continue
-      }
-
-      regen.add_sec(
-        `lhg.helper.${ic.name}.input.${arg.name}`,
-        `        { "${arg.name}", lhg::schema_t<${arg.type}>::schema },`
-      )
-    }
-    regen.add_raw(`    };
-}
-`)
+  for (const type in cfg.opaque) {
+    regen.add_raw(`static lhg::opaque_manager<${type} *> ${type}__OpaqueManager;\n`)
+    declareSchema(regen, `${type} *`, `string@${type}`)
   }
 
   for (const ic of int.interface) {
+    const args = processArguments(cfg, ic.argument)
+
+    regen.add_raw(`json::object ${ic.name}_HelperInput() {
+    return json::object {`)
+
+    for (const arg of args) {
+      if (arg.special) {
+        if (arg.special.type === 'callback') {
+          regen.add_sec(
+            `lhg.helper.${ic.name}.input.${arg.name}`,
+            `        ${objectEntryToJson(arg.name, `string@${arg.special.refer.name}`)},`
+          )
+        } else if (arg.special.type === 'opaque') {
+          regen.add_sec(
+            `lhg.helper.${ic.name}.input.${arg.name}`,
+            `        ${objectEntryToJson(arg.name, `string@${arg.special.name}`)},`
+          )
+        }
+      } else {
+        regen.add_sec(
+          `lhg.helper.${ic.name}.input.${arg.name}`,
+          `        ${objectEntryToJson(arg.name, schemaOf(arg.type))},`
+        )
+      }
+    }
+
+    regen.add_raw(`    };
+}
+`)
+
     regen.add_raw(`json::object ${ic.name}_HelperOutput() {
     return json::object {
         { "data", {`)
     regen.add_sec(
       `lhg.helper.${ic.name}.output.return`,
-      `            { "return", lhg::schema_t<${ic.return}>::schema },`
+      `            ${objectEntryToJson('return', schemaOf(ic.return))},`
     )
-    for (const [idx, arg] of ic.argument.entries()) {
-      if (arg.type.endsWith(' *') && cfg.output.includes(arg.type.slice(0, -2))) {
-        regen.add_sec(
-          `lhg.helper.${ic.name}.output.${arg.name}`,
-          `            { "${arg.name}", lhg::schema_t<${arg.type}>::schema },`
-        )
-        continue
+    for (const arg of args) {
+      if (arg.special) {
+        if (arg.special.type === 'output') {
+          regen.add_sec(
+            `lhg.helper.${ic.name}.output.${arg.name}`,
+            `            ${objectEntryToJson(arg.name, schemaOf(arg.type))},`
+          )
+        }
       }
     }
     regen.add_raw(`        }},
@@ -133,7 +155,7 @@ struct lhg::schema_t<${type} *>
     let ctxPos: number | null = null
     const outputCache: string[] = []
     for (const [idx, arg] of ic.argument.entries()) {
-      if (arg.type in callback_ids) {
+      if (arg.type in cfg.callback) {
         ctxPos = idx + cfg.callback[arg.type]!.pass
       }
     }
@@ -150,8 +172,8 @@ struct lhg::schema_t<${type} *>
     }`
         )
         continue
-      } else if (arg.type in callback_ids) {
-        cbId = callback_ids[arg.type]!
+      } else if (arg.type in cfg.callback) {
+        cbId = cfg.callback[arg.type]!.name
         continue
       }
 
@@ -195,9 +217,9 @@ struct lhg::schema_t<${type} *>
     }`
         )
         continue
-      } else if (arg.type in callback_ids) {
+      } else if (arg.type in cfg.callback) {
         const m = /\(\*\)\((.*)\)$/.exec(arg.type)
-        cbId = callback_ids[arg.type]!
+        cbId = cfg.callback[arg.type]!.name
         cbParam = arg.name
         regen.add_sec(
           `lhg.impl.${ic.name}.arg.${arg.name}`,
@@ -342,8 +364,8 @@ ${
     .map(x => `"${x}"`)
     .join(', ')} }, [](json::object& result) {
 ${Object.keys(cfg.callback).map(type => {
-  const name = callback_ids[type]!
   const cc = cfg.callback[type]!
+  const name = cc.name
   const m = /(.*?) *\(\*\)\(.*\)$/.exec(type)!
   const rt = m[1]!
   return `            // ${name}
@@ -373,7 +395,7 @@ ${Array.from({ length: cc.all }, (_, k) => k)
                 rt === 'void'
                   ? {}
                   : {
-                      return: new expressionItem('lhg::schema_t<${rt}>::schema')
+                      return: new ExprItem('lhg::schema_t<${rt}>::schema')
                     },
               response: { data: {}, error: 'string' }
             })};

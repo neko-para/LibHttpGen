@@ -1,6 +1,4 @@
-import exp = require('constants')
-
-export class expressionItem {
+export class ExprItem {
   expr: string
 
   constructor(expr: string) {
@@ -8,7 +6,7 @@ export class expressionItem {
   }
 }
 
-type JsonValue =
+export type JsonValue =
   | {
       [key: string]: JsonValue
     }
@@ -17,21 +15,21 @@ type JsonValue =
   | number
   | boolean
   | null
-  | expressionItem
+  | ExprItem
 
 export function objectEntryToJson(key: string, value: JsonValue) {
   return `{ ${JSON.stringify(key)}, ${objectToJson(value, true)} }`
 }
 
-export function objectToJson(obj: JsonValue, inside = false) {
-  if (obj instanceof expressionItem) {
+export function objectToJson(obj: JsonValue, inside = false): string {
+  if (obj instanceof ExprItem) {
     return obj.expr
   } else if (obj instanceof Array) {
     return `json::array { ${obj.map(x => objectToJson(x, true)).join(', ')} }`
   } else if (typeof obj === 'object') {
     const res: string[] = []
     for (const key in obj) {
-      res.push(objectEntryToJson(key, obj[key]))
+      res.push(objectEntryToJson(key, obj[key]!))
     }
     return `${inside && res.length > 0 ? '' : 'json::object '}{${
       res.length > 0 ? ` ${res.join(', ')} ` : ''
