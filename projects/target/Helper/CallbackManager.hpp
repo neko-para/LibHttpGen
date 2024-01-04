@@ -27,6 +27,7 @@ struct CallbackManager
     struct CallbackContext : public std::enable_shared_from_this<CallbackContext>
     {
         using args_type = typename std::tuple<Args...>;
+        using real_return_type = Ret;
         using return_type = typename FixVoid<Ret>::type;
 
         struct InstanceContext

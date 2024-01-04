@@ -2,15 +2,19 @@ import axios from 'axios'
 
 import interfaceData from '../gen.interface'
 
-type GetRealType<K extends string> = K extends `${infer R}@${infer X}`
-  ? GetRealType<R>
-  : K extends 'string'
-    ? string
-    : K extends 'number'
-      ? number
-      : K extends 'boolean'
-        ? boolean
-        : unknown
+type GetRealType<K extends string> = K extends `${infer X}|${infer Y}`
+  ? GetRealType<X> | GetRealType<Y>
+  : K extends `${infer X}[]`
+    ? GetRealType<X>[]
+    : K extends `${infer R}@${infer X}`
+      ? GetRealType<R>
+      : K extends 'string'
+        ? string
+        : K extends 'number'
+          ? number
+          : K extends 'boolean'
+            ? boolean
+            : unknown
 
 type ReduceType<T> = T extends Record<string, unknown>
   ? {

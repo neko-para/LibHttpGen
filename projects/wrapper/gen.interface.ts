@@ -7,7 +7,12 @@ export default {
       config: 'string',
       type: 'number'
     },
-    output: { data: { return: 'string@MaaControllerAPI' }, error: 'string' }
+    output: {
+      data: {
+        return: 'string@MaaControllerAPI'
+      },
+      error: 'string'
+    }
   },
   MaaAdbControllerCreateV2: {
     input: {
@@ -18,63 +23,174 @@ export default {
       config: 'string',
       type: 'number'
     },
-    output: { data: { return: 'string@MaaControllerAPI' }, error: 'string' }
+    output: {
+      data: {
+        return: 'string@MaaControllerAPI'
+      },
+      error: 'string'
+    }
   },
   MaaBindController: {
-    input: { ctrl: 'string@MaaControllerAPI', inst: 'string@MaaInstanceAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      ctrl: 'string@MaaControllerAPI',
+      inst: 'string@MaaInstanceAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaBindResource: {
-    input: { inst: 'string@MaaInstanceAPI', res: 'string@MaaResourceAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      inst: 'string@MaaInstanceAPI',
+      res: 'string@MaaResourceAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaClearCustomAction: {
-    input: { inst: 'string@MaaInstanceAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      inst: 'string@MaaInstanceAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaClearCustomRecognizer: {
-    input: { inst: 'string@MaaInstanceAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      inst: 'string@MaaInstanceAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaClearImage: {
-    input: { handle: 'string@MaaImageBuffer' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      handle: 'string@MaaImageBuffer'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaControllerConnected: {
-    input: { ctrl: 'string@MaaControllerAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      ctrl: 'string@MaaControllerAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaControllerDestroy: {
-    input: { ctrl: 'string@MaaControllerAPI' },
-    output: { data: { return: 'never' }, error: 'string' }
+    input: {
+      ctrl: 'string@MaaControllerAPI'
+    },
+    output: {
+      data: {
+        return: 'never'
+      },
+      error: 'string'
+    }
   },
   MaaControllerGetImage: {
-    input: { buffer: 'string@MaaImageBuffer', ctrl: 'string@MaaControllerAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      buffer: 'string@MaaImageBuffer',
+      ctrl: 'string@MaaControllerAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaControllerGetUUID: {
-    input: { ctrl: 'string@MaaControllerAPI' },
-    output: { data: { buffer: 'string', return: 'number' }, error: 'string' }
+    input: {
+      ctrl: 'string@MaaControllerAPI'
+    },
+    output: {
+      data: {
+        buffer: 'string',
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaControllerPostClick: {
-    input: { ctrl: 'string@MaaControllerAPI', x: 'number', y: 'number' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      ctrl: 'string@MaaControllerAPI',
+      x: 'number',
+      y: 'number'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaControllerPostConnection: {
-    input: { ctrl: 'string@MaaControllerAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      ctrl: 'string@MaaControllerAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaControllerPostInputText: {
-    input: { ctrl: 'string@MaaControllerAPI', text: 'string' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      ctrl: 'string@MaaControllerAPI',
+      text: 'string'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaControllerPostPressKey: {
-    input: { ctrl: 'string@MaaControllerAPI', keycode: 'number' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      ctrl: 'string@MaaControllerAPI',
+      keycode: 'number'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaControllerPostScreencap: {
-    input: { ctrl: 'string@MaaControllerAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      ctrl: 'string@MaaControllerAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaControllerPostSwipe: {
     input: {
@@ -85,7 +201,12 @@ export default {
       y1: 'number',
       y2: 'number'
     },
-    output: { data: { return: 'number' }, error: 'string' }
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaControllerPostTouchDown: {
     input: {
@@ -95,7 +216,12 @@ export default {
       x: 'number',
       y: 'number'
     },
-    output: { data: { return: 'number' }, error: 'string' }
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaControllerPostTouchMove: {
     input: {
@@ -105,31 +231,81 @@ export default {
       x: 'number',
       y: 'number'
     },
-    output: { data: { return: 'number' }, error: 'string' }
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaControllerPostTouchUp: {
-    input: { contact: 'number', ctrl: 'string@MaaControllerAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      contact: 'number',
+      ctrl: 'string@MaaControllerAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaControllerSetOption: {
-    input: { ctrl: 'string@MaaControllerAPI', key: 'number', value: 'string|number|boolean' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      ctrl: 'string@MaaControllerAPI',
+      key: 'number',
+      value: 'string|number|boolean'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaControllerStatus: {
-    input: { ctrl: 'string@MaaControllerAPI', id: 'number' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      ctrl: 'string@MaaControllerAPI',
+      id: 'number'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaControllerWait: {
-    input: { ctrl: 'string@MaaControllerAPI', id: 'number' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      ctrl: 'string@MaaControllerAPI',
+      id: 'number'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaCreate: {
-    input: { callback: 'string@MaaAPICallback' },
-    output: { data: { return: 'string@MaaInstanceAPI' }, error: 'string' }
+    input: {
+      callback: 'string@MaaAPICallback'
+    },
+    output: {
+      data: {
+        return: 'string@MaaInstanceAPI'
+      },
+      error: 'string'
+    }
   },
   MaaCreateImageBuffer: {
     input: {},
-    output: { data: { return: 'string@MaaImageBuffer' }, error: 'string' }
+    output: {
+      data: {
+        return: 'string@MaaImageBuffer'
+      },
+      error: 'string'
+    }
   },
   MaaDbgControllerCreate: {
     input: {
@@ -139,119 +315,336 @@ export default {
       type: 'number',
       write_path: 'string'
     },
-    output: { data: { return: 'string@MaaControllerAPI' }, error: 'string' }
+    output: {
+      data: {
+        return: 'string@MaaControllerAPI'
+      },
+      error: 'string'
+    }
   },
   MaaDestroy: {
-    input: { inst: 'string@MaaInstanceAPI' },
-    output: { data: { return: 'never' }, error: 'string' }
+    input: {
+      inst: 'string@MaaInstanceAPI'
+    },
+    output: {
+      data: {
+        return: 'never'
+      },
+      error: 'string'
+    }
   },
   MaaDestroyImageBuffer: {
-    input: { handle: 'string@MaaImageBuffer' },
-    output: { data: { return: 'never' }, error: 'string' }
+    input: {
+      handle: 'string@MaaImageBuffer'
+    },
+    output: {
+      data: {
+        return: 'never'
+      },
+      error: 'string'
+    }
   },
   MaaGetController: {
-    input: { inst: 'string@MaaInstanceAPI' },
-    output: { data: { return: 'string@MaaControllerAPI' }, error: 'string' }
+    input: {
+      inst: 'string@MaaInstanceAPI'
+    },
+    output: {
+      data: {
+        return: 'string@MaaControllerAPI'
+      },
+      error: 'string'
+    }
   },
   MaaGetImageEncoded: {
-    input: { handle: 'string@MaaImageBuffer' },
-    output: { data: { return: 'string@buffer' }, error: 'string' }
+    input: {
+      handle: 'string@MaaImageBuffer'
+    },
+    output: {
+      data: {
+        return: 'string@buffer'
+      },
+      error: 'string'
+    }
   },
   MaaGetImageHeight: {
-    input: { handle: 'string@MaaImageBuffer' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      handle: 'string@MaaImageBuffer'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaGetImageType: {
-    input: { handle: 'string@MaaImageBuffer' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      handle: 'string@MaaImageBuffer'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaGetImageWidth: {
-    input: { handle: 'string@MaaImageBuffer' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      handle: 'string@MaaImageBuffer'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaGetResource: {
-    input: { inst: 'string@MaaInstanceAPI' },
-    output: { data: { return: 'string@MaaResourceAPI' }, error: 'string' }
+    input: {
+      inst: 'string@MaaInstanceAPI'
+    },
+    output: {
+      data: {
+        return: 'string@MaaResourceAPI'
+      },
+      error: 'string'
+    }
   },
   MaaInited: {
-    input: { inst: 'string@MaaInstanceAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      inst: 'string@MaaInstanceAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaIsImageEmpty: {
-    input: { handle: 'string@MaaImageBuffer' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      handle: 'string@MaaImageBuffer'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaPostStop: {
-    input: { inst: 'string@MaaInstanceAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      inst: 'string@MaaInstanceAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaPostTask: {
-    input: { entry: 'string', inst: 'string@MaaInstanceAPI', param: 'string' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      entry: 'string',
+      inst: 'string@MaaInstanceAPI',
+      param: 'string'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaResourceCreate: {
-    input: { callback: 'string@MaaAPICallback' },
-    output: { data: { return: 'string@MaaResourceAPI' }, error: 'string' }
+    input: {
+      callback: 'string@MaaAPICallback'
+    },
+    output: {
+      data: {
+        return: 'string@MaaResourceAPI'
+      },
+      error: 'string'
+    }
   },
   MaaResourceDestroy: {
-    input: { res: 'string@MaaResourceAPI' },
-    output: { data: { return: 'never' }, error: 'string' }
+    input: {
+      res: 'string@MaaResourceAPI'
+    },
+    output: {
+      data: {
+        return: 'never'
+      },
+      error: 'string'
+    }
   },
   MaaResourceGetHash: {
-    input: { res: 'string@MaaResourceAPI' },
-    output: { data: { buffer: 'string', return: 'number' }, error: 'string' }
+    input: {
+      res: 'string@MaaResourceAPI'
+    },
+    output: {
+      data: {
+        buffer: 'string',
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaResourceGetTaskList: {
-    input: { res: 'string@MaaResourceAPI' },
-    output: { data: { buffer: 'string', return: 'number' }, error: 'string' }
+    input: {
+      res: 'string@MaaResourceAPI'
+    },
+    output: {
+      data: {
+        buffer: 'string',
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaResourceLoaded: {
-    input: { res: 'string@MaaResourceAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      res: 'string@MaaResourceAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaResourcePostPath: {
-    input: { path: 'string', res: 'string@MaaResourceAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      path: 'string',
+      res: 'string@MaaResourceAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaResourceSetOption: {
-    input: { key: 'number', res: 'string@MaaResourceAPI', value: 'string|number|boolean' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      key: 'number',
+      res: 'string@MaaResourceAPI',
+      value: 'string|number|boolean'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaResourceStatus: {
-    input: { id: 'number', res: 'string@MaaResourceAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      id: 'number',
+      res: 'string@MaaResourceAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaResourceWait: {
-    input: { id: 'number', res: 'string@MaaResourceAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      id: 'number',
+      res: 'string@MaaResourceAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaSetGlobalOption: {
-    input: { key: 'number', value: 'string|number|boolean' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      key: 'number',
+      value: 'string|number|boolean'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaSetImageEncoded: {
-    input: { data: 'string@buffer', handle: 'string@MaaImageBuffer' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      data: 'string@buffer',
+      handle: 'string@MaaImageBuffer'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaSetOption: {
-    input: { inst: 'string@MaaInstanceAPI', key: 'number', value: 'string|number|boolean' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      inst: 'string@MaaInstanceAPI',
+      key: 'number',
+      value: 'string|number|boolean'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaSetTaskParam: {
-    input: { id: 'number', inst: 'string@MaaInstanceAPI', param: 'string' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      id: 'number',
+      inst: 'string@MaaInstanceAPI',
+      param: 'string'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaStop: {
-    input: { inst: 'string@MaaInstanceAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      inst: 'string@MaaInstanceAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaTaskAllFinished: {
-    input: { inst: 'string@MaaInstanceAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      inst: 'string@MaaInstanceAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaTaskStatus: {
-    input: { id: 'number', inst: 'string@MaaInstanceAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      id: 'number',
+      inst: 'string@MaaInstanceAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaThriftControllerCreate: {
     input: {
@@ -261,95 +654,281 @@ export default {
       port: 'number',
       type: 'number'
     },
-    output: { data: { return: 'string@MaaControllerAPI' }, error: 'string' }
+    output: {
+      data: {
+        return: 'string@MaaControllerAPI'
+      },
+      error: 'string'
+    }
   },
-  MaaToolKitFindDevice: { input: {}, output: { data: { return: 'number' }, error: 'string' } },
-  MaaToolKitFindDeviceWithAdb: {
-    input: { adb_path: 'string' },
-    output: { data: { return: 'number' }, error: 'string' }
-  },
-  MaaToolKitFindWindow: {
-    input: { class_name: 'string', window_name: 'string' },
-    output: { data: { return: 'number' }, error: 'string' }
-  },
-  MaaToolKitGetCursorWindow: { input: {}, output: { data: { return: 'number' }, error: 'string' } },
-  MaaToolKitGetDeviceAdbConfig: {
-    input: { index: 'number' },
-    output: { data: { return: 'string' }, error: 'string' }
-  },
-  MaaToolKitGetDeviceAdbControllerType: {
-    input: { index: 'number' },
-    output: { data: { return: 'number' }, error: 'string' }
-  },
-  MaaToolKitGetDeviceAdbPath: {
-    input: { index: 'number' },
-    output: { data: { return: 'string' }, error: 'string' }
-  },
-  MaaToolKitGetDeviceAdbSerial: {
-    input: { index: 'number' },
-    output: { data: { return: 'string' }, error: 'string' }
-  },
-  MaaToolKitGetDeviceCount: { input: {}, output: { data: { return: 'number' }, error: 'string' } },
-  MaaToolKitGetDeviceName: {
-    input: { index: 'number' },
-    output: { data: { return: 'string' }, error: 'string' }
-  },
-  MaaToolKitGetWindow: {
-    input: { index: 'number' },
-    output: { data: { return: 'number' }, error: 'string' }
-  },
-  MaaToolKitInit: { input: {}, output: { data: { return: 'number' }, error: 'string' } },
-  MaaToolKitIsFindDeviceCompleted: {
+  MaaToolkitFindDevice: {
     input: {},
-    output: { data: { return: 'number' }, error: 'string' }
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
-  MaaToolKitPostFindDevice: { input: {}, output: { data: { return: 'number' }, error: 'string' } },
-  MaaToolKitPostFindDeviceWithAdb: {
-    input: { adb_path: 'string' },
-    output: { data: { return: 'number' }, error: 'string' }
+  MaaToolkitFindDeviceWithAdb: {
+    input: {
+      adb_path: 'string'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
-  MaaToolKitRegisterCustomActionExecutor: {
+  MaaToolkitFindWindow: {
+    input: {
+      class_name: 'string',
+      window_name: 'string'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
+  },
+  MaaToolkitGetCursorWindow: {
+    input: {},
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
+  },
+  MaaToolkitGetDeviceAdbConfig: {
+    input: {
+      index: 'number'
+    },
+    output: {
+      data: {
+        return: 'string'
+      },
+      error: 'string'
+    }
+  },
+  MaaToolkitGetDeviceAdbControllerType: {
+    input: {
+      index: 'number'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
+  },
+  MaaToolkitGetDeviceAdbPath: {
+    input: {
+      index: 'number'
+    },
+    output: {
+      data: {
+        return: 'string'
+      },
+      error: 'string'
+    }
+  },
+  MaaToolkitGetDeviceAdbSerial: {
+    input: {
+      index: 'number'
+    },
+    output: {
+      data: {
+        return: 'string'
+      },
+      error: 'string'
+    }
+  },
+  MaaToolkitGetDeviceCount: {
+    input: {},
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
+  },
+  MaaToolkitGetDeviceName: {
+    input: {
+      index: 'number'
+    },
+    output: {
+      data: {
+        return: 'string'
+      },
+      error: 'string'
+    }
+  },
+  MaaToolkitGetWindow: {
+    input: {
+      index: 'number'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
+  },
+  MaaToolkitInit: {
+    input: {},
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
+  },
+  MaaToolkitIsFindDeviceCompleted: {
+    input: {},
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
+  },
+  MaaToolkitPostFindDevice: {
+    input: {},
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
+  },
+  MaaToolkitPostFindDeviceWithAdb: {
+    input: {
+      adb_path: 'string'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
+  },
+  MaaToolkitRegisterCustomActionExecutor: {
     input: {
       action_exec_param_json: 'string',
       action_exec_path: 'string',
       action_name: 'string',
       handle: 'string@MaaInstanceAPI'
     },
-    output: { data: { return: 'number' }, error: 'string' }
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
-  MaaToolKitRegisterCustomRecognizerExecutor: {
+  MaaToolkitRegisterCustomRecognizerExecutor: {
     input: {
       handle: 'string@MaaInstanceAPI',
       recognizer_exec_param_json: 'string',
       recognizer_exec_path: 'string',
       recognizer_name: 'string'
     },
-    output: { data: { return: 'number' }, error: 'string' }
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
-  MaaToolKitSearchWindow: {
-    input: { class_name: 'string', window_name: 'string' },
-    output: { data: { return: 'number' }, error: 'string' }
+  MaaToolkitSearchWindow: {
+    input: {
+      class_name: 'string',
+      window_name: 'string'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
-  MaaToolKitUninit: { input: {}, output: { data: { return: 'number' }, error: 'string' } },
-  MaaToolKitUnregisterCustomActionExecutor: {
-    input: { action_name: 'string', handle: 'string@MaaInstanceAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
-  },
-  MaaToolKitUnregisterCustomRecognizerExecutor: {
-    input: { handle: 'string@MaaInstanceAPI', recognizer_name: 'string' },
-    output: { data: { return: 'number' }, error: 'string' }
-  },
-  MaaToolKitWaitForFindDeviceToComplete: {
+  MaaToolkitUninit: {
     input: {},
-    output: { data: { return: 'number' }, error: 'string' }
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
-  MaaVersion: { input: {}, output: { data: { return: 'string' }, error: 'string' } },
+  MaaToolkitUnregisterCustomActionExecutor: {
+    input: {
+      action_name: 'string',
+      handle: 'string@MaaInstanceAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
+  },
+  MaaToolkitUnregisterCustomRecognizerExecutor: {
+    input: {
+      handle: 'string@MaaInstanceAPI',
+      recognizer_name: 'string'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
+  },
+  MaaToolkitWaitForFindDeviceToComplete: {
+    input: {},
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
+  },
+  MaaVersion: {
+    input: {},
+    output: {
+      data: {
+        return: 'string'
+      },
+      error: 'string'
+    }
+  },
   MaaWaitTask: {
-    input: { id: 'number', inst: 'string@MaaInstanceAPI' },
-    output: { data: { return: 'number' }, error: 'string' }
+    input: {
+      id: 'number',
+      inst: 'string@MaaInstanceAPI'
+    },
+    output: {
+      data: {
+        return: 'number'
+      },
+      error: 'string'
+    }
   },
   MaaWin32ControllerCreate: {
-    input: { callback: 'string@MaaAPICallback', hWnd: 'number', type: 'number' },
-    output: { data: { return: 'string@MaaControllerAPI' }, error: 'string' }
+    input: {
+      callback: 'string@MaaAPICallback',
+      hWnd: 'number',
+      type: 'number'
+    },
+    output: {
+      data: {
+        return: 'string@MaaControllerAPI'
+      },
+      error: 'string'
+    }
   }
 } as const

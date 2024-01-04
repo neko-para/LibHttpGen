@@ -57,8 +57,6 @@ async function main() {
   regen.add_raw(
     `// clang-format off
 
-#include <optional>
-
 #include "Utils.h"
 #define LHG_PROCESS
 `
@@ -238,7 +236,11 @@ struct lhg::schema_t<${type} *>
         regen.add_sec(
           `lhg.impl.${ic.name}.arg.${arg.name}`,
           `    auto ${arg.name}_id = __param["${cbParam}"].as_string();
-    auto ${arg.name} = ${cbId}__Manager.find(${arg.name}_id).get();`
+    auto ${arg.name} = ${cbId}__Manager.find(${arg.name}_id).get();
+    if (${arg.name}) {
+        __error = "${cbParam} not found in manager";
+        return std::nullopt;
+    }`
         )
         continue
       } else if (arg.type in callback_ids) {
@@ -331,6 +333,8 @@ struct lhg::schema_t<${type} *>
 
   for (const type in cfg.callback) {
     const cc = cfg.callback[type]!
+    const m = /(.*?) *\(\*\)\(.*\)$/.exec(type)
+    const rt = m[1]!
     regen.add_raw(`    // callback ${cc.name}`)
     regen.add_raw(`    if (lhg::handle_callback("${cc.name}", ${
       cc.name
@@ -345,6 +349,17 @@ ${Array.from({ length: cc.all }, (_, k) => k)
   .map(id => `            { "${cc.argn[id]}", v${id} },`)
   .join('\n')}
         };
+    }, [](const auto& ret) {
+${
+  rt === 'void'
+    ? '        return 0;'
+    : `        if constexpr (lhg::check_t<${rt}>::enable) {
+            if (!lhg::check_var<${rt}>(ret)) {
+                return std::nullopt;
+            }
+        }
+        return lhg::from_json<${rt}>(ret);`
+}
     })) {
         return true;
     }
@@ -369,8 +384,40 @@ ${Array.from({ length: cc.all }, (_, k) => k)
     if (lhg::handle_api(ctx, segs, obj, wrappers)) {
         return true;
     }
-    return false;
-}`)
+`)
+
+  regen.add_raw(`    if (lhg::handle_help(ctx, segs, wrappers, { ${cfg.opaque
+    .map(x => `"${x}"`)
+    .join(', ')} }, [](json::object& result) {
+${Object.keys(cfg.callback).map(type => {
+  const name = callback_ids[type]!
+  const cc = cfg.callback[type]!
+  const m = /(.*?) *\(\*\)\(.*\)$/.exec(type)
+  const rt = m[1]!
+  return `            // ${name}
+            result["/callback/${name}/add"] = { { "body", json::object {} }, { "response", { { "data", { { "id", "string" } } } } } };
+            result["/callback/${name}/:id/del"] = { { "body", json::object {} }, { "response", { { "data", json::object {} }, { "error", "string" } } } };
+            result["/callback/${name}/:id/pull"] = { { "body", json::object {} }, { "response", { { "data", json::object { { "ids", "string[]" } } }, { "error", "string" } } } };
+            result["/callback/${name}/:id/:cid/request"] = { { "body", json::object {} }, { "response", { { "data", json::object {
+${Array.from({ length: cc.all }, (_, k) => k)
+  .filter(x => x != cc.self)
+  .map(
+    id =>
+      `                { "${cc.argn[id]}", lhg::schema_t<decltype(std::get<${id}>(lhg::callback_manager<${type}>::CallbackContext::args_type {}))>::schema },`
+  )
+  .join('\n')}
+            } }, { "error", "string" } } } };
+            result["/callback/${name}/:id/:cid/response"] = { { "body", json::object {${
+              rt === 'void' ? '' : ' { "return", lhg::schema_t<${rt}>::schema } '
+            }} }, { "response", { { "data", json::object {} }, { "error", "string" } } } };
+`
+})}
+    })) {
+        return true;
+    }
+`)
+
+  regen.add_raw('    return false;\n}')
 
   await regen.save(source_path)
 }

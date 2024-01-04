@@ -19,6 +19,9 @@ struct schema_t
 };
 
 template <typename Type>
+struct schema_t<Type &&> : schema_t<Type> {};
+
+template <typename Type>
 bool check_var(json::value v) = delete;
 
 #pragma region void

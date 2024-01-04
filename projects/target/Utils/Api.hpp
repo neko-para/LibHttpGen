@@ -44,25 +44,18 @@ inline bool handle_api(Context& ctx, UrlSegments segs, json::object& obj, const 
                 }
                 return true;
             }
-            else if (segs.enter_path("help") && segs.end()) {
-                auto input = it->second.input();
-                auto output = it->second.output();
-                ctx.json_body(json::object { { "input", input }, { "output", output } });
-                return true;
-            }
         }
-    }
-    else if (segs.enter_path("help") && segs.end()) {
-        json::object result;
-        for (const auto& [api, info] : wrappers) {
-            auto input = info.input();
-            auto output = info.output();
-            result[api] = json::object { { "input", input }, { "output", output } };
-        }
-        ctx.json_body(result);
-        return true;
     }
     return false;
+}
+
+inline void help_api(json::object& result, const api_info_map& wrappers)
+{
+    for (const auto& [api, info] : wrappers) {
+        auto input = info.input();
+        auto output = info.output();
+        result["/api/" + api] = json::object { { "body", input }, { "response", output } };
+    }
 }
 
 } // namespace lhg

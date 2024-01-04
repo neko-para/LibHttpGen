@@ -54,8 +54,10 @@ static typename __private::func_traits<F>::return_t callback_implementation(Args
 }
 
 template <typename CM>
-inline bool handle_callback(const char* name, CM& manager, Context& ctx, UrlSegments segs, json::object& obj,
-                            std::function<json::object(const typename CM::CallbackContext::args_type&)> convert)
+inline bool handle_callback(
+    const char* name, CM& manager, Context& ctx, UrlSegments segs, json::object& obj,
+    std::function<json::object(const typename CM::CallbackContext::args_type&)> convert_arg,
+    std::function<std::optional<typename CM::CallbackContext::return_type>(const json::value&)> convert_ret)
 {
     segs.reset();
     if (segs.enter_path("callback")) {
@@ -70,7 +72,7 @@ inline bool handle_callback(const char* name, CM& manager, Context& ctx, UrlSegm
             if (segs.enter_id(id)) {
                 if (segs.enter_path("del")) {
                     if (manager.free(id)) {
-                        ctx.json_body({ { "data", {} } });
+                        ctx.json_body({ { "data", json::object {} } });
                     }
                     else {
                         ctx.json_body({ { "error", "id not found" } });
@@ -105,7 +107,7 @@ inline bool handle_callback(const char* name, CM& manager, Context& ctx, UrlSegm
                             ctx.json_body({ { "error", "cid not found" } });
                             return true;
                         }
-                        json::object __arg = convert(args);
+                        json::object __arg = convert_arg(args);
                         ctx.json_body({ { "data", __arg } });
                         return true;
                     }
@@ -115,9 +117,29 @@ inline bool handle_callback(const char* name, CM& manager, Context& ctx, UrlSegm
                             ctx.json_body({ { "error", "id not found" } });
                             return true;
                         }
-                        if (!__inst_ctx->resp(cid, 0)) {
-                            ctx.json_body({ { "error", "cid not found" } });
-                            return true;
+                        if constexpr (std::is_same_v<typename CM::CallbackContext::real_return_type, void>) {
+                            if (!__inst_ctx->resp(cid, 0)) {
+                                ctx.json_body({ { "error", "cid not found" } });
+                                return true;
+                            }
+                        }
+                        else {
+                            if (!obj.contains("return")) {
+                                ctx.json_body({ { "error", "return not provided" } });
+                                return true;
+                            }
+                            auto ret = convert_ret(obj["return"]);
+                            if (!ret.has_value()) {
+                                ctx.json_body({ { "error", "return convert failed" } });
+                                return true;
+                            }
+                            if (!__inst_ctx->resp(cid, ret.value())) {
+                                ctx.json_body({ { "data", json::object {} } });
+                                return true;
+                            } else {
+                                ctx.json_body({ { "error", "cid not found" } });
+                                return true;
+                            }
                         }
                         return true;
                     }
