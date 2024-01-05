@@ -7,6 +7,7 @@ interface LHGCallbackConfig {
 }
 
 interface LHGOpaqueConfig {
+  'non-alloc'?: string[]
   free?: string[]
 }
 

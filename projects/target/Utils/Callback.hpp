@@ -53,6 +53,25 @@ static typename func_traits<F>::return_t callback_implementation(Args... arg)
     }
 }
 
+template <size_t C, typename F, typename... Args>
+struct get_callback_impl_helper
+{
+    static constexpr const F func = &callback_implementation<C, F, Args...>;
+};
+
+template <typename T, size_t C, typename F>
+struct get_callback_impl;
+
+template <size_t C, typename F, typename... Args>
+struct get_callback_impl<std::tuple<Args...>, C, F> {
+    using type = get_callback_impl_helper<C, F, Args...>;
+};
+
+template <size_t C, typename F>
+inline F get_callback() {
+    return get_callback_impl<typename func_traits<F>::arguments_t, C, F>::type::func;
+}
+
 template <typename CM>
 inline bool handle_callback(
     const char* name, CM& manager, Context& ctx, UrlSegments segs, json::object& obj,

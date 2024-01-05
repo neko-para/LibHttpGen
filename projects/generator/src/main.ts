@@ -12,10 +12,6 @@ struct lhg::schema_t<${type}>
 `)
 }
 
-function schemaOf(type: string) {
-  return new ExprItem(`lhg::schema_t<${type}>::schema`)
-}
-
 function processArguments(cfg: Required<LHGConfig>, args: LHGInterfaceArgumentInfo[]) {
   for (const [idx, arg] of args.entries()) {
     if (arg.type in cfg.callback) {
@@ -80,6 +76,11 @@ async function main() {
   regen.add_sec('lhg.custom.global', '')
   regen.add_raw('')
 
+  for (const type in cfg.callback) {
+    const name = cfg.callback[type]!.name
+    regen.add_raw(`static lhg::callback_manager<${type}> ${name}__Manager;\n`)
+  }
+
   for (const ic of int.interface) {
     const args = processArguments(cfg, ic.argument)
     regen.add_raw(`struct __${ic.name}_t {
@@ -108,14 +109,20 @@ struct lhg::is_callback<__${ic.name}_t::__${arg.name}_t>
 {
     static constexpr const bool value = true;
     static constexpr const char* const name = ${JSON.stringify(arg.special.refer.name)};
+    static constexpr const size_t context = ${arg.special.refer.self};
     using traits = lhg::func_traits<typename __${ic.name}_t::__${arg.name}_t::type>;
+    static decltype(${arg.special.refer.name}__Manager) &manager; 
 };
+decltype(${arg.special.refer.name}__Manager)& lhg::is_callback<__${ic.name}_t::__${
+            arg.name
+          }_t>::manager = ${arg.special.refer.name}__Manager;
 `)
         } else if (arg.special.type === 'callback_context') {
           regen.add_raw(`template<>
 struct lhg::is_callback_context<__${ic.name}_t::__${arg.name}_t>
 {
     static constexpr const bool value = true;
+    using callback_arg_tag = __${ic.name}_t::__${arg.special.param}_t;
 };
 `)
         } else if (arg.special.type === 'output') {
@@ -129,7 +136,7 @@ struct lhg::is_output<__${ic.name}_t::__${arg.name}_t>
       }
     }
     regen.add_raw('namespace lhg {')
-    regen.add_sec(`lhg.custom.${ic.name}`, '')
+    regen.add_sec(`lhg.custom.${ic.name}.tag`, '')
     regen.add_raw('}\n')
   }
 
@@ -141,6 +148,7 @@ struct lhg::is_output<__${ic.name}_t::__${arg.name}_t>
 struct lhg::is_opaque<${type} *> {
     static constexpr const bool value = true;
     using type = ${type};
+    static constexpr const char* const name = ${JSON.stringify(type)};
     static lhg::opaque_manager<${type} *>& manager;
 };
 lhg::opaque_manager<${type} *>& lhg::is_opaque<${type} *>::manager = ${type}__OpaqueManager;
@@ -153,182 +161,66 @@ struct lhg::is_opaque_free<${type} *, __${f}_t> {
 };
 `)
     }
-  }
-
-  for (const type in cfg.callback) {
-    const name = cfg.callback[type]!.name
-    regen.add_raw(`static lhg::callback_manager<${type}> ${name}__Manager;\n`)
+    for (const f of oc['non-alloc'] ?? []) {
+      regen.add_raw(`template<>
+struct lhg::is_opaque_non_alloc<${type} *, __${f}_t> {
+    static constexpr const bool value = true;
+};
+`)
+    }
   }
 
   for (const ic of int.interface) {
     const args = processArguments(cfg, ic.argument)
 
-    regen.add_raw(`json::object ${ic.name}_HelperInput() {
-    return lhg::input_helper<__${ic.name}_t>();
-}
-`)
+    regen.add_sec(`lhg.custom.${ic.name}.func`, '')
 
-    regen.add_raw(`json::object ${ic.name}_HelperOutput() {
-    return lhg::output_helper<__${ic.name}_t>();
-}
-`)
-  }
-
-  for (const ic of int.interface) {
     regen.add_raw(
       `std::optional<json::object> ${ic.name}_Wrapper(json::object __param, std::string &__error) {`
     )
 
-    // callback
-    let cbId: string | null = null
-    let cbParam: string | null = null
-    let ctxPos: number | null = null
+    regen.add_raw(`    if (!lhg::perform_check<__${ic.name}_t>(__param, __error)) {
+        return std::nullopt;
+    }
+`)
+
+    regen.add_raw(`    typename lhg::arg_set<__${ic.name}_t>::temp_type __temp;
+    typename lhg::arg_set<__${ic.name}_t>::call_type __call;
+    if (!lhg::perform_input<__${ic.name}_t>(__temp, __param, __error)) {
+        return std::nullopt;
+    }
+    if (!lhg::perform_input_fix<__${ic.name}_t>(__call, __temp, __param, __error)) {
+        return std::nullopt;
+    }
+`)
+
     const outputCache: string[] = []
-    for (const [idx, arg] of ic.argument.entries()) {
-      if (arg.type in cfg.callback) {
-        ctxPos = idx + cfg.callback[arg.type]!.pass
-      }
-    }
-
-    // check
-    for (const [idx, arg] of ic.argument.entries()) {
-      // callback
-      if (ctxPos === idx) {
-        regen.add_sec(
-          `lhg.impl.${ic.name}.arg.${arg.name}.check`,
-          `    if (!lhg::check_var<const char*>(__param["${cbParam}"])) {
-        __error = "${cbParam} should be string@${cbId}";
-        return std::nullopt;
-    }`
-        )
-        continue
-      } else if (arg.type in cfg.callback) {
-        cbId = cfg.callback[arg.type]!.name
-        continue
-      }
-
-      // opacity
-      if (arg.type.endsWith(' *') && cfg.opaque[arg.type.slice(0, -2)]) {
-        regen.add_sec(
-          `lhg.impl.${ic.name}.arg.${arg.name}.check`,
-          `    if (!lhg::check_var<const char*>(__param["${arg.name}"])) {
-        __error = "${arg.name} should be string@${arg.type.slice(0, -2)}";
-        return std::nullopt;
-    }`
-        )
-        continue
-      }
-
-      if (arg.type.endsWith(' *') && cfg.output.includes(arg.type.slice(0, -2))) {
-        continue
-      }
-
-      regen.add_sec(
-        `lhg.impl.${ic.name}.arg.${arg.name}.check`,
-        `    if constexpr (lhg::check_t<${arg.type}>::enable) {
-        if (!lhg::check_var<${arg.type}>(__param["${arg.name}"])) {
-            __error = "${arg.name} should be ${cfg.check[arg.type] ?? arg.type}";
-            return std::nullopt;
+    for (const arg of args) {
+      if (arg.special) {
+        if (arg.special.type === 'output') {
+          outputCache.push(arg.name)
         }
-    }`
-      )
-    }
-
-    for (const [idx, arg] of ic.argument.entries()) {
-      // callback
-      if (ctxPos === idx) {
-        regen.add_sec(
-          `lhg.impl.${ic.name}.arg.${arg.name}`,
-          `    auto ${arg.name}_id = __param["${cbParam}"].as_string();
-    auto ${arg.name} = ${cbId}__Manager.find(${arg.name}_id).get();
-    if (${arg.name}) {
-        __error = "${cbParam} not found in manager";
-        return std::nullopt;
-    }`
-        )
-        continue
-      } else if (arg.type in cfg.callback) {
-        const m = /\(\*\)\((.*)\)$/.exec(arg.type)
-        cbId = cfg.callback[arg.type]!.name
-        cbParam = arg.name
-        regen.add_sec(
-          `lhg.impl.${ic.name}.arg.${arg.name}`,
-          `    auto ${arg.name} = &lhg::callback_implementation<${cfg.callback[arg.type]!.self}, ${
-            arg.type
-          }, ${m![1]}>;`
-        )
-        continue
       }
-
-      // opacity
-      if (arg.type.endsWith(' *') && cfg.opaque[arg.type.slice(0, -2)]) {
-        const type = arg.type.slice(0, -2)
-        if ((cfg.opaque[type]!.free ?? []).includes(ic.name)) {
-          regen.add_sec(
-            `lhg.impl.${ic.name}.arg.${arg.name}`,
-            `    auto ${arg.name}_id = __param["${arg.name}"].as_string();
-    ${type} *${arg.name} = 0;
-    ${type}__OpaqueManager.del(${arg.name}_id, ${arg.name});`
-          )
-        } else {
-          regen.add_sec(
-            `lhg.impl.${ic.name}.arg.${arg.name}`,
-            `    auto ${arg.name}_id = __param["${arg.name}"].as_string();
-    auto ${arg.name} = ${type}__OpaqueManager.get(${arg.name}_id);`
-          )
-        }
-        regen.add_raw(`    if (!${arg.name}) {
-        __error = "${arg.name} not found in manager.";
-        return std::nullopt;
-    }`)
-        continue
-      }
-
-      if (arg.type.endsWith(' *') && cfg.output.includes(arg.type.slice(0, -2))) {
-        const type = arg.type.slice(0, -2)
-        regen.add_sec(
-          `lhg.impl.${ic.name}.arg.${arg.name}`,
-          `    auto ${arg.name} = lhg::output_prepare<${type} *>();`
-        )
-        outputCache.push(arg.name)
-        continue
-      }
-
-      regen.add_sec(
-        `lhg.impl.${ic.name}.arg.${arg.name}`,
-        `    auto ${arg.name}_temp = lhg::from_json<${arg.type}>(__param["${arg.name}"]);
-    auto ${arg.name} = lhg::from_json_fix<${arg.type}>(${arg.name}_temp);`
-      )
     }
-    if (ic.return === 'void') {
-      regen.add_raw(`    ${ic.name}(`)
-    } else {
-      regen.add_raw(`    auto __return = ${ic.name}(`)
-    }
-    regen.add_raw(ic.argument.map(x => `        ${x.name}`).join(',\n'))
-    regen.add_raw('    );')
-    if (ic.return === 'void') {
-      regen.add_sec(`lhg.impl.${ic.name}.return`, '')
-    } else {
-      if (ic.return.endsWith(' *') && cfg.opaque[ic.return.slice(0, -2)]) {
-        const type = ic.return.slice(0, -2)
-        regen.add_sec(
-          `lhg.impl.${ic.name}.return`,
-          `    auto __ret = ${type}__OpaqueManager.add(__return);`
-        )
+    if (args.length > 0) {
+      if (ic.return === 'void') {
+        regen.add_raw(`    std::apply(${ic.name}, __call);`)
       } else {
-        regen.add_sec(`lhg.impl.${ic.name}.return`, '    auto __ret = __return;')
+        regen.add_raw(`    auto __return = std::apply(${ic.name}, __call);`)
+      }
+    } else {
+      if (ic.return === 'void') {
+        regen.add_raw(`    ${ic.name}();`)
+      } else {
+        regen.add_raw(`    auto __return = ${ic.name}();`)
       }
     }
-    const outputDic = outputCache
-      .map(name => `{ "${name}", lhg::output_finalize(${name}) }`)
-      .join(', ')
-    regen.add_sec(
-      `lhg.impl.${ic.name}.final`,
-      `    return json::object { { "return", ${
-        ic.return === 'void' ? 'json::value(json::value::value_type::null)' : 'lhg::to_json(__ret)'
-      } }, ${outputDic} };`
-    )
+    if (ic.return === 'void') {
+      regen.add_sec(`lhg.impl.${ic.name}.return`, '    int __ret = 0;')
+    } else {
+      regen.add_sec(`lhg.impl.${ic.name}.return`, '    auto __ret = __return;')
+    }
+    regen.add_raw(`    return lhg::perform_output<__${ic.name}_t>(__call, __ret);`)
     regen.add_raw('}\n')
   }
 
@@ -381,7 +273,7 @@ ${
   regen.add_raw(`    const static lhg::api_info_map wrappers = {`)
   for (const ic of int.interface) {
     regen.add_raw(
-      `        { "${ic.name}", { &${ic.name}_Wrapper, &${ic.name}_HelperInput, &${ic.name}_HelperOutput } },`
+      `        { "${ic.name}", { &${ic.name}_Wrapper, &lhg::input_helper<__${ic.name}_t>, &lhg::output_helper<__${ic.name}_t> } },`
     )
   }
   regen.add_raw(`    };

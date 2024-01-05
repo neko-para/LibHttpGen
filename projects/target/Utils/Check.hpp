@@ -29,7 +29,7 @@ bool check_var(json::value v) = delete;
 template <>
 struct schema_t<void>
 {
-    static constexpr const char* const schema = "never";
+    static constexpr const char* const schema = "null";
 };
 
 #pragma endregion
