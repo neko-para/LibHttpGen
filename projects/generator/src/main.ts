@@ -44,6 +44,14 @@ function processArguments(cfg: Required<LHGConfig>, args: LHGInterfaceArgumentIn
   return args
 }
 
+function FS(func: string) {
+  return `${func}__ft`
+}
+
+function AS(arg: string) {
+  return `${arg}__at`
+}
+
 async function main() {
   const cfg = await loadConfig()
   const int = await loadInterface()
@@ -83,10 +91,10 @@ async function main() {
 
   for (const ic of int.interface) {
     const args = processArguments(cfg, ic.argument)
-    regen.add_raw(`struct __${ic.name}_t {
+    regen.add_raw(`struct ${FS(ic.name)} {
 ${args
   .map(
-    (arg, idx) => `    struct __${arg.name}_t {
+    (arg, idx) => `    struct ${AS(arg.name)} {
         using type = ${arg.type};
         static constexpr size_t index = ${idx};
         static constexpr const char* const name = ${JSON.stringify(arg.name)};
@@ -96,7 +104,7 @@ ${args
   .join('')}    using arguments_t = ${
       ic.argument.length === 0
         ? 'void'
-        : `std::tuple<${ic.argument.map(x => `__${x.name}_t`).join(', ')}>`
+        : `std::tuple<${ic.argument.map(x => AS(x.name)).join(', ')}>`
     };
     using return_t = ${ic.return};
 };
@@ -105,29 +113,29 @@ ${args
       if (arg.special) {
         if (arg.special.type === 'callback') {
           regen.add_raw(`template<>
-struct lhg::is_callback<__${ic.name}_t::__${arg.name}_t>
+struct lhg::is_callback<${FS(ic.name)}::${AS(arg.name)}>
 {
     static constexpr const bool value = true;
     static constexpr const char* const name = ${JSON.stringify(arg.special.refer.name)};
     static constexpr const size_t context = ${arg.special.refer.self};
-    using traits = lhg::func_traits<typename __${ic.name}_t::__${arg.name}_t::type>;
+    using traits = lhg::func_traits<typename ${FS(ic.name)}::${AS(arg.name)}::type>;
     static decltype(${arg.special.refer.name}__Manager) &manager; 
 };
-decltype(${arg.special.refer.name}__Manager)& lhg::is_callback<__${ic.name}_t::__${
+decltype(${arg.special.refer.name}__Manager)& lhg::is_callback<${FS(ic.name)}::${AS(
             arg.name
-          }_t>::manager = ${arg.special.refer.name}__Manager;
+          )}>::manager = ${arg.special.refer.name}__Manager;
 `)
         } else if (arg.special.type === 'callback_context') {
           regen.add_raw(`template<>
-struct lhg::is_callback_context<__${ic.name}_t::__${arg.name}_t>
+struct lhg::is_callback_context<${FS(ic.name)}::${AS(arg.name)}>
 {
     static constexpr const bool value = true;
-    using callback_arg_tag = __${ic.name}_t::__${arg.special.param}_t;
+    using callback_arg_tag = ${FS(ic.name)}::${AS(arg.special.param)};
 };
 `)
         } else if (arg.special.type === 'output') {
           regen.add_raw(`template<>
-struct lhg::is_output<__${ic.name}_t::__${arg.name}_t>
+struct lhg::is_output<${FS(ic.name)}::${AS(arg.name)}>
 {
     static constexpr const bool value = true;
 };
@@ -156,14 +164,14 @@ lhg::opaque_manager<${type} *>& lhg::is_opaque<${type} *>::manager = ${type}__Op
     const oc = cfg.opaque[type]!
     for (const f of oc.free ?? []) {
       regen.add_raw(`template<>
-struct lhg::is_opaque_free<${type} *, __${f}_t> {
+struct lhg::is_opaque_free<${type} *, ${FS(f)}> {
     static constexpr const bool value = true;
 };
 `)
     }
     for (const f of oc['non-alloc'] ?? []) {
       regen.add_raw(`template<>
-struct lhg::is_opaque_non_alloc<${type} *, __${f}_t> {
+struct lhg::is_opaque_non_alloc<${type} *, ${FS(f)}> {
     static constexpr const bool value = true;
 };
 `)
@@ -179,17 +187,17 @@ struct lhg::is_opaque_non_alloc<${type} *, __${f}_t> {
       `std::optional<json::object> ${ic.name}_Wrapper(json::object __param, std::string &__error) {`
     )
 
-    regen.add_raw(`    if (!lhg::perform_check<__${ic.name}_t>(__param, __error)) {
+    regen.add_raw(`    if (!lhg::perform_check<${FS(ic.name)}>(__param, __error)) {
         return std::nullopt;
     }
 `)
 
-    regen.add_raw(`    typename lhg::arg_set<__${ic.name}_t>::temp_type __temp;
-    typename lhg::arg_set<__${ic.name}_t>::call_type __call;
-    if (!lhg::perform_input<__${ic.name}_t>(__temp, __param, __error)) {
+    regen.add_raw(`    typename lhg::arg_set<${FS(ic.name)}>::temp_type __temp;
+    typename lhg::arg_set<${FS(ic.name)}>::call_type __call;
+    if (!lhg::perform_input<${FS(ic.name)}>(__temp, __param, __error)) {
         return std::nullopt;
     }
-    if (!lhg::perform_input_fix<__${ic.name}_t>(__call, __temp, __param, __error)) {
+    if (!lhg::perform_input_fix<${FS(ic.name)}>(__call, __temp, __param, __error)) {
         return std::nullopt;
     }
 `)
@@ -220,7 +228,7 @@ struct lhg::is_opaque_non_alloc<${type} *, __${f}_t> {
     } else {
       regen.add_sec(`lhg.impl.${ic.name}.return`, '    auto __ret = __return;')
     }
-    regen.add_raw(`    return lhg::perform_output<__${ic.name}_t>(__call, __ret);`)
+    regen.add_raw(`    return lhg::perform_output<${FS(ic.name)}>(__call, __ret);`)
     regen.add_raw('}\n')
   }
 
@@ -273,7 +281,9 @@ ${
   regen.add_raw(`    const static lhg::api_info_map wrappers = {`)
   for (const ic of int.interface) {
     regen.add_raw(
-      `        { "${ic.name}", { &${ic.name}_Wrapper, &lhg::input_helper<__${ic.name}_t>, &lhg::output_helper<__${ic.name}_t> } },`
+      `        { "${ic.name}", { &${ic.name}_Wrapper, &lhg::input_helper<${FS(
+        ic.name
+      )}>, &lhg::output_helper<${FS(ic.name)}> } },`
     )
   }
   regen.add_raw(`    };
