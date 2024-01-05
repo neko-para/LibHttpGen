@@ -108,6 +108,7 @@ struct lhg::is_callback<__${ic.name}_t::__${arg.name}_t>
 {
     static constexpr const bool value = true;
     static constexpr const char* const name = ${JSON.stringify(arg.special.refer.name)};
+    using traits = lhg::func_traits<typename __${ic.name}_t::__${arg.name}_t::type>;
 };
 `)
         } else if (arg.special.type === 'callback_context') {

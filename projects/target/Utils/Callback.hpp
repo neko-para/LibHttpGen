@@ -10,18 +10,18 @@
 namespace lhg
 {
 
+template <typename T>
+struct func_traits;
+
+template <typename R, typename... Args>
+struct func_traits<R (*)(Args...)>
+{
+    using return_t = R;
+    using arguments_t = std::tuple<Args...>;
+};
+
 namespace __private
 {
-
-    template <typename T>
-    struct func_traits;
-
-    template <typename R, typename... Args>
-    struct func_traits<R (*)(Args...)>
-    {
-        using return_t = R;
-        using arguments_t = std::tuple<Args...>;
-    };
 
     template <typename Ret, typename Tuple, typename... Args>
     struct callback_manager_helper;
@@ -35,11 +35,11 @@ namespace __private
 }
 
 template <typename F>
-using callback_manager = __private::callback_manager_helper<typename __private::func_traits<F>::return_t,
-                                                            typename __private::func_traits<F>::arguments_t>::type;
+using callback_manager = __private::callback_manager_helper<typename func_traits<F>::return_t,
+                                                            typename func_traits<F>::arguments_t>::type;
 
 template <size_t C, typename F, typename... Args>
-static typename __private::func_traits<F>::return_t callback_implementation(Args... arg)
+static typename func_traits<F>::return_t callback_implementation(Args... arg)
 {
     using manager = callback_manager<F>;
 
@@ -48,7 +48,7 @@ static typename __private::func_traits<F>::return_t callback_implementation(Args
     std::string cid = __ctx_ptr->push(arg...);
     typename manager::CallbackContext::return_type result;
     __ctx_ptr->wait(cid, result);
-    if constexpr (!std::is_same_v<typename __private::func_traits<F>::return_t, void>) {
+    if constexpr (!std::is_same_v<typename func_traits<F>::return_t, void>) {
         return result;
     }
 }
