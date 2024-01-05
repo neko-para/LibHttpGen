@@ -8,7 +8,8 @@ function declareSchema(regen: Regenerator, type: string, schema: string) {
 struct lhg::schema_t<${type}>
 {
     static constexpr const char* const schema = ${JSON.stringify(schema)};
-};`)
+};
+`)
 }
 
 function schemaOf(type: string) {
@@ -79,67 +80,95 @@ async function main() {
   regen.add_sec('lhg.custom.global', '')
   regen.add_raw('')
 
-  for (const type in cfg.callback) {
-    const name = cfg.callback[type]!.name
-    regen.add_raw(`static lhg::callback_manager<${type}> ${name}__Manager;\n`)
+  for (const ic of int.interface) {
+    const args = processArguments(cfg, ic.argument)
+    regen.add_raw(`struct __${ic.name}_t {
+${args
+  .map(
+    (arg, idx) => `    struct __${arg.name}_t {
+        using type = ${arg.type};
+        static constexpr size_t index = ${idx};
+        static constexpr const char* const name = ${JSON.stringify(arg.name)};
+    };
+`
+  )
+  .join('')}    using arguments_t = ${
+      ic.argument.length === 0
+        ? 'void'
+        : `std::tuple<${ic.argument.map(x => `__${x.name}_t`).join(', ')}>`
+    };
+    using return_t = ${ic.return};
+};
+`)
+    for (const arg of args) {
+      if (arg.special) {
+        if (arg.special.type === 'callback') {
+          regen.add_raw(`template<>
+struct lhg::is_callback<__${ic.name}_t::__${arg.name}_t>
+{
+    static constexpr const bool value = true;
+    static constexpr const char* const name = ${JSON.stringify(arg.special.refer.name)};
+};
+`)
+        } else if (arg.special.type === 'callback_context') {
+          regen.add_raw(`template<>
+struct lhg::is_callback_context<__${ic.name}_t::__${arg.name}_t>
+{
+    static constexpr const bool value = true;
+};
+`)
+        } else if (arg.special.type === 'output') {
+          regen.add_raw(`template<>
+struct lhg::is_output<__${ic.name}_t::__${arg.name}_t>
+{
+    static constexpr const bool value = true;
+};
+`)
+        }
+      }
+    }
+    regen.add_raw('namespace lhg {')
+    regen.add_sec(`lhg.custom.${ic.name}`, '')
+    regen.add_raw('}\n')
   }
 
   for (const type in cfg.opaque) {
     regen.add_raw(`static lhg::opaque_manager<${type} *> ${type}__OpaqueManager;\n`)
     declareSchema(regen, `${type} *`, `string@${type}`)
+
+    regen.add_raw(`template<>
+struct lhg::is_opaque<${type} *> {
+    static constexpr const bool value = true;
+    using type = ${type};
+    static lhg::opaque_manager<${type} *>& manager;
+};
+lhg::opaque_manager<${type} *>& lhg::is_opaque<${type} *>::manager = ${type}__OpaqueManager;
+`)
+    const oc = cfg.opaque[type]!
+    for (const f of oc.free ?? []) {
+      regen.add_raw(`template<>
+struct lhg::is_opaque_free<${type} *, __${f}_t> {
+    static constexpr const bool value = true;
+};
+`)
+    }
+  }
+
+  for (const type in cfg.callback) {
+    const name = cfg.callback[type]!.name
+    regen.add_raw(`static lhg::callback_manager<${type}> ${name}__Manager;\n`)
   }
 
   for (const ic of int.interface) {
     const args = processArguments(cfg, ic.argument)
 
     regen.add_raw(`json::object ${ic.name}_HelperInput() {
-    return json::object {`)
-
-    for (const arg of args) {
-      if (arg.special) {
-        if (arg.special.type === 'callback') {
-          regen.add_sec(
-            `lhg.helper.${ic.name}.input.${arg.name}`,
-            `        ${objectEntryToJson(arg.name, `string@${arg.special.refer.name}`)},`
-          )
-        } else if (arg.special.type === 'opaque') {
-          regen.add_sec(
-            `lhg.helper.${ic.name}.input.${arg.name}`,
-            `        ${objectEntryToJson(arg.name, `string@${arg.special.name}`)},`
-          )
-        }
-      } else {
-        regen.add_sec(
-          `lhg.helper.${ic.name}.input.${arg.name}`,
-          `        ${objectEntryToJson(arg.name, schemaOf(arg.type))},`
-        )
-      }
-    }
-
-    regen.add_raw(`    };
+    return lhg::input_helper<__${ic.name}_t>();
 }
 `)
 
     regen.add_raw(`json::object ${ic.name}_HelperOutput() {
-    return json::object {
-        { "data", {`)
-    regen.add_sec(
-      `lhg.helper.${ic.name}.output.return`,
-      `            ${objectEntryToJson('return', schemaOf(ic.return))},`
-    )
-    for (const arg of args) {
-      if (arg.special) {
-        if (arg.special.type === 'output') {
-          regen.add_sec(
-            `lhg.helper.${ic.name}.output.${arg.name}`,
-            `            ${objectEntryToJson(arg.name, schemaOf(arg.type))},`
-          )
-        }
-      }
-    }
-    regen.add_raw(`        }},
-        { "error", "string" }
-    };
+    return lhg::output_helper<__${ic.name}_t>();
 }
 `)
   }

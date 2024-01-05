@@ -6,6 +6,8 @@
 
 #include "Handle/Context.hpp"
 #include "Helper/UrlSegments.hpp"
+#include "Utils/Check.hpp"
+#include "Utils/Traits.hpp"
 
 namespace lhg
 {
@@ -56,6 +58,74 @@ inline void help_api(json::object& result, const api_info_map& wrappers)
         auto output = info.output();
         result["/api/" + api] = json::object { { "body", input }, { "response", output } };
     }
+}
+
+template <typename ArgTag>
+inline void input_helper_entry(json::object& obj, ArgTag)
+{
+    if constexpr (!shown_in_schema<ArgTag>::value) {
+        return;
+    }
+    if constexpr (is_arg_schema_impl<ArgTag>) {
+        obj[ArgTag::name] = arg_schema<ArgTag>::schema;
+    }
+    else if constexpr (is_callback<ArgTag>::value) {
+        obj[ArgTag::name] = std::string("string@") + is_callback<ArgTag>::name;
+    }
+    else if constexpr (is_callback_context<ArgTag>::value) {
+        return;
+    }
+    else {
+        obj[ArgTag::name] = schema_t<typename ArgTag::type>::schema;
+    }
+}
+
+template <typename FuncTag>
+inline json::object input_helper()
+{
+    using ArgTuple = typename FuncTag::arguments_t;
+    
+    if constexpr (std::is_same_v<ArgTuple, void>) {
+        return json::object {};
+    }
+    else {
+        json::object obj;
+        [&]<std::size_t... I>(std::index_sequence<I...>) {
+            (input_helper_entry<std::tuple_element_t<I, ArgTuple>>(obj, {}), ...);
+        }(std::make_index_sequence<std::tuple_size_v<ArgTuple>> {});
+
+        return obj;
+    }
+}
+
+template <typename ArgTag>
+inline void output_helper_entry(json::object& obj, ArgTag)
+{
+    if constexpr (!shown_in_schema<ArgTag>::value) {
+        return;
+    }
+    if constexpr (is_output<ArgTag>::value) {
+        obj[ArgTag::name] = schema_t<typename ArgTag::type>::schema;
+    }
+}
+
+template <typename FuncTag>
+inline json::object output_helper()
+{
+    using ArgTuple = typename FuncTag::arguments_t;
+    using Return = typename FuncTag::return_t;
+
+    json::object obj = { { "return", schema_t<Return>::schema } };
+    if constexpr (is_ret_schema_impl<FuncTag>) {
+        obj = { { "return", ret_schema<FuncTag>::schema } };
+    }
+    if constexpr (!std::is_same_v<ArgTuple, void>) {
+        [&]<std::size_t... I>(std::index_sequence<I...>) {
+            (output_helper_entry<std::tuple_element_t<I, ArgTuple>>(obj, {}), ...);
+        }(std::make_index_sequence<std::tuple_size_v<ArgTuple>> {});
+    }
+
+    return { { "data", obj }, { "error", "string" } };
 }
 
 } // namespace lhg
