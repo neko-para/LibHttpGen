@@ -8,3 +8,4 @@
 #include "Utils/Help.hpp"
 #include "Utils/Output.hpp"
 #include "Utils/Traits.hpp"
+#include "Utils/Schema.hpp"
