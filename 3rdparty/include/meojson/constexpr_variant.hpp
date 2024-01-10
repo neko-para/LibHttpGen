@@ -5,30 +5,30 @@
 namespace json
 {
 
-template <typename T, typename... Types>
-concept contains_type = (std::same_as<T, Types> || ...);
+template <typename T, typename... elems_t>
+concept contains_type = (std::same_as<T, elems_t> || ...);
 
 template <typename... elems_t>
 class constexpr_variant
 {
 public:
-    constexpr constexpr_variant() { __index = 0; }
+    constexpr constexpr_variant() = default;
 
-    constexpr constexpr_variant(const constexpr_variant& v) : __data(v.__data) { __index = v.__index; }
+    constexpr constexpr_variant(const constexpr_variant& v) : _data(v._data), _index(v._index) {}
 
-    constexpr constexpr_variant(constexpr_variant&& v) : __data(std::move(v.__data)) { __index = v.__index; }
+    constexpr constexpr_variant(constexpr_variant&& v) : _data(std::move(v._data)), _index(v._index) {}
 
     constexpr constexpr_variant& operator=(const constexpr_variant& v)
     {
-        __index = v.__index;
-        __data = v.__data;
+        _index = v._index;
+        _data = v._data;
         return *this;
     }
 
     constexpr constexpr_variant& operator=(constexpr_variant&& v)
     {
-        __index = v.__index;
-        __data = std::move(v.__data);
+        _index = v._index;
+        _data = std::move(v._data);
         return *this;
     }
 
@@ -39,8 +39,8 @@ public:
     constexpr constexpr_variant(elem_t&& elem)
     {
         constexpr size_t index = index_of<elem_t>();
-        std::get<index>(__data) = std::move(elem);
-        __index = index;
+        std::get<index>(_data) = std::forward<elem_t&&>(elem);
+        _index = index;
     }
 
     template <typename elem_t>
@@ -48,8 +48,8 @@ public:
     constexpr constexpr_variant& operator=(elem_t&& elem)
     {
         constexpr size_t index = index_of<elem_t>();
-        std::get<index>(__data) = std::move(elem);
-        __index = index;
+        std::get<index>(_data) = std::forward<elem_t&&>(elem);
+        _index = index;
         return *this;
     }
 
@@ -78,8 +78,8 @@ public:
     constexpr const elem_t* get_if() const
     {
         constexpr size_t index = index_of<elem_t>();
-        if (__index == index) {
-            return &std::get<index>(__data);
+        if (_index == index) {
+            return &std::get<index>(_data);
         }
         else {
             return nullptr;
@@ -91,18 +91,45 @@ public:
     constexpr const elem_t& get() const
     {
         constexpr size_t index = index_of<elem_t>();
-        if (__index == index) {
-            return std::get<index>(__data);
+        if (_index == index) {
+            return std::get<index>(_data);
         }
         else {
             throw std::bad_variant_access();
         }
     }
 
+    constexpr size_t index() const { return _index; }
+
+    constexpr const std::tuple<elems_t...>& data() const { return _data; }
+
 private:
-    std::tuple<elems_t...> __data;
-    size_t __index;
+    std::tuple<elems_t...> _data;
+    size_t _index = 0;
 };
+
+#ifndef _MSC_VER
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-value"
+#endif
+
+template <typename tuple_t, std::size_t... Is>
+constexpr bool compare_at_indexs(const tuple_t& t1, const tuple_t& t2, std::size_t index, std::index_sequence<Is...>)
+{
+    bool result = false;
+    (..., (Is == index ? (result = (std::get<Is>(t1) == std::get<Is>(t2)), true) : false));
+    return result;
+}
+
+#ifndef _MSC_VER
+#pragma GCC diagnostic pop
+#endif
+
+template <typename... elems_t>
+constexpr bool compare_at_index(const std::tuple<elems_t...>& t1, const std::tuple<elems_t...>& t2, std::size_t index)
+{
+    return compare_at_indexs(t1, t2, index, std::index_sequence_for<elems_t...> {});
+}
 
 } // namespace json
 
@@ -123,4 +150,19 @@ constexpr const elem_t& get(const json::constexpr_variant<elems_t...>& v)
     return v.template get<elem_t>();
 }
 
+}
+
+template <typename... elems_t>
+constexpr bool operator==(const json::constexpr_variant<elems_t...>& x, const json::constexpr_variant<elems_t...>& y)
+{
+    if (x.index() != y.index()) {
+        return false;
+    }
+    return compare_at_index(x.data(), y.data(), x.index());
+}
+
+template <typename... elems_t>
+constexpr bool operator!=(const json::constexpr_variant<elems_t...>& x, const json::constexpr_variant<elems_t...>& y)
+{
+    return !(x == y);
 }

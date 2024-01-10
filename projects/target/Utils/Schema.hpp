@@ -37,7 +37,7 @@ namespace json_schema
         return true;
     }
 
-    constexpr schema type(std::string type)
+    constexpr schema make_type(std::string type)
     {
         if (!__check_type(type)) {
             throw schema_validation_failed { "type invalid" };
@@ -45,7 +45,7 @@ namespace json_schema
         return { { "type", type } };
     }
 
-    constexpr schema type(std::initializer_list<std::string> types)
+    constexpr schema make_type(std::initializer_list<std::string> types)
     {
         if (!__check_unique(types)) {
             throw schema_validation_failed { "type is not unique" };
@@ -57,6 +57,8 @@ namespace json_schema
         }
         return { { "type", json::carray(types) } };
     }
+
+    constexpr schema make_enum
 
 }
 
