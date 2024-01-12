@@ -8,7 +8,7 @@ namespace lhg
 {
 
 inline bool handle_help(Context& ctx, UrlSegments segs, const api_info_map& wrappers,
-                        const std::vector<std::string>& opaques, std::function<void(json::object& )> callbacks)
+                        const std::vector<std::string>& opaques, std::function<void(json::object&)> callbacks)
 {
     segs.reset();
     if (segs.enter_path("help") && segs.end()) {
@@ -17,12 +17,14 @@ inline bool handle_help(Context& ctx, UrlSegments segs, const api_info_map& wrap
         help_api(result, wrappers);
 
         for (const auto& opaque : opaques) {
-            result["/opaque/" + opaque] = { { "body", json::object {} }, { "response", { { ":id", "string" } } } };
+            result["/opaque/" + opaque] =
+                wrap_oper({}, { { "type", "object" }, { "additionalProperties", { { "type", "string" } } } });
         }
 
         callbacks(result);
 
-        ctx.json_body(result);
+        ctx.json_body(
+            { { "openapi", "3.0" }, { "info", { { "title", "lhg" }, { "version", "1.0" } } }, { "paths", result } });
         return true;
     }
     return false;

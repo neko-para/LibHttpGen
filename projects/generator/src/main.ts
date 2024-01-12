@@ -3,11 +3,11 @@ import { Regenerator } from './regenerator'
 import { LHGConfig, LHGInterfaceArgumentInfo } from './types'
 import { ExprItem, JsonValue, objectEntryToJson, objectToJson } from './utils'
 
-function declareSchema(regen: Regenerator, type: string, schema: string) {
+function declareSchema(regen: Regenerator, type: string, schema: JsonValue) {
   regen.add_raw(`template<>
 struct lhg::schema_t<${type}>
 {
-    static constexpr const char* const schema = ${JSON.stringify(schema)};
+    static constexpr const char* const schema = ${JSON.stringify(JSON.stringify(schema))};
 };
 `)
 }
@@ -150,7 +150,7 @@ struct lhg::is_output<${FS(ic.name)}::${AS(arg.name)}>
 
   for (const type in cfg.opaque) {
     regen.add_raw(`static lhg::opaque_manager<${type} *> ${type}__OpaqueManager;\n`)
-    declareSchema(regen, `${type} *`, `string@${type}`)
+    declareSchema(regen, `${type} *`, { type: 'string', title: type })
 
     regen.add_raw(`template<>
 struct lhg::is_opaque<${type} *> {
@@ -295,42 +295,72 @@ ${
   regen.add_raw(`    if (lhg::handle_help(ctx, segs, wrappers, { ${Object.keys(cfg.opaque)
     .map(x => `"${x}"`)
     .join(', ')} }, [](json::object& result) {
+        using lhg::wrap_oper;
 ${Object.keys(cfg.callback).map(type => {
   const cc = cfg.callback[type]!
   const name = cc.name
   const m = /(.*?) *\(\*\)\(.*\)$/.exec(type)!
   const rt = m[1]!
   return `            // ${name}
-            result["/callback/${name}/add"] = ${objectToJson({
-              body: {},
-              response: { data: { id: 'string' } }
-            })};
-            result["/callback/${name}/:id/del"] = ${objectToJson({
-              body: {},
-              response: { data: {}, error: 'string' }
-            })};
-            result["/callback/${name}/:id/pull"] = ${objectToJson({
-              body: {},
-              response: { data: { ids: 'string[]' } }
-            })};
-            result["/callback/${name}/:id/:cid/request"] = { { "body", json::object {} }, { "response", { { "data", json::object {
-${Array.from({ length: cc.all }, (_, k) => k)
-  .filter(x => x != cc.self)
-  .map(
-    id =>
-      `                { "${cc.arg_name[id]}", lhg::schema_t<decltype(std::get<${id}>(lhg::callback_manager<${type}>::CallbackContext::args_type {}))>::schema },`
-  )
-  .join('\n')}
-            } }, { "error", "string" } } } };
-            result["/callback/${name}/:id/:cid/response"] = ${objectToJson({
-              body:
-                rt === 'void'
-                  ? {}
-                  : {
-                      return: new ExprItem('lhg::schema_t<${rt}>::schema')
-                    },
-              response: { data: {}, error: 'string' }
-            })};
+        result["/callback/${name}/add"] = wrap_oper({}, ${objectToJson({
+          type: 'object',
+          properties: {
+            data: { type: 'object', properties: { id: { type: 'string' } } }
+          }
+        })});
+        result["/callback/${name}/{id}/del"] = wrap_oper({}, ${objectToJson({
+          type: 'object',
+          properties: {
+            data: {},
+            error: { type: 'string' }
+          }
+        })});
+        result["/callback/${name}/{id}/pull"] = ${objectToJson({
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              properties: {
+                ids: {
+                  type: 'array',
+                  items: {
+                    type: 'string'
+                  }
+                }
+              }
+            }
+          }
+        })};
+        result["/callback/${name}/{id}/{cid}/request"] = wrap_oper({}, ${objectToJson({
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              properties: (() => {
+                const res: JsonValue = {}
+                for (const id of Array.from({ length: cc.all }, (_, k) => k)) {
+                  if (id != cc.self) {
+                    res[cc.arg_name[id]!] = new ExprItem(
+                      `json::parse(lhg::schema_t<decltype(std::get<${id}>(lhg::callback_manager<${type}>::CallbackContext::args_type {}))>::schema).value()`
+                    )
+                  }
+                }
+                Array.from({ length: cc.all }, (_, k) => k).filter(x => x != cc.self)
+                return res
+              })()
+            },
+            error: {
+              type: 'string'
+            }
+          }
+        })});
+        result["/callback/${name}/{id}/{cid}/response"] = wrap_oper(${objectToJson(
+          rt === 'void'
+            ? {}
+            : {
+                return: new ExprItem('json::parse(lhg::schema_t<${rt}>::schema).value()')
+              }
+        )}, ${objectToJson({ data: {}, error: { type: 'string' } })});
 `
 })}
     })) {

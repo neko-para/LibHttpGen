@@ -56,12 +56,21 @@ inline bool handle_api(Context& ctx, UrlSegments segs, json::object& obj, const 
     return false;
 }
 
+inline json::object wrap_oper(const json::object& input, const json::object& output)
+{
+    return json::object {
+        { "post",
+          { { "responses", { { "200", { { "content", { { "application/json", { { "schema", output } } } } } } } } },
+            { "requestBody", { { "content", { { "application/json", { { "schema", input } } } } } } } } }
+    };
+}
+
 inline void help_api(json::object& result, const api_info_map& wrappers)
 {
     for (const auto& [api, info] : wrappers) {
         auto input = info.input();
         auto output = info.output();
-        result["/api/" + api] = json::object { { "body", input }, { "response", output } };
+        result["/api/" + api] = wrap_oper(input, output);
     }
 }
 
@@ -72,16 +81,16 @@ inline void input_helper_entry(json::object& obj, ArgTag)
         return;
     }
     if constexpr (is_arg_schema_impl<ArgTag>) {
-        obj[ArgTag::name] = arg_schema<ArgTag>::schema;
+        obj[ArgTag::name] = json::parse(arg_schema<ArgTag>::schema).value();
     }
     else if constexpr (is_callback<ArgTag>::value) {
-        obj[ArgTag::name] = std::string("string@") + is_callback<ArgTag>::name;
+        obj[ArgTag::name] = json::object { { "type", "string" }, { "title", is_callback<ArgTag>::name } };
     }
     else if constexpr (is_callback_context<ArgTag>::value) {
         return;
     }
     else {
-        obj[ArgTag::name] = schema_t<typename ArgTag::type>::schema;
+        obj[ArgTag::name] = json::parse(schema_t<typename ArgTag::type>::schema).value();
     }
 }
 
@@ -99,7 +108,7 @@ inline json::object input_helper()
             (input_helper_entry<std::tuple_element_t<I, ArgTuple>>(obj, {}), ...);
         }(std::make_index_sequence<std::tuple_size_v<ArgTuple>> {});
 
-        return obj;
+        return { { "type", "object" }, { "properties", obj } };
     }
 }
 
@@ -110,7 +119,7 @@ inline void output_helper_entry(json::object& obj, ArgTag)
         return;
     }
     if constexpr (is_output<ArgTag>::value) {
-        obj[ArgTag::name] = schema_t<typename ArgTag::type>::schema;
+        obj[ArgTag::name] = json::parse(schema_t<typename ArgTag::type>::schema).value();
     }
 }
 
@@ -120,9 +129,9 @@ inline json::object output_helper()
     using ArgTuple = typename FuncTag::arguments_t;
     using Return = typename FuncTag::return_t;
 
-    json::object obj = { { "return", schema_t<Return>::schema } };
+    json::object obj = { { "return", json::parse(schema_t<Return>::schema).value() } };
     if constexpr (is_ret_schema_impl<FuncTag>) {
-        obj = { { "return", ret_schema<FuncTag>::schema } };
+        obj = { { "return", json::parse(ret_schema<FuncTag>::schema).value() } };
     }
     if constexpr (!std::is_same_v<ArgTuple, void>) {
         [&]<std::size_t... I>(std::index_sequence<I...>) {
@@ -130,7 +139,10 @@ inline json::object output_helper()
         }(std::make_index_sequence<std::tuple_size_v<ArgTuple>> {});
     }
 
-    return { { "data", obj }, { "error", "string" } };
+    return { { "type", "object" },
+             { "properties",
+               { { "data", { { "type", "object" }, { "properties", obj } } },
+                 { "error", { { "type", "string" } } } } } };
 }
 
 template <typename ArgTag>
@@ -333,10 +345,12 @@ inline json::object perform_output(typename arg_set<FuncTag>::call_type& data, R
         auto& manager = is_opaque<RealReturn>::manager;
         if constexpr (is_opaque_non_alloc<RealReturn, FuncTag>::value) {
             obj["return"] = manager.find(ret);
-        } else {
+        }
+        else {
             obj["return"] = manager.add(ret);
         }
-    } else {
+    }
+    else {
         obj["return"] = to_json(ret);
     }
     if constexpr (!std::is_same_v<ArgTuple, void>) {
