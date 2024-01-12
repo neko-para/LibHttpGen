@@ -77,6 +77,7 @@ async function main() {
 
 #include "LHGUtils.h"
 #define LHG_PROCESS
+#define LHG_BUILD
 `
   )
   regen.add_sec('lhg.include', '')
