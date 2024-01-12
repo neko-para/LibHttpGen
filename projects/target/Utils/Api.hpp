@@ -12,6 +12,7 @@
 #include "Utils/Convert.hpp"
 #include "Utils/Output.hpp"
 #include "Utils/Traits.hpp"
+#include "Utils/TypeHelp.hpp"
 
 namespace lhg
 {
@@ -205,8 +206,8 @@ struct temp_arg_t<ArgTag>
 template <typename FuncTag>
 struct arg_set
 {
-    using temp_type = transform_tuple<typename FuncTag::arguments_t, temp_arg_t>;
-    using call_type = transform_tuple<typename FuncTag::arguments_t, call_arg_t>;
+    using temp_type = help::transform_tuple<typename FuncTag::arguments_t, temp_arg_t>;
+    using call_type = help::transform_tuple<typename FuncTag::arguments_t, call_arg_t>;
 };
 
 template <typename FuncTag>
