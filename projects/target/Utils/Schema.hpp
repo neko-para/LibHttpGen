@@ -9,19 +9,35 @@ namespace lhg
 
 namespace json_schema
 {
-    bool is_integer(long double v)
+    inline bool is_integer(long double v)
     {
         return v == std::floor(v);
     }
 
+    inline bool is_unique(const json::array& arr) {
+        for (auto it1 = arr.begin(); it1 != arr.end(); it1++) {
+            for (auto it2 = it1 + 1; it2 != arr.end(); it2++) {
+                if (*it1 == *it2) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     bool validate(const json::value& schema, const json::value& value);
+
+    inline auto validate_with(const json::value& schema)
+    {
+        return [&schema](const json::value& value) { return validate(schema, value); };
+    }
 
     struct schema_error : std::exception
     {
         virtual const char* what() const noexcept override { return "json schema error"; }
     };
 
-    bool check_type_entry(const std::string& type, const json::value& value)
+    inline bool check_type_entry(const std::string& type, const json::value& value)
     {
         if (type == "null") {
             return value.is_null();
@@ -49,7 +65,7 @@ namespace json_schema
         }
     }
 
-    bool check_type(const json::object& schema, const json::value& value)
+    inline bool check_type(const json::object& schema, const json::value& value)
     {
         auto type_opt = schema.find("type");
         if (!type_opt.has_value()) {
@@ -62,7 +78,9 @@ namespace json_schema
             }
         }
         else if (type.is_array()) {
-            // doesn't check unique
+            if (!is_unique(type.as_array())) {
+                throw schema_error();
+            }
             for (const auto& v : type.as_array()) {
                 if (!v.is_string()) {
                     throw schema_error();
@@ -78,7 +96,7 @@ namespace json_schema
         return true;
     }
 
-    bool check_enum(const json::object& schema, const json::value& value)
+    inline bool check_enum(const json::object& schema, const json::value& value)
     {
         auto enum_opt = schema.find("enum");
         if (!enum_opt.has_value()) {
@@ -96,7 +114,7 @@ namespace json_schema
         return false;
     }
 
-    bool check_const(const json::object& schema, const json::value& value)
+    inline bool check_const(const json::object& schema, const json::value& value)
     {
         auto const_opt = schema.find("const");
         if (!const_opt.has_value()) {
@@ -105,7 +123,7 @@ namespace json_schema
         return value == const_opt.value();
     }
 
-    bool check_multipleOf(const json::object& schema, const json::value& value)
+    inline bool check_multipleOf(const json::object& schema, const json::value& value)
     {
         if (!value.is_number()) {
             return true;
@@ -127,7 +145,7 @@ namespace json_schema
         return is_integer(value_num / multipleOf_num);
     }
 
-    bool check_maximum(const json::object& schema, const json::value& value)
+    inline bool check_maximum(const json::object& schema, const json::value& value)
     {
         if (!value.is_number()) {
             return true;
@@ -149,7 +167,7 @@ namespace json_schema
         return value_num <= maximum_num;
     }
 
-    bool check_exclusiveMaximum(const json::object& schema, const json::value& value)
+    inline bool check_exclusiveMaximum(const json::object& schema, const json::value& value)
     {
         if (!value.is_number()) {
             return true;
@@ -171,7 +189,7 @@ namespace json_schema
         return value_num < exclusiveMaximum_num;
     }
 
-    bool check_minimum(const json::object& schema, const json::value& value)
+    inline bool check_minimum(const json::object& schema, const json::value& value)
     {
         if (!value.is_number()) {
             return true;
@@ -193,7 +211,7 @@ namespace json_schema
         return value_num >= minimum_num;
     }
 
-    bool check_exclusiveMinimum(const json::object& schema, const json::value& value)
+    inline bool check_exclusiveMinimum(const json::object& schema, const json::value& value)
     {
         if (!value.is_number()) {
             return true;
@@ -215,7 +233,7 @@ namespace json_schema
         return value_num > exclusiveMinimum_num;
     }
 
-    bool check_maxLength(const json::object& schema, const json::value& value)
+    inline bool check_maxLength(const json::object& schema, const json::value& value)
     {
         if (!value.is_string()) {
             return true;
@@ -233,7 +251,7 @@ namespace json_schema
         return value_str.size() <= maxLength.as_unsigned();
     }
 
-    bool check_minLength(const json::object& schema, const json::value& value)
+    inline bool check_minLength(const json::object& schema, const json::value& value)
     {
         if (!value.is_string()) {
             return true;
@@ -251,7 +269,7 @@ namespace json_schema
         return value_str.size() >= minLength.as_unsigned();
     }
 
-    bool check_pattern(const json::object& schema, const json::value& value)
+    inline bool check_pattern(const json::object& schema, const json::value& value)
     {
         if (!value.is_string()) {
             return true;
@@ -270,9 +288,161 @@ namespace json_schema
         return std::regex_match(value_str, pattern_reg);
     }
 
-    /*
+    inline bool check_items_additionalItems(const json::object& schema, const json::value& value)
+    {
+        if (!value.is_array()) {
+            return true;
+        }
+        auto value_arr = value.as_array();
 
-    bool check_properties(const json::object& schema, const json::value& value) {
+        auto items_opt = schema.find("items");
+        auto additionalItems_opt = schema.find("additionalItems");
+
+        if (!items_opt.has_value()) {
+            return true;
+        }
+        const auto& items = items_opt.value();
+        if (items.is_object()) {
+            return std::all_of(value_arr.begin(), value_arr.end(), validate_with(items));
+        }
+        else if (items.is_array()) {
+            const auto& items_arr = items.as_array();
+            size_t maxi = std::max(items_arr.size(), value_arr.size());
+            for (size_t i = 0; i < maxi; i++) {
+                if (!validate(items_arr[i], value_arr[i])) {
+                    return false;
+                }
+            }
+            if (maxi < value_arr.size() && additionalItems_opt.has_value()) {
+                return std::all_of(value_arr.begin() + maxi, value_arr.end(),
+                                   validate_with(additionalItems_opt.value()));
+            }
+            return true;
+        }
+        else {
+            throw schema_error();
+        }
+    }
+
+    inline bool check_maxItems(const json::object& schema, const json::value& value)
+    {
+        if (!value.is_array()) {
+            return true;
+        }
+        auto value_arr = value.as_array();
+
+        auto maxItems_opt = schema.find("maxItems");
+        if (!maxItems_opt.has_value()) {
+            return true;
+        }
+        return value_arr.size() <= maxItems_opt.value().as_unsigned();
+    }
+
+    inline bool check_minItems(const json::object& schema, const json::value& value)
+    {
+        if (!value.is_array()) {
+            return true;
+        }
+        auto value_arr = value.as_array();
+
+        auto minItems_opt = schema.find("minItems");
+        if (!minItems_opt.has_value()) {
+            return true;
+        }
+        return value_arr.size() >= minItems_opt.value().as_unsigned();
+    }
+
+    inline bool check_uniqueItems(const json::object& schema, const json::value& value)
+    {
+        if (!value.is_array()) {
+            return true;
+        }
+        auto value_arr = value.as_array();
+
+        auto uniqueItems_opt = schema.find("uniqueItems");
+        if (!uniqueItems_opt.has_value()) {
+            return true;
+        }
+        const auto& uniqueItems = uniqueItems_opt.value();
+        if (!uniqueItems.is_boolean()) {
+            throw schema_error();
+        }
+        if (!uniqueItems.as_boolean()) {
+            return true;
+        }
+        return is_unique(value_arr);
+    }
+
+    inline bool check_contains(const json::object& schema, const json::value& value)
+    {
+        if (!value.is_array()) {
+            return true;
+        }
+        auto value_arr = value.as_array();
+
+        auto contains_opt = schema.find("contains");
+        if (!contains_opt.has_value()) {
+            return true;
+        }
+        return std::any_of(value_arr.begin(), value_arr.end(), validate_with(contains_opt.value()));
+    }
+
+    inline bool check_maxProperties(const json::object& schema, const json::value& value)
+    {
+        if (!value.is_object()) {
+            return true;
+        }
+        auto value_obj = value.as_object();
+
+        auto maxProperties_opt = schema.find("maxProperties");
+        if (!maxProperties_opt.has_value()) {
+            return true;
+        }
+        return value_obj.size() <= maxProperties_opt.value().as_unsigned();
+    }
+
+    inline bool check_minProperties(const json::object& schema, const json::value& value)
+    {
+        if (!value.is_object()) {
+            return true;
+        }
+        auto value_obj = value.as_object();
+
+        auto minProperties_opt = schema.find("minProperties");
+        if (!minProperties_opt.has_value()) {
+            return true;
+        }
+        return value_obj.size() >= minProperties_opt.value().as_unsigned();
+    }
+
+    inline bool check_required(const json::object& schema, const json::value& value)
+    {
+        if (!value.is_object()) {
+            return true;
+        }
+        auto value_obj = value.as_object();
+
+        auto required_opt = schema.find("required");
+        if (!required_opt.has_value()) {
+            return true;
+        }
+        const auto& required = required_opt.value();
+        if (!required.is_array()) {
+            throw schema_error();
+        }
+        const auto& required_arr = required.as_array();
+        if (std::all_of(required_arr.begin(), required_arr.end(), [](const auto& v) { return !v.is_string(); }) || !is_unique(required_arr)) {
+            throw schema_error();
+        }
+        for (const auto& v: required_arr) {
+            if (!value_obj.exists(v.as_string())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    inline bool check_properties_patternProperties_additionalProperties(const json::object& schema, const json::value& value) {
         if (!value.is_object()) {
             return true;
         }
@@ -281,7 +451,6 @@ namespace json_schema
         auto properties_opt = schema.find("properties");
         auto patternProperties_opt = schema.find("patternProperties");
         auto additionalProperties_opt = schema.find("additionalProperties");
-        auto unevaluatedProperties_opt = schema.find("unevaluatedProperties");
 
         if (properties_opt.has_value() && !properties_opt.value().is_object()) {
             throw schema_error();
@@ -290,9 +459,6 @@ namespace json_schema
             throw schema_error();
         }
         if (additionalProperties_opt.has_value() && !additionalProperties_opt.value().is_object()) {
-            throw schema_error();
-        }
-        if (unevaluatedProperties_opt.has_value() && !unevaluatedProperties_opt.value().is_object()) {
             throw schema_error();
         }
 
@@ -310,7 +476,7 @@ namespace json_schema
             if (patternProperties_opt.has_value()) {
                 for (const auto& [reg, subs] : patternProperties_opt.value().as_object()) {
                     std::regex regex(reg);
-                    if (std::regex_match(key, reg)) {
+                    if (std::regex_match(key, regex)) {
                         evaluated = true;
                         if (!validate(subs, subv)) {
                             return false;
@@ -318,15 +484,73 @@ namespace json_schema
                     }
                 }
             }
-            if ()
+            if (!evaluated && additionalProperties_opt.has_value()) {
+                if (!validate(additionalProperties_opt.value(), subv)) {
+                    return false;
+                }
+            }
         }
 
         return true;
     }
 
-    */
+    inline bool check_dependencies(const json::object& schema, const json::value& value) {
+        if (!value.is_object()) {
+            return true;
+        }
+        const auto& value_obj = value.as_object();
 
-    bool check_if_then_else(const json::object& schema, const json::value& value)
+        auto dependencies_opt = schema.find("dependencies");
+        if (!dependencies_opt.has_value()) {
+            return true;
+        }
+        const auto& dependencies = dependencies_opt.value();
+        if (!dependencies.is_object()) {
+            throw schema_error();
+        }
+
+        for (const auto& [prop, subs] : dependencies.as_object()) {
+            if (value_obj.exists(prop)) {
+                if (subs.is_array()) {
+                    const auto& subs_arr = subs.as_array();
+                    if (std::any_of(subs_arr.begin(), subs_arr.end(), [](const auto& v) { return !v.is_string(); }) || !is_unique(subs_arr)) {
+                        throw schema_error();
+                    }
+                    if (std::any_of(subs_arr.begin(), subs_arr.end(), [&value_obj](const auto& v) {
+                        return !value_obj.exists(v.as_string());
+                    })) {
+                        return false;
+                    }
+                } else if (subs.is_object()) {
+                    if (!validate(subs, value_obj)) {
+                        return false;
+                    }
+                } else {
+                    throw schema_error();
+                }
+            }
+        }
+        return true;
+    }
+
+    inline bool check_propertyNames(const json::object& schema, const json::value& value)
+    {
+        if (!value.is_object()) {
+            return true;
+        }
+        auto value_obj = value.as_object();
+
+        auto propertyNames_opt = schema.find("propertyNames");
+        if (!propertyNames_opt.has_value()) {
+            return true;
+        }
+        const auto& propertyNames = propertyNames_opt.value();
+        return std::all_of(value_obj.begin(), value_obj.end(), [&propertyNames](const auto& pr) {
+            return validate(propertyNames, pr.first);
+        });
+    }
+
+    inline bool check_if_then_else(const json::object& schema, const json::value& value)
     {
         auto if_opt = schema.find("if");
         if (!if_opt.has_value()) {
@@ -349,7 +573,7 @@ namespace json_schema
         }
     }
 
-    bool check_allOf(const json::object& schema, const json::value& value)
+    inline bool check_allOf(const json::object& schema, const json::value& value)
     {
         auto allOf_opt = schema.find("allOf");
         if (!allOf_opt.has_value()) {
@@ -367,7 +591,7 @@ namespace json_schema
                            [&value](const json::value& subs) { return validate(subs, value); });
     }
 
-    bool check_anyOf(const json::object& schema, const json::value& value)
+    inline bool check_anyOf(const json::object& schema, const json::value& value)
     {
         auto anyOf_opt = schema.find("anyOf");
         if (!anyOf_opt.has_value()) {
@@ -385,7 +609,7 @@ namespace json_schema
                            [&value](const json::value& subs) { return validate(subs, value); });
     }
 
-    bool check_oneOf(const json::object& schema, const json::value& value)
+    inline bool check_oneOf(const json::object& schema, const json::value& value)
     {
         auto oneOf_opt = schema.find("oneOf");
         if (!oneOf_opt.has_value()) {
@@ -411,7 +635,7 @@ namespace json_schema
         return counter == 1;
     }
 
-    bool check_not(const json::object& schema, const json::value& value)
+    inline bool check_not(const json::object& schema, const json::value& value)
     {
         auto not_opt = schema.find("not");
         if (!not_opt.has_value()) {
@@ -420,20 +644,39 @@ namespace json_schema
         return !validate(not_opt.value(), value);
     }
 
-    bool validate(const json::value& schemav, const json::value& value)
+    inline bool validate(const json::value& schemav, const json::value& value)
     {
         if (!schemav.is_object()) {
             throw schema_error();
         }
         using checker = bool (*)(const json::object& schema, const json::value& value);
-        constexpr const checker checkers[] = { check_type,      check_enum,
-                                               check_const,     check_multipleOf,
-                                               check_maximum,   check_exclusiveMaximum,
-                                               check_minimum,   check_exclusiveMinimum,
-                                               check_maxLength, check_minLength,
-                                               check_pattern,   check_if_then_else,
-                                               check_allOf,     check_anyOf,
-                                               check_oneOf,     check_not };
+        constexpr const checker checkers[] = { check_type,
+                                               check_enum,
+                                               check_const,
+                                               check_multipleOf,
+                                               check_maximum,
+                                               check_exclusiveMaximum,
+                                               check_minimum,
+                                               check_exclusiveMinimum,
+                                               check_maxLength,
+                                               check_minLength,
+                                               check_pattern,
+                                               check_items_additionalItems,
+                                               check_maxItems,
+                                               check_minItems,
+                                               check_uniqueItems,
+                                               check_contains,
+                                               check_maxProperties,
+                                               check_minProperties,
+                                               check_required,
+                                               check_properties_patternProperties_additionalProperties,
+                                               check_dependencies,
+                                               check_propertyNames,
+                                               check_if_then_else,
+                                               check_allOf,
+                                               check_anyOf,
+                                               check_oneOf,
+                                               check_not };
         const auto& schema = schemav.as_object();
         for (auto ch : checkers) {
             if (!ch(schema, value)) {
