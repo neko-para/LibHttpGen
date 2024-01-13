@@ -123,6 +123,8 @@ inline void output_helper_entry(json::object& obj, ArgTag)
     }
 }
 
+json::object wrap_data_error(const json::object& data);
+
 template <typename FuncTag>
 inline json::object output_helper()
 {
@@ -139,10 +141,7 @@ inline json::object output_helper()
         }(std::make_index_sequence<std::tuple_size_v<ArgTuple>> {});
     }
 
-    return { { "type", "object" },
-             { "properties",
-               { { "data", { { "type", "object" }, { "properties", obj } } },
-                 { "error", { { "type", "string" } } } } } };
+    return wrap_data_error({ { "type", "object" }, { "properties", obj } });
 }
 
 template <typename ArgTag>

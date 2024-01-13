@@ -7,41 +7,39 @@
 namespace lhg
 {
 
+inline json::object wrap_data_error(const json::object& data)
+{
+    return { { "type", "object" },
+             { "oneOf", json::array { { { "properties", { { "data", data } } } },
+                                      { { "properties", { { "error", { { "type", "string" } } } } } } } } };
+}
+
 inline void help_callback(const char* name, json::object& result, const json::object& arg,
                           const std::optional<json::object>& ret)
 {
     std::string prefix = std::string("/callback/") + name + "/";
     auto id_cid = json::object { { "id", { { "type", "string" } } }, { "cid", { { "type", "string" } } } };
     result[prefix + "dump"] = wrap_oper(
-        {}, { { "type", "object" },
+        {},
+        wrap_data_error(
+            { { "type", "object" },
               { "properties",
-                { { "data",
-                    { { "type", "object" },
-                      { "properties",
-                        { { "ids", { { "type", "array" }, { "items", { { "type", "string" } } } } } } } } } } } });
+                { { "ids", { { "type", "array" }, { "items", { { "type", "string" }, { "title", name } } } } } } } }));
     result[prefix + "add"] = wrap_oper(
-        {}, { { "type", "object" },
-              { "properties",
-                { { "data", { { "type", "object" }, { "properties", { { "id", { { "type", "string" } } } } } } } } } });
-    result[prefix + "del"] =
-        wrap_oper({ { "type", "object" }, { "properties", { { "id", { { "type", "string" } } } } } },
-                  { { "type", "object" },
-                    { "properties", { { "data", json::object {} }, { "error", { { "type", "string" } } } } } });
-    result[prefix + "pull"] =
-        wrap_oper({ { "type", "object" }, { "properties", { { "id", { { "type", "string" } } } } } },
-                  { { "type", "object" },
-                    { "properties",
-                      { { "data", { { "ids", { { "type", "array" }, { "items", { { "type", "string" } } } } } } },
-                        { "error", { { "type", "string" } } } } } });
-    result[prefix + "request"] = wrap_oper(
-        { { "type", "object" }, { "properties", id_cid } },
-        { { "type", "object" },
-          { "properties",
-            { { "data", { { "type", "object" }, { "properties", arg } } }, { "error", { { "type", "string" } } } } } });
+        {}, wrap_data_error({ { "type", "object" }, { "properties", { { "id", { { "type", "string" } } } } } }));
+    result[prefix + "del"] = wrap_oper(
+        { { "type", "object" }, { "properties", { { "id", { { "type", "string" } } } } } }, wrap_data_error({}));
+    result[prefix + "pull"] = wrap_oper(
+        { { "type", "object" }, { "properties", { { "id", { { "type", "string" } } } } } },
+        wrap_data_error(
+            { { "type", "object" },
+              { "properties", { { "ids", { { "type", "array" }, { "items", { { "type", "string" } } } } } } } }));
+    result[prefix + "request"] = wrap_oper({ { "type", "object" }, { "properties", id_cid } },
+                                           wrap_data_error({ { "type", "object" }, { "properties", arg } }));
     result[prefix + "response"] = wrap_oper(
         { { "type", "object" },
           { "properties", ret.has_value() ? (id_cid | json::object { { "return", ret.value() } }) : id_cid } },
-        { { "data", json::object {} }, { "error", { { "type", "string" } } } });
+        wrap_data_error({}));
 }
 
 inline bool handle_help(Context& ctx, UrlSegments segs, const api_info_map& wrappers,
@@ -54,8 +52,9 @@ inline bool handle_help(Context& ctx, UrlSegments segs, const api_info_map& wrap
         help_api(result, wrappers);
 
         for (const auto& opaque : opaques) {
-            result["/opaque/" + opaque] =
-                wrap_oper({}, { { "type", "object" }, { "additionalProperties", { { "type", "string" } } } });
+            result["/opaque/" + opaque] = wrap_oper(
+                {}, wrap_data_error({ { "type", "object" },
+                                      { "additionalProperties", { { "type", "string" }, { "title", opaque } } } }));
         }
 
         callbacks(result);
