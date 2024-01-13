@@ -23,9 +23,10 @@ inline void help_callback(const char* name, json::object& result, const json::ob
         {}, { { "type", "object" },
               { "properties",
                 { { "data", { { "type", "object" }, { "properties", { { "id", { { "type", "string" } } } } } } } } } });
-    result[prefix + "del"] = wrap_oper(
-        { { "type", "object" }, { "properties", { { "id", { { "type", "string" } } } } } },
-        { { "type", "object" }, { "properties", { { "data", {} }, { "error", { { "type", "string" } } } } } });
+    result[prefix + "del"] =
+        wrap_oper({ { "type", "object" }, { "properties", { { "id", { { "type", "string" } } } } } },
+                  { { "type", "object" },
+                    { "properties", { { "data", json::object {} }, { "error", { { "type", "string" } } } } } });
     result[prefix + "pull"] =
         wrap_oper({ { "type", "object" }, { "properties", { { "id", { { "type", "string" } } } } } },
                   { { "type", "object" },
