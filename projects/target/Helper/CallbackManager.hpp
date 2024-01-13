@@ -140,4 +140,14 @@ struct CallbackManager
         }
         return false;
     }
+
+    std::vector<std::string> dump()
+    {
+        std::unique_lock<std::mutex> lock(mtx_);
+        std::vector<std::string> ids;
+        for (const auto& [key, val] : contexts_) {
+            ids.push_back(key);
+        }
+        return ids;
+    }
 };

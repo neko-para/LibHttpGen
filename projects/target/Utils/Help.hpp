@@ -12,6 +12,13 @@ inline void help_callback(const char* name, json::object& result, const json::ob
 {
     std::string prefix = std::string("/callback/") + name + "/";
     auto id_cid = json::object { { "id", { { "type", "string" } } }, { "cid", { { "type", "string" } } } };
+    result[prefix + "dump"] = wrap_oper(
+        {}, { { "type", "object" },
+              { "properties",
+                { { "data",
+                    { { "type", "object" },
+                      { "properties",
+                        { { "ids", { { "type", "array" }, { "items", { { "type", "string" } } } } } } } } } } } });
     result[prefix + "add"] = wrap_oper(
         {}, { { "type", "object" },
               { "properties",

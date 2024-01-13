@@ -83,7 +83,11 @@ inline bool handle_callback(
     segs.reset();
     if (segs.enter_path("callback")) {
         if (segs.enter_path(name)) {
-            if (segs.enter_path("add")) {
+            if (segs.enter_path("dump")) {
+                ctx.json_body({ { "data", { { "ids", manager.dump() } } } });
+                return true;
+            }
+            else if (segs.enter_path("add")) {
                 std::string id;
                 manager.alloc(id);
                 ctx.json_body({ { "data", { { "id", id } } } });
