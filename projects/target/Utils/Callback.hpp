@@ -35,8 +35,8 @@ namespace __private
 }
 
 template <typename F>
-using callback_manager = __private::callback_manager_helper<typename func_traits<F>::return_t,
-                                                            typename func_traits<F>::arguments_t>::type;
+using callback_manager =
+    __private::callback_manager_helper<typename func_traits<F>::return_t, typename func_traits<F>::arguments_t>::type;
 
 template <size_t C, typename F, typename... Args>
 static typename func_traits<F>::return_t callback_implementation(Args... arg)
@@ -63,12 +63,14 @@ template <typename T, size_t C, typename F>
 struct get_callback_impl;
 
 template <size_t C, typename F, typename... Args>
-struct get_callback_impl<std::tuple<Args...>, C, F> {
+struct get_callback_impl<std::tuple<Args...>, C, F>
+{
     using type = get_callback_impl_helper<C, F, Args...>;
 };
 
 template <size_t C, typename F>
-inline F get_callback() {
+inline F get_callback()
+{
     return get_callback_impl<typename func_traits<F>::arguments_t, C, F>::type::func;
 }
 
@@ -87,82 +89,132 @@ inline bool handle_callback(
                 ctx.json_body({ { "data", { { "id", id } } } });
                 return true;
             }
-            std::string id;
-            if (segs.enter_id(id)) {
-                if (segs.enter_path("del")) {
-                    if (manager.free(id)) {
+            else if (segs.enter_path("del")) {
+                auto id = obj.find("id");
+                if (!id.has_value()) {
+                    ctx.json_body({ { "error", "id not provided" } });
+                    return true;
+                }
+                if (!id.value().is_string()) {
+                    ctx.json_body({ { "error", "id should be string" } });
+                    return true;
+                }
+                if (manager.free(id.value().as_string())) {
+                    ctx.json_body({ { "data", json::object {} } });
+                }
+                else {
+                    ctx.json_body({ { "error", "id not found" } });
+                }
+                return true;
+            }
+            else if (segs.enter_path("pull")) {
+                auto id = obj.find("id");
+                if (!id.has_value()) {
+                    ctx.json_body({ { "error", "id not provided" } });
+                    return true;
+                }
+                if (!id.value().is_string()) {
+                    ctx.json_body({ { "error", "id should be string" } });
+                    return true;
+                }
+                auto __inst_ctx = manager.find(id.value().as_string());
+                if (!__inst_ctx) {
+                    ctx.json_body({ { "error", "id not found" } });
+                    return true;
+                }
+                std::vector<std::string> cids;
+                __inst_ctx->take(cids);
+                json::array obj_ids;
+                for (const auto& cid : cids) {
+                    obj_ids.push_back(cid);
+                }
+                ctx.json_body({ { "data", { { "ids", obj_ids } } } });
+                return true;
+            }
+            else if (segs.enter_path("request")) {
+                auto id = obj.find("id");
+                auto cid = obj.find("cid");
+                if (!id.has_value()) {
+                    ctx.json_body({ { "error", "id not provided" } });
+                    return true;
+                }
+                if (!cid.has_value()) {
+                    ctx.json_body({ { "error", "cid not provided" } });
+                    return true;
+                }
+                if (!id.value().is_string()) {
+                    ctx.json_body({ { "error", "id should be string" } });
+                    return true;
+                }
+                if (!id.value().is_string()) {
+                    ctx.json_body({ { "error", "cid should be string" } });
+                    return true;
+                }
+                auto __inst_ctx = manager.find(id.value().as_string());
+                if (!__inst_ctx) {
+                    ctx.json_body({ { "error", "id not found" } });
+                    return true;
+                }
+                typename CM::CallbackContext::args_type args;
+                if (!__inst_ctx->get_args(cid.value().as_string(), args)) {
+                    ctx.json_body({ { "error", "cid not found" } });
+                    return true;
+                }
+                json::object __arg = convert_arg(args);
+                ctx.json_body({ { "data", __arg } });
+                return true;
+            }
+            else if (segs.enter_path("response")) {
+                auto id = obj.find("id");
+                auto cid = obj.find("cid");
+                if (!id.has_value()) {
+                    ctx.json_body({ { "error", "id not provided" } });
+                    return true;
+                }
+                if (!cid.has_value()) {
+                    ctx.json_body({ { "error", "cid not provided" } });
+                    return true;
+                }
+                if (!id.value().is_string()) {
+                    ctx.json_body({ { "error", "id should be string" } });
+                    return true;
+                }
+                if (!id.value().is_string()) {
+                    ctx.json_body({ { "error", "cid should be string" } });
+                    return true;
+                }
+                auto __inst_ctx = manager.find(id.value().as_string());
+                if (!__inst_ctx) {
+                    ctx.json_body({ { "error", "id not found" } });
+                    return true;
+                }
+                if constexpr (std::is_same_v<typename CM::CallbackContext::real_return_type, void>) {
+                    if (!__inst_ctx->resp(cid.value().as_string(), 0)) {
+                        ctx.json_body({ { "error", "cid not found" } });
+                        return true;
+                    }
+                }
+                else {
+                    auto return_ = obj.find("return");
+                    if (!return_.has_value()) {
+                        ctx.json_body({ { "error", "return not provided" } });
+                        return true;
+                    }
+                    auto ret = convert_ret(return_.value());
+                    if (!ret.has_value()) {
+                        ctx.json_body({ { "error", "return convert failed" } });
+                        return true;
+                    }
+                    if (!__inst_ctx->resp(cid.value().as_string(), ret.value())) {
                         ctx.json_body({ { "data", json::object {} } });
+                        return true;
                     }
                     else {
-                        ctx.json_body({ { "error", "id not found" } });
-                    }
-                    return true;
-                }
-                else if (segs.enter_path("pull")) {
-                    auto __inst_ctx = manager.find(id);
-                    if (!__inst_ctx) {
-                        ctx.json_body({ { "error", "id not found" } });
-                        return true;
-                    }
-                    std::vector<std::string> cids;
-                    __inst_ctx->take(cids);
-                    json::array obj_ids;
-                    for (const auto& cid : cids) {
-                        obj_ids.push_back(cid);
-                    }
-                    ctx.json_body({ { "data", { { "ids", obj_ids } } } });
-                    return true;
-                }
-                std::string cid;
-                if (segs.enter_id(cid)) {
-                    if (segs.enter_path("request")) {
-                        auto __inst_ctx = manager.find(id);
-                        if (!__inst_ctx) {
-                            ctx.json_body({ { "error", "id not found" } });
-                            return true;
-                        }
-                        typename CM::CallbackContext::args_type args;
-                        if (!__inst_ctx->get_args(cid, args)) {
-                            ctx.json_body({ { "error", "cid not found" } });
-                            return true;
-                        }
-                        json::object __arg = convert_arg(args);
-                        ctx.json_body({ { "data", __arg } });
-                        return true;
-                    }
-                    else if (segs.enter_path("response")) {
-                        auto __inst_ctx = manager.find(id);
-                        if (!__inst_ctx) {
-                            ctx.json_body({ { "error", "id not found" } });
-                            return true;
-                        }
-                        if constexpr (std::is_same_v<typename CM::CallbackContext::real_return_type, void>) {
-                            if (!__inst_ctx->resp(cid, 0)) {
-                                ctx.json_body({ { "error", "cid not found" } });
-                                return true;
-                            }
-                        }
-                        else {
-                            if (!obj.contains("return")) {
-                                ctx.json_body({ { "error", "return not provided" } });
-                                return true;
-                            }
-                            auto ret = convert_ret(obj["return"]);
-                            if (!ret.has_value()) {
-                                ctx.json_body({ { "error", "return convert failed" } });
-                                return true;
-                            }
-                            if (!__inst_ctx->resp(cid, ret.value())) {
-                                ctx.json_body({ { "data", json::object {} } });
-                                return true;
-                            } else {
-                                ctx.json_body({ { "error", "cid not found" } });
-                                return true;
-                            }
-                        }
+                        ctx.json_body({ { "error", "cid not found" } });
                         return true;
                     }
                 }
+                return true;
             }
         }
     }

@@ -296,73 +296,25 @@ ${
   regen.add_raw(`    if (lhg::handle_help(ctx, segs, wrappers, { ${Object.keys(cfg.opaque)
     .map(x => `"${x}"`)
     .join(', ')} }, [](json::object& result) {
-        using lhg::wrap_oper;
 ${Object.keys(cfg.callback).map(type => {
   const cc = cfg.callback[type]!
   const name = cc.name
   const m = /(.*?) *\(\*\)\(.*\)$/.exec(type)!
   const rt = m[1]!
-  return `            // ${name}
-        result["/callback/${name}/add"] = wrap_oper({}, ${objectToJson({
-          type: 'object',
-          properties: {
-            data: { type: 'object', properties: { id: { type: 'string' } } }
-          }
-        })});
-        result["/callback/${name}/{id}/del"] = wrap_oper({}, ${objectToJson({
-          type: 'object',
-          properties: {
-            data: {},
-            error: { type: 'string' }
-          }
-        })});
-        result["/callback/${name}/{id}/pull"] = ${objectToJson({
-          type: 'object',
-          properties: {
-            data: {
-              type: 'object',
-              properties: {
-                ids: {
-                  type: 'array',
-                  items: {
-                    type: 'string'
-                  }
-                }
-              }
-            }
-          }
-        })};
-        result["/callback/${name}/{id}/{cid}/request"] = wrap_oper({}, ${objectToJson({
-          type: 'object',
-          properties: {
-            data: {
-              type: 'object',
-              properties: (() => {
-                const res: JsonValue = {}
-                for (const id of Array.from({ length: cc.all }, (_, k) => k)) {
-                  if (id != cc.self) {
-                    res[cc.arg_name[id]!] = new ExprItem(
-                      `json::parse(lhg::schema_t<decltype(std::get<${id}>(lhg::callback_manager<${type}>::CallbackContext::args_type {}))>::schema).value()`
-                    )
-                  }
-                }
-                Array.from({ length: cc.all }, (_, k) => k).filter(x => x != cc.self)
-                return res
-              })()
-            },
-            error: {
-              type: 'string'
-            }
-          }
-        })});
-        result["/callback/${name}/{id}/{cid}/response"] = wrap_oper(${objectToJson(
-          rt === 'void'
-            ? {}
-            : {
-                return: new ExprItem('json::parse(lhg::schema_t<${rt}>::schema).value()')
-              }
-        )}, ${objectToJson({ data: {}, error: { type: 'string' } })});
-`
+  return `        lhg::help_callback(${JSON.stringify(name)}, result, ${objectToJson(
+    (() => {
+      const res: JsonValue = {}
+      for (const id of Array.from({ length: cc.all }, (_, k) => k)) {
+        if (id != cc.self) {
+          res[cc.arg_name[id]!] = new ExprItem(
+            `json::parse(lhg::schema_t<decltype(std::get<${id}>(lhg::callback_manager<${type}>::CallbackContext::args_type {}))>::schema).value()`
+          )
+        }
+      }
+      Array.from({ length: cc.all }, (_, k) => k).filter(x => x != cc.self)
+      return res
+    })()
+  )}, ${rt == 'void' ? 'std::nullopt' : 'json::parse(lhg::schema_t<${rt}>::schema).value()'});`
 })}
     })) {
         return true;
