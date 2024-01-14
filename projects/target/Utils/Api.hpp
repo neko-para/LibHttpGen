@@ -30,6 +30,15 @@ struct api_info
 
 using api_info_map = std::map<std::string, api_info>;
 
+inline json::array keys_of(const json::object& obj)
+{
+    json::array keys;
+    for (const auto& [k, v] : obj) {
+        keys.push_back(k);
+    }
+    return keys;
+}
+
 inline bool handle_api(Context& ctx, UrlSegments segs, json::object& obj, const api_info_map& wrappers)
 {
     segs.reset();
@@ -108,7 +117,7 @@ inline json::object input_helper()
             (input_helper_entry<std::tuple_element_t<I, ArgTuple>>(obj, {}), ...);
         }(std::make_index_sequence<std::tuple_size_v<ArgTuple>> {});
 
-        return { { "type", "object" }, { "properties", obj } };
+        return { { "type", "object" }, { "properties", obj }, { "required", keys_of(obj) } };
     }
 }
 
@@ -141,7 +150,7 @@ inline json::object output_helper()
         }(std::make_index_sequence<std::tuple_size_v<ArgTuple>> {});
     }
 
-    return wrap_data_error({ { "type", "object" }, { "properties", obj } });
+    return wrap_data_error({ { "type", "object" }, { "properties", obj }, { "required", keys_of(obj) } });
 }
 
 template <typename ArgTag>
