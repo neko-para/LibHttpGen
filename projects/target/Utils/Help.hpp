@@ -62,9 +62,12 @@ inline bool handle_help(Context& ctx, UrlSegments segs, const api_info_map& wrap
         help_api(result, wrappers);
 
         for (const auto& opaque : opaques) {
-            result["/opaque/" + opaque] = wrap_oper(
-                {}, wrap_data_error({ { "type", "object" },
-                                      { "additionalProperties", { { "type", "string" }, { "title", opaque } } } }));
+            result["/opaque/" + opaque] =
+                wrap_oper({}, wrap_data_error({ { "type", "object" },
+                                                { "additionalProperties",
+                                                  { { "type", "object" },
+                                                    { "properties", { { "pointer", { { "type", "string" } } } } },
+                                                    { "required", json::array { "pointer" } } } } }));
         }
 
         callbacks(result);

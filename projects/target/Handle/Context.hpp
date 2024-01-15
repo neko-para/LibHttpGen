@@ -37,6 +37,7 @@ struct Context
     {
         res_.set(http::field::server, BOOST_BEAST_VERSION_STRING);
         res_.set(http::field::access_control_allow_origin, "*");
+        res_.set(http::field::access_control_allow_headers, "Content-Type");
         res_.keep_alive(req_.keep_alive());
     }
 

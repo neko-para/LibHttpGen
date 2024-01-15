@@ -218,6 +218,7 @@ inline bool handle_callback(
                         return true;
                     }
                 }
+                ctx.json_body({ { "data", json::object {} } });
                 return true;
             }
         }

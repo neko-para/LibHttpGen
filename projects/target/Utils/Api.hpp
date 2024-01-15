@@ -159,8 +159,8 @@ inline bool perform_check_entry(json::object& __param, std::string& __error)
     using Argt = typename ArgTag::type;
 
     if constexpr (is_callback_context<ArgTag>::value) {
-        if (!check_var<const char*>(__param[ArgTag::name])) {
-            __error = std::string(ArgTag::name) + " type error, expect string@" +
+        if (!check_var<const char*>(__param[is_callback_context<ArgTag>::callback_arg_tag::name])) {
+            __error = std::string(is_callback_context<ArgTag>::callback_arg_tag::name) + " type error, expect string@" +
                       is_callback<typename is_callback_context<ArgTag>::callback_arg_tag>::name;
             return false;
         }
