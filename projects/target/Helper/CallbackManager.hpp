@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <condition_variable>
 #include <map>
 #include <mutex>
@@ -45,12 +46,19 @@ struct CallbackManager
         std::map<std::string, std::shared_ptr<InstanceContext>> pendings_;
         std::mutex mtx_;
 
+        std::mutex cond_mtx_;
+        std::condition_variable cond_;
+
         std::string push(const Args&... args)
         {
             auto cid = make_uuid();
 
             std::unique_lock<std::mutex> lock(mtx_);
             pendings_[cid] = std::make_shared<InstanceContext>(args...);
+
+            std::lock_guard<std::mutex> clock(cond_mtx_);
+            cond_.notify_all();
+
             return cid;
         }
 
@@ -74,6 +82,25 @@ struct CallbackManager
             std::unique_lock<std::mutex> lock(mtx_);
             for (const auto& [id, _] : pendings_) {
                 cids.push_back(id);
+            }
+        }
+
+        bool take_wait(std::vector<std::string>& cids)
+        {
+            auto timeout = std::chrono::system_clock::now() + std::chrono::seconds(5);
+            std::unique_lock<std::mutex> clock(cond_mtx_);
+            if (cond_.wait_until(clock, timeout, [this]() {
+                    std::unique_lock<std::mutex> lock(mtx_);
+
+                    return pendings_.size() > 0;
+                })) {
+
+                take(cids);
+                return true;
+            }
+            else {
+                cids.clear();
+                return false;
             }
         }
 

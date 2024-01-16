@@ -127,7 +127,7 @@ inline bool handle_callback(
                     return true;
                 }
                 std::vector<std::string> cids;
-                __inst_ctx->take(cids);
+                __inst_ctx->take_wait(cids);
                 json::array obj_ids;
                 for (const auto& cid : cids) {
                     obj_ids.push_back(cid);
