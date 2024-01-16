@@ -98,6 +98,9 @@ inline void input_helper_entry(json::object& obj, ArgTag)
     else if constexpr (is_callback_context<ArgTag>::value) {
         return;
     }
+    else if constexpr (is_output<ArgTag>::value) {
+        return;
+    }
     else {
         obj[ArgTag::name] = json::parse(schema_t<typename ArgTag::type>::schema).value();
     }
