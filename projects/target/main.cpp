@@ -3,7 +3,7 @@
 
 int main()
 {
-    int threads = 4;
+    int threads = 8;
 
     asio::io_context ioc { threads };
 
