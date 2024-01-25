@@ -354,11 +354,15 @@ inline json::object perform_output(typename arg_set<FuncTag>::call_type& data, R
     }
     else if constexpr (is_opaque<RealReturn>::value) {
         auto& manager = is_opaque<RealReturn>::manager;
-        if constexpr (is_opaque_non_alloc<RealReturn, FuncTag>::value) {
-            obj["return"] = manager.find(ret);
-        }
-        else {
-            obj["return"] = manager.add(ret);
+        if (ret) {
+            if constexpr (is_opaque_non_alloc<RealReturn, FuncTag>::value) {
+                obj["return"] = manager.find(ret);
+            }
+            else {
+                obj["return"] = manager.add(ret);
+            }
+        } else {
+            obj["return"] = "";
         }
     }
     else {
