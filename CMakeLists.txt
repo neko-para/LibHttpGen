@@ -23,10 +23,6 @@ if(NOT LHG_EMBEDDED)
   endif()
 endif()
 
-if(APPLE)
-  add_compile_definitions(LHG_USE_FMTLIB)
-endif()
-
 find_package(Boost REQUIRED COMPONENTS system)
 add_subdirectory(3rdparty)
 
