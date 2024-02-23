@@ -17,7 +17,7 @@ inline json::object wrap_data_error(const json::object& data)
 }
 
 inline void help_callback(const char* name, json::object& result, const json::object& arg,
-                          const std::optional<json::object>& ret)
+                          const std::optional<json::object>& ret, const json::object& out_ret = {})
 {
     std::string prefix = std::string("/callback/") + name + "/";
     auto id_cid = json::object { { "id", { { "type", "string" } } }, { "cid", { { "type", "string" } } } };
@@ -47,8 +47,8 @@ inline void help_callback(const char* name, json::object& result, const json::ob
                   wrap_data_error({ { "type", "object" }, { "properties", arg }, { "required", keys_of(arg) } }));
     result[prefix + "response"] =
         wrap_oper({ { "type", "object" },
-                    { "properties", ret.has_value() ? (id_cid | json::object { { "return", ret.value() } }) : id_cid },
-                    { "required", json::array { "id", "cid" } } },
+                    { "properties", ret.has_value() ? (out_ret | id_cid | json::object { { "return", ret.value() } }) : out_ret | id_cid },
+                    { "required", json::array { "id", "cid" } + keys_of(out_ret) + (ret.has_value() ? json::array { "return" } : json::array {}) } },
                   wrap_data_error({}));
 }
 

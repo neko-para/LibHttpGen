@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MaaFramework/MaaDef.h"
 #include <meojson/json.hpp>
 
 namespace lhg
@@ -39,6 +40,18 @@ template <can_convert_from_json Type>
 inline Type from_json(json::value v)
 {
     return v.as<Type>();
+}
+
+template <>
+inline unsigned char from_json<unsigned char>(json::value v)
+{
+    return v.as_unsigned();
+}
+
+template <>
+inline signed char from_json<signed char>(json::value v)
+{
+    return v.as_integer();
 }
 
 template <can_construct_json Type>

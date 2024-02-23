@@ -241,20 +241,22 @@ struct lhg::is_opaque_non_alloc<${type} *, ${FS(f)}> {
     const m = /(.*?) *\(\*\)\(.*\)$/.exec(type)!
     const rt = m[1]!
     regen.add_raw(`    // callback ${cc.name}`)
-    regen.add_raw(`    if (lhg::handle_callback("${cc.name}", ${
-      cc.name
-    }__Manager, ctx, segs, obj, [](const auto& args) {
+    regen.add_raw(
+      `    if (lhg::handle_callback("${cc.name}", ${cc.name}__Manager, ctx, segs, obj, [](const auto& args) {`
+    )
+    Array.from({ length: cc.all }, (_, k) => k)
+      .filter(x => x !== cc.self && !(cc.out ?? []).includes(x))
+      .forEach(id =>
+        regen.add_sec(`lhg.cb.${cc.name}.${id}`, `        auto v${id} = std::get<${id}>(args);`)
+      )
+
+    regen.add_raw(`        return json::object {
 ${Array.from({ length: cc.all }, (_, k) => k)
-  .filter(x => x != cc.self)
-  .map(id => `        auto v${id} = std::get<${id}>(args);`)
-  .join('\n')}
-        return json::object {
-${Array.from({ length: cc.all }, (_, k) => k)
-  .filter(x => x != cc.self)
+  .filter(x => x !== cc.self && !(cc.out ?? []).includes(x))
   .map(id => `            { "${cc.arg_name[id]}", v${id} },`)
   .join('\n')}
         };
-    }, [](const auto& ret) {
+    }, [](const auto& ret) ${rt === 'void' ? '' : `-> std::optional<${rt}> `}{
 ${
   rt === 'void'
     ? '        return 0;'
@@ -265,7 +267,15 @@ ${
         }
         return lhg::from_json<${rt}>(ret);`
 }
-    })) {
+    }, [](const auto& arg, const auto& res) {`)
+    Array.from({ length: cc.all }, (_, k) => k)
+      .filter(x => x !== cc.self && (cc.out ?? []).includes(x))
+      .forEach(id => {
+        regen.add_raw(`        auto _${cc.arg_name[id]} = res.find("${cc.arg_name[id]}");
+        auto v_${cc.arg_name[id]} = std::get<${id}>(arg);`)
+        regen.add_sec(`lhg.callback.output.fix.${id}`, '')
+      })
+    regen.add_raw(`    })) {
         return true;
     }
 `)
@@ -296,26 +306,41 @@ ${
   regen.add_raw(`    if (lhg::handle_help(ctx, segs, wrappers, { ${Object.keys(cfg.opaque)
     .map(x => `"${x}"`)
     .join(', ')} }, [](json::object& result) {
-${Object.keys(cfg.callback).map(type => {
-  const cc = cfg.callback[type]!
-  const name = cc.name
-  const m = /(.*?) *\(\*\)\(.*\)$/.exec(type)!
-  const rt = m[1]!
-  return `        lhg::help_callback(${JSON.stringify(name)}, result, ${objectToJson(
-    (() => {
-      const res: JsonValue = {}
-      for (const id of Array.from({ length: cc.all }, (_, k) => k)) {
-        if (id != cc.self) {
-          res[cc.arg_name[id]!] = new ExprItem(
-            `json::parse(lhg::schema_t<decltype(std::get<${id}>(lhg::callback_manager<${type}>::CallbackContext::args_type {}))>::schema).value()`
-          )
+${Object.keys(cfg.callback)
+  .map(type => {
+    const cc = cfg.callback[type]!
+    const name = cc.name
+    const m = /(.*?) *\(\*\)\(.*\)$/.exec(type)!
+    const rt = m[1]!
+    return `        lhg::help_callback(${JSON.stringify(name)}, result, ${objectToJson(
+      (() => {
+        const res: JsonValue = {}
+        for (const id of Array.from({ length: cc.all }, (_, k) => k)) {
+          if (id !== cc.self && !(cc.out ?? []).includes(id)) {
+            res[cc.arg_name[id]!] = new ExprItem(
+              `json::parse(lhg::schema_t<decltype(std::get<${id}>(lhg::callback_manager<${type}>::CallbackContext::args_type {}))>::schema).value()`
+            )
+          }
         }
-      }
-      Array.from({ length: cc.all }, (_, k) => k).filter(x => x != cc.self)
-      return res
-    })()
-  )}, ${rt == 'void' ? 'std::nullopt' : 'json::parse(lhg::schema_t<${rt}>::schema).value()'});`
-})}
+        Array.from({ length: cc.all }, (_, k) => k).filter(x => x != cc.self)
+        return res
+      })()
+    )},
+        ${
+          rt == 'void'
+            ? 'std::nullopt'
+            : `json::parse(lhg::schema_t<${rt}>::schema).value().as_object()`
+        },
+        json::object {
+${Array.from({ length: cc.all }, (_, k) => k)
+  .filter(x => x !== cc.self && (cc.out ?? []).includes(x))
+  .map(id => {
+    return `            { "${cc.arg_name[id]}", json::parse(lhg::schema_t<decltype(std::get<${id}>(lhg::callback_manager<${type}>::CallbackContext::args_type {}))>::schema).value() },`
+  })
+  .join('\n')}
+        });`
+  })
+  .join('\n\n')}
     })) {
         return true;
     }

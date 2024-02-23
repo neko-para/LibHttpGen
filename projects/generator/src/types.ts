@@ -4,6 +4,7 @@ interface LHGCallbackConfig {
   self: number
   all: number
   arg_name: string[]
+  out?: number[]
 }
 
 interface LHGOpaqueConfig {

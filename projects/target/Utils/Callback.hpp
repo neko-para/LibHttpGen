@@ -78,7 +78,8 @@ template <typename CM>
 inline bool handle_callback(
     const char* name, CM& manager, Context& ctx, UrlSegments segs, json::object& obj,
     std::function<json::object(const typename CM::CallbackContext::args_type&)> convert_arg,
-    std::function<std::optional<typename CM::CallbackContext::return_type>(const json::value&)> convert_ret)
+    std::function<std::optional<typename CM::CallbackContext::return_type>(const json::value&)> convert_ret,
+    std::function<void(const typename CM::CallbackContext::args_type&, const json::object&)> output_fix)
 {
     segs.reset();
     if (segs.enter_path("callback")) {
@@ -192,6 +193,14 @@ inline bool handle_callback(
                     ctx.json_body({ { "error", "id not found" } });
                     return true;
                 }
+
+                typename CM::CallbackContext::args_type args;
+                if (!__inst_ctx->get_args(cid.value().as_string(), args)) {
+                    ctx.json_body({ { "error", "cid not found" } });
+                    return true;
+                }
+                output_fix(args, obj);
+
                 if constexpr (std::is_same_v<typename CM::CallbackContext::real_return_type, void>) {
                     if (!__inst_ctx->resp(cid.value().as_string(), 0)) {
                         ctx.json_body({ { "error", "cid not found" } });
