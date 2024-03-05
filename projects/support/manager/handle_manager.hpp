@@ -17,12 +17,12 @@ struct HandleManager
         HandleManager<handle_t>& manager;
         handle_t handle;
 
-        ScopedHandle(HandleManager<handle_t>& manager, handle_t handle, std::string& id) : manager(manager), handle(handle) {
+        ScopedHandle(HandleManager<handle_t>& manager, handle_t handle, std::string& id)
+            : manager(manager), handle(handle)
+        {
             id = manager.add(handle);
         }
-        ~ScopedHandle() {
-            manager.del(handle);
-        }
+        ~ScopedHandle() { manager.del(handle); }
         ScopedHandle(const ScopedHandle&) = delete;
         ScopedHandle& operator=(const ScopedHandle&) = delete;
     };

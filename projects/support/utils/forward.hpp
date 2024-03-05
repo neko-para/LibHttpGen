@@ -1,12 +1,11 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma warning(disable:4100)
-#pragma warning(disable:4702)
+#pragma warning(disable : 4100)
+#pragma warning(disable : 4702)
 #else
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
-
 
 #include <boost/asio.hpp>
 #include <boost/beast/core.hpp>
