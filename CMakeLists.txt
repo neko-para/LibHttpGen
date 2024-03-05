@@ -34,3 +34,5 @@ if(NOT LHG_EMBEDDED)
   add_subdirectory(projects/clang-cpp)
   add_subdirectory(projects/interface-extractor)
 endif()
+
+add_subdirectory(projects/support)
