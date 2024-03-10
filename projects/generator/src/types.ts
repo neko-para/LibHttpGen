@@ -13,6 +13,8 @@ interface LHGOpaqueConfig {
 }
 
 export interface LHGConfig {
+  name?: string
+  header?: string[]
   callback?: Record<string, LHGCallbackConfig>
   opaque?: Record<string, LHGOpaqueConfig>
   output?: string[]

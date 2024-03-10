@@ -12,6 +12,8 @@ export const interface_path = path.join(root_path, 'interface.json')
 export async function loadConfig() {
   const obj = JSON.parse(await fs.readFile(config_path, 'utf-8')) as LHGConfig
   return {
+    name: obj.name ?? 'unknown',
+    header: obj.header ?? [],
     callback: obj.callback ?? {},
     opaque: obj.opaque ?? {},
     output: obj.output ?? [],

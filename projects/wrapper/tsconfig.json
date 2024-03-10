@@ -1,8 +1,0 @@
-{
-    "extends": "@tsconfig/node20/tsconfig.json",
-    "include": ["src/**/*.ts"],
-    "compilerOptions": {
-        "noUncheckedIndexedAccess": true,
-        "resolveJsonModule": true
-    }
-}
