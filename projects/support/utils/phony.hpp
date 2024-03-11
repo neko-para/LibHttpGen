@@ -1,6 +1,7 @@
 #pragma once
 
 #include "function/call.hpp"
+#include "function/cast.hpp"
 #include "function/interface.hpp"
 
 #include "manager/handle_manager.hpp"
