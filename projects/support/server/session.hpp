@@ -2,20 +2,19 @@
 
 #include <memory>
 
+#include "server/dispatcher.hpp"
 #include "server/fail.hpp"
 #include "utils/forward.hpp"
 
 namespace lhg::server
 {
 
-http::message_generator handle_request(http::request<http::string_body>&& req);
-
 // Handles an HTTP server connection
 class Session : public std::enable_shared_from_this<Session>
 {
 public:
     // Take ownership of the stream
-    Session(tcp::socket&& socket) : stream_(std::move(socket)) {}
+    Session(Dispatcher* dispatcher, tcp::socket&& socket) : dispatcher_(dispatcher), stream_(std::move(socket)) {}
 
     // Start the asynchronous operation
     void run()
@@ -44,7 +43,7 @@ public:
             return fail(ec, "read");
         }
 
-        send_response(handle_request(std::move(req_)));
+        send_response(dispatcher_->handle_request(std::move(req_)));
     }
 
     void send_response(http::message_generator&& msg)
@@ -81,6 +80,7 @@ public:
     }
 
 private:
+    Dispatcher* dispatcher_;
     beast::tcp_stream stream_;
     beast::flat_buffer buffer_;
     http::request<http::string_body> req_;

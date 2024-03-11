@@ -9,11 +9,14 @@
 namespace lhg::server
 {
 
+class Dispatcher;
+
 // Accepts incoming connections and launches the sessions
 class Listener : public std::enable_shared_from_this<Listener>
 {
 public:
-    Listener(asio::io_context& ioc, tcp::endpoint endpoint) : ioc_(ioc), acceptor_(asio::make_strand(ioc))
+    Listener(Dispatcher* dispatcher, asio::io_context& ioc, tcp::endpoint endpoint)
+        : dispatcher_(dispatcher), ioc_(ioc), acceptor_(asio::make_strand(ioc))
     {
         beast::error_code ec;
 
@@ -64,12 +67,13 @@ private:
             return;
         }
         else {
-            std::make_shared<Session>(std::move(socket))->run();
+            std::make_shared<Session>(dispatcher_, std::move(socket))->run();
         }
 
         do_accept();
     }
 
+    Dispatcher* dispatcher_;
     asio::io_context& ioc_;
     tcp::acceptor acceptor_;
 };

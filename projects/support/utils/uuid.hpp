@@ -1,9 +1,15 @@
 #pragma once
 
-#include <string>
+#include "utils/forward.hpp"
 
-namespace lhg {
+namespace lhg
+{
 
-std::string make_uuid();
+inline std::string make_uuid()
+{
+    static auto uuid_generator = boost::uuids::random_generator();
+
+    return boost::uuids::to_string(uuid_generator());
+}
 
 }

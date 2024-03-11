@@ -6,13 +6,18 @@
 namespace lhg::server
 {
 
-class Server {
+class Dispatcher;
+
+class Server
+{
 public:
-    Server(unsigned short port, int threads = 8):ioc(threads), threads(threads) {
-        listener = std::make_shared<Listener>(ioc, tcp::endpoint { asio::ip::make_address("127.0.0.1"), port });
+    Server(Dispatcher* dispatcher, unsigned short port, int threads = 8) : ioc(threads), threads(threads)
+    {
+        listener = std::make_shared<Listener>(dispatcher, ioc, tcp::endpoint { asio::ip::make_address("127.0.0.1"), port });
     }
 
-    void run() {
+    void run()
+    {
         listener->run();
 
         // Run the I/O service on the requested number of threads
@@ -22,9 +27,7 @@ public:
             v.emplace_back([&ioc = this->ioc] { ioc.run(); });
     }
 
-    void stop() {
-        ioc.stop();
-    }
+    void stop() { ioc.stop(); }
 
 private:
     asio::io_context ioc;

@@ -42,21 +42,20 @@ async function main() {
     result.push(`struct func_type_${info.name} {`)
     for (const [idx, arg] of info.argument.entries()) {
       result.push(`  struct _${idx}_${arg.name} {`)
-      result.push(`    constexpr static bool ret = false;`)
       result.push(`    constexpr static size_t index = ${idx};`)
       result.push(`    constexpr static const char* name = "${arg.name}";`)
       result.push(`    using type = ${arg.type};`)
       result.push('  };')
     }
-    result.push(`  struct _ret {`)
-    result.push(`    constexpr static bool ret = true;`)
+    result.push(`  struct ret {`)
     result.push(`    constexpr static size_t index = ${info.argument.length};`)
+    result.push(`    constexpr static const char* name = "return";`)
     result.push(`    using type = ${info.return};`)
     result.push('  };')
     result.push(
       `  using args = std::tuple<${info.argument
         .map((v, i) => `_${i}_${v.name}`)
-        .concat(['_ret'])
+        .concat(['ret'])
         .join(', ')}>;`
     )
 
@@ -64,27 +63,19 @@ async function main() {
 
     result.push(`struct function_${info.name} {`)
     result.push(`  constexpr static auto func = ${info.name};`)
+    result.push(`  constexpr static const char* name = "${info.name}";`)
     result.push(`  using type = func_type_${info.name};`)
     result.push('};')
     result.push('')
   }
 
+  result.push(`using __function_list = std::tuple<
+${int.interface.map(info => `  function_${info.name}`).join(',\n')}
+>;`)
+
   result.push('')
   result.push(`}`)
   result.push('')
-
-  for (const info of int.interface) {
-    result.push('template <>')
-    result.push(`struct is_input<${cfg.name}::func_type_${info.name}::_ret, false> {`)
-    result.push('  constexpr static bool value = false;')
-    result.push('  using type = std::monostate;')
-    result.push('};')
-    result.push('template <>')
-    result.push(`struct is_output<${cfg.name}::func_type_${info.name}::_ret, false> {`)
-    result.push('  constexpr static bool value = true;')
-    result.push(`  using type = typename ${cfg.name}::func_type_${info.name}::_ret::type;`)
-    result.push('};')
-  }
 
   result.push('')
   result.push(`}`)
