@@ -6,14 +6,15 @@
 #include "server/context.hpp"
 #include "server/url.hpp"
 #include "utils/forward.hpp"
+#include "manager/manager.hpp"
 
 namespace lhg::server
 {
 
 struct Endpoint
 {
-    std::function<void(json::object& res, const json::object& req)> process;
-    std::function<void(json::object& res, json::object& req)> schema;
+    std::function<void(ManagerProvider& provider, json::object& res, const json::object& req)> process;
+    std::function<void(ManagerProvider& provider, json::object& res, json::object& req)> schema;
 };
 
 class Dispatcher
@@ -66,7 +67,7 @@ private:
         if (current && current->endpoint) {
             json::object req = json::parse(ctx.req_.body()).value_or(json::object {}).as_object();
             json::object res;
-            current->endpoint->process(res, req);
+            current->endpoint->process(provider, res, req);
             ctx.json_body(res);
         } else {
             ctx.bad_request(std::format("unknown path {}", url));
@@ -83,6 +84,7 @@ private:
         std::shared_ptr<Endpoint> endpoint;
     };
 
+    ManagerProvider provider;
     Node root;
 };
 

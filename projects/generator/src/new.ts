@@ -77,6 +77,20 @@ ${int.interface.map(info => `  function_${info.name}`).join(',\n')}
   result.push(`}`)
   result.push('')
 
+  for (const info of int.interface) {
+    result.push('template<>')
+    result.push(`struct is_input<${cfg.name}::func_type_${info.name}::ret, false> {`)
+    result.push('  constexpr static bool value = false;')
+    result.push('  using type = std::monostate;')
+    result.push('};')
+    result.push('template<>')
+    result.push(`struct is_output<${cfg.name}::func_type_${info.name}::ret, false> {`)
+    result.push('  constexpr static bool value = true;')
+    result.push(`  using type = ${cfg.name}::func_type_${info.name}::ret::type;`)
+    result.push('};')
+    result.push('')
+  }
+
   result.push('')
   result.push(`}`)
 
