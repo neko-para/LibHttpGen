@@ -29,11 +29,6 @@ struct type_is_handle<type, false> {
     constexpr static bool value = type_is_handle<type, true>::value;
 };
 
-#pragma mark - handle_type
-
-template <typename type>
-concept handle_type = type_is_handle<type, true>::value;
-
 #pragma mark - is_handle
 
 template <typename arg_tag, bool impl>
@@ -49,6 +44,11 @@ struct is_handle<arg_tag, false>
     constexpr static bool value = is_handle<arg_tag, true>::value;
     constexpr static handle_oper oper = is_handle<arg_tag, true>::oper;
 };
+
+#pragma mark - handle_arg
+
+template <typename arg_tag>
+concept handle_arg = is_handle<arg_tag, true>::value;
 
 #pragma mark - is_input
 
