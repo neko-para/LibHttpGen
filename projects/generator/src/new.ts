@@ -91,6 +91,15 @@ ${int.interface.map(info => `  function_${info.name}`).join(',\n')}
     result.push('')
   }
 
+  for (const opaque in cfg.opaque) {
+    result.push(
+      `template<>
+struct type_is_handle<${opaque} *, false> {
+  constexpr static bool value = true;
+};`
+    )
+  }
+
   result.push('')
   result.push(`}`)
 

@@ -1,12 +1,12 @@
 #pragma once
 
-#include <meojson/json.hpp>
 #include <format>
+#include <meojson/json.hpp>
 
+#include "manager/manager.hpp"
 #include "server/context.hpp"
 #include "server/url.hpp"
 #include "utils/forward.hpp"
-#include "manager/manager.hpp"
 
 namespace lhg::server
 {
@@ -20,17 +20,16 @@ struct Endpoint
 class Dispatcher
 {
 public:
-    void handle(std::string route, Endpoint endpoint) {
+    void handle(std::string route, Endpoint endpoint)
+    {
         auto segs = segment_split(route);
 
-        Node *current = &root;
+        Node* current = &root;
 
         for (const auto& seg : segs) {
             auto it = current->child.find(seg);
             if (it == current->child.end()) {
-                it = current->child.emplace(seg, Node {
-                    {}, nullptr
-                }).first;
+                it = current->child.emplace(seg, Node { {}, nullptr }).first;
             }
             current = &it->second;
         }
@@ -49,13 +48,14 @@ private:
 
         auto url_segs = segment_split(url);
 
-        Node *current = &root;
+        Node* current = &root;
 
         for (const auto& seg : url_segs) {
             auto it = current->child.find(seg);
             if (it != current->child.end()) {
                 current = &it->second;
-            } else {
+            }
+            else {
                 current = nullptr;
                 break;
             }
@@ -65,11 +65,12 @@ private:
         ctx.init();
 
         if (current && current->endpoint) {
-            json::object req = json::parse(ctx.req_.body()).value_or(json::object {}).as_object();
-            json::object res;
-            current->endpoint->process(provider, res, req);
-            ctx.json_body(res);
-        } else {
+            json::object req_obj = json::parse(ctx.req_.body()).value_or(json::object {}).as_object();
+            json::object res_obj;
+            current->endpoint->process(provider, res_obj, req_obj);
+            ctx.json_body(res_obj);
+        }
+        else {
             ctx.bad_request(std::format("unknown path {}", url));
         }
 
@@ -88,4 +89,4 @@ private:
     Node root;
 };
 
-}
+} // namespace lhg::server
