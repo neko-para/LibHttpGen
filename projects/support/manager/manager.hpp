@@ -18,7 +18,10 @@ private:
     struct holder : public holder_base
     {
         type* ptr;
-        holder(type* p) : ptr(p) {}
+        holder(type* p)
+            : ptr(p)
+        {
+        }
         holder(const holder&) = delete;
         holder& operator=(const holder&) = delete;
         virtual ~holder() override { delete ptr; }
@@ -45,7 +48,10 @@ public:
     }
 
 private:
-    std::unordered_map<std::type_index, std::unordered_map<std::type_index, std::unique_ptr<holder_base>>> managers;
+    std::unordered_map<
+        std::type_index,
+        std::unordered_map<std::type_index, std::unique_ptr<holder_base>>>
+        managers;
 };
 
 }

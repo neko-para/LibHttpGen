@@ -4,7 +4,7 @@
 
 #include "server/dispatcher.hpp"
 #include "server/fail.hpp"
-#include "utils/forward.hpp"
+#include "utils/boost.hpp"
 
 namespace lhg::server
 {
@@ -14,12 +14,18 @@ class Session : public std::enable_shared_from_this<Session>
 {
 public:
     // Take ownership of the stream
-    Session(Dispatcher* dispatcher, tcp::socket&& socket) : dispatcher_(dispatcher), stream_(std::move(socket)) {}
+    Session(Dispatcher* dispatcher, tcp::socket&& socket)
+        : dispatcher_(dispatcher)
+        , stream_(std::move(socket))
+    {
+    }
 
     // Start the asynchronous operation
     void run()
     {
-        asio::dispatch(stream_.get_executor(), beast::bind_front_handler(&Session::do_read, shared_from_this()));
+        asio::dispatch(
+            stream_.get_executor(),
+            beast::bind_front_handler(&Session::do_read, shared_from_this()));
     }
 
     void do_read()
@@ -28,7 +34,11 @@ public:
 
         stream_.expires_after(std::chrono::seconds(30));
 
-        http::async_read(stream_, buffer_, req_, beast::bind_front_handler(&Session::on_read, shared_from_this()));
+        http::async_read(
+            stream_,
+            buffer_,
+            req_,
+            beast::bind_front_handler(&Session::on_read, shared_from_this()));
     }
 
     void on_read(beast::error_code ec, std::size_t bytes_transferred)
@@ -51,8 +61,10 @@ public:
         bool keep_alive = msg.keep_alive();
 
         // Write the response
-        beast::async_write(stream_, std::move(msg),
-                           beast::bind_front_handler(&Session::on_write, shared_from_this(), keep_alive));
+        beast::async_write(
+            stream_,
+            std::move(msg),
+            beast::bind_front_handler(&Session::on_write, shared_from_this(), keep_alive));
     }
 
     void on_write(bool keep_alive, beast::error_code ec, std::size_t bytes_transferred)

@@ -10,7 +10,8 @@ namespace lhg::call::cast
 {
 
 template <typename type, typename state, typename arg_tag>
-inline void from_json(ManagerProvider& p, const json::value& j, type& v, state& s, arg_tag) = delete;
+inline void
+    from_json(ManagerProvider& p, const json::value& j, type& v, state& s, arg_tag) = delete;
 
 template <std::integral type, typename state, typename arg_tag>
 inline void from_json(ManagerProvider& p, const json::value& j, type& v, state& s, arg_tag)
@@ -45,7 +46,8 @@ inline void from_json(ManagerProvider& p, const json::value& j, bool& v, state& 
 }
 
 template <typename arg_tag>
-inline void from_json(ManagerProvider& p, const json::value& j, const char*& v, std::string& s, arg_tag)
+inline void
+    from_json(ManagerProvider& p, const json::value& j, const char*& v, std::string& s, arg_tag)
 {
     std::ignore = p;
     s = j.as_string();

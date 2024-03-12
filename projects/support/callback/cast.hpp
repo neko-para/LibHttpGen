@@ -11,7 +11,8 @@ namespace lhg::callback::cast
 {
 
 template <typename type, typename state, typename arg_tag>
-inline void from_json(ManagerProvider& p, const json::value& j, type& v, state& s, arg_tag) = delete;
+inline void
+    from_json(ManagerProvider& p, const json::value& j, type& v, state& s, arg_tag) = delete;
 
 template <std::integral type, typename state, typename arg_tag>
 inline void from_json(ManagerProvider& p, const json::value& j, type& v, state& s, arg_tag)
@@ -46,7 +47,8 @@ inline void from_json(ManagerProvider& p, const json::value& j, bool& v, state& 
 }
 
 template <typename arg_tag>
-inline void from_json(ManagerProvider& p, const json::value& j, const char*& v, std::string& s, arg_tag)
+inline void
+    from_json(ManagerProvider& p, const json::value& j, const char*& v, std::string& s, arg_tag)
 {
     std::ignore = p;
     s = j.as_string();
@@ -114,8 +116,9 @@ inline void to_json(ManagerProvider& p, json::value& j, const type& v, state& s,
         j = manager->find(v);
     }
     else if constexpr (oper == handle_oper::scope) {
-        static_assert(std::is_same_v<state, typename HandleManager<type>::ScopedHandle>,
-                      "from_json: scope handle oper require state to be ScopedHandle");
+        static_assert(
+            std::is_same_v<state, typename HandleManager<type>::ScopedHandle>,
+            "from_json: scope handle oper require state to be ScopedHandle");
         std::string id;
         s = typename HandleManager<type>::ScopedHandle(manager, v, id);
         j = id;

@@ -21,7 +21,7 @@
 #include "server/server.hpp"
 #include "server/session.hpp"
 
-#include "utils/forward.hpp"
+#include "utils/boost.hpp"
 #include "utils/general.hpp"
 #include "utils/schema.hpp"
 #include "utils/type.hpp"

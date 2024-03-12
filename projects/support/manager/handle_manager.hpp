@@ -23,7 +23,8 @@ struct HandleManager
             handle = nullptr;
         }
         ScopedHandle(HandleManager<handle_t>* manager, handle_t handle, std::string& id)
-            : manager(manager), handle(handle)
+            : manager(manager)
+            , handle(handle)
         {
             id = manager->add(handle);
         }
@@ -35,7 +36,12 @@ struct HandleManager
         }
         ScopedHandle(const ScopedHandle&) = delete;
         ScopedHandle& operator=(const ScopedHandle&) = delete;
-        ScopedHandle(ScopedHandle&& h) : manager(h.manager), handle(h.handle) { h.handle = nullptr; }
+        ScopedHandle(ScopedHandle&& h)
+            : manager(h.manager)
+            , handle(h.handle)
+        {
+            h.handle = nullptr;
+        }
         ScopedHandle& operator=(ScopedHandle&& h)
         {
             if (this == &h) {

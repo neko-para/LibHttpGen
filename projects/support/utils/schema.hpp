@@ -11,7 +11,7 @@ concept arithmetic = std::is_arithmetic<T>::value;
 
 #define __LHG_SCHEMA_ARI_ENTRY(name) \
     template <arithmetic T>          \
-    Builder& name(T&& value)   \
+    Builder& name(T&& value)         \
     {                                \
         obj[#name] = value;          \
         return *this;                \
@@ -19,21 +19,21 @@ concept arithmetic = std::is_arithmetic<T>::value;
 
 #define __LHG_SCHEMA_INT_ENTRY(name) \
     template <std::integral T>       \
-    Builder& name(T&& value)   \
+    Builder& name(T&& value)         \
     {                                \
         obj[#name] = value;          \
         return *this;                \
     }
 
-#define __LHG_SCHEMA_STR_ENTRY(name)         \
+#define __LHG_SCHEMA_STR_ENTRY(name)   \
     Builder& name(std::string&& value) \
-    {                                        \
-        obj[#name] = value;                  \
-        return *this;                        \
+    {                                  \
+        obj[#name] = value;            \
+        return *this;                  \
     }
 
 #define __LHG_SCHEMA_FLG_ENTRY(name) \
-    Builder& name(bool value)  \
+    Builder& name(bool value)        \
     {                                \
         obj[#name] = value;          \
         return *this;                \
@@ -43,7 +43,10 @@ struct Builder
 {
     json::object obj;
 
-    Builder(const json::object& obj = {}) : obj(obj) {}
+    Builder(const json::object& obj = {})
+        : obj(obj)
+    {
+    }
 
     __LHG_SCHEMA_STR_ENTRY(title)
 

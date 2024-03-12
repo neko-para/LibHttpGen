@@ -14,8 +14,11 @@ struct prepare_state
     using call_arg_tuple = convert_arg_type<arg_tuple>;
     using call_arg_state_tuple = convert_outer_state<arg_tuple>;
 
-    static void prepare(ManagerProvider& provider, const json::object& req, call_arg_tuple& arg,
-                        call_arg_state_tuple& state)
+    static void prepare(
+        ManagerProvider& provider,
+        const json::object& req,
+        call_arg_tuple& arg,
+        call_arg_state_tuple& state)
     {
         std::ignore = provider;
         std::ignore = req;
@@ -30,8 +33,11 @@ struct json_to_arg
     using call_arg_tuple = convert_arg_type<arg_tuple>;
     using call_arg_state_tuple = convert_outer_state<arg_tuple>;
 
-    static bool convert(ManagerProvider& provider, const json::object& req, call_arg_tuple& arg,
-                        call_arg_state_tuple& state)
+    static bool convert(
+        ManagerProvider& provider,
+        const json::object& req,
+        call_arg_tuple& arg,
+        call_arg_state_tuple& state)
     {
         std::ignore = state;
 
@@ -47,7 +53,12 @@ struct json_to_arg
             }
 
             const json::value& value = req.at(name);
-            cast::from_json(provider, value, std::get<index>(arg), std::get<index>(state), arg_tag {});
+            cast::from_json(
+                provider,
+                value,
+                std::get<index>(arg),
+                std::get<index>(state),
+                arg_tag {});
             return true;
         }
     }
@@ -59,20 +70,30 @@ struct arg_to_json
     using call_arg_tuple = convert_arg_type<arg_tuple>;
     using call_arg_state_tuple = convert_outer_state<arg_tuple>;
 
-    static void convert(ManagerProvider& provider, json::object& res, call_arg_tuple& arg, call_arg_state_tuple& state)
+    static void convert(
+        ManagerProvider& provider,
+        json::object& res,
+        call_arg_tuple& arg,
+        call_arg_state_tuple& state)
     {
         std::ignore = state;
 
         using arg_tag = std::tuple_element_t<index, arg_tuple>;
 
-        if constexpr (!is_output<arg_tag, true>::value || std::is_same_v<typename arg_tag::type, void>) {
+        if constexpr (
+            !is_output<arg_tag, true>::value || std::is_same_v<typename arg_tag::type, void>) {
             return;
         }
         else {
             auto name = arg_tag::name;
 
             json::value value;
-            cast::to_json(provider, value, std::get<index>(arg), std::get<index>(state), arg_tag {});
+            cast::to_json(
+                provider,
+                value,
+                std::get<index>(arg),
+                std::get<index>(state),
+                arg_tag {});
 
             res[name] = value;
         }

@@ -10,7 +10,11 @@ namespace lhg::server
 
 struct Context
 {
-    Context(http::request<http::string_body>& req, http::response<http::string_body>& res) : req_(req), res_(res) {}
+    Context(http::request<http::string_body>& req, http::response<http::string_body>& res)
+        : req_(req)
+        , res_(res)
+    {
+    }
 
     void json_body(const json::object& value)
     {
@@ -44,7 +48,10 @@ struct Context
         res_.keep_alive(req_.keep_alive());
     }
 
-    void match_verb() { bad_request(std::format("bad verb {}", std::string_view(req_.method_string()))); }
+    void match_verb()
+    {
+        bad_request(std::format("bad verb {}", std::string_view(req_.method_string())));
+    }
 
     template <typename Func>
     void match_verb(http::verb v, Func func)

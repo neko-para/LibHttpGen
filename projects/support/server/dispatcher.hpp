@@ -6,20 +6,24 @@
 #include "manager/manager.hpp"
 #include "server/context.hpp"
 #include "server/url.hpp"
-#include "utils/forward.hpp"
+#include "utils/boost.hpp"
 
 namespace lhg::server
 {
 
 struct Endpoint
 {
-    std::function<void(ManagerProvider& provider, json::object& res, const json::object& req)> process = nullptr;
+    std::function<void(ManagerProvider& provider, json::object& res, const json::object& req)>
+        process = nullptr;
     std::function<void(ManagerProvider& provider, json::object& res)> schema = nullptr;
 
     Endpoint() = default;
     template <typename F1, typename F2>
-    Endpoint(F1&& f1, F2&& f2) : process(std::forward<F1>(f1)), schema(std::forward<F2>(f2))
-    {}
+    Endpoint(F1&& f1, F2&& f2)
+        : process(std::forward<F1>(f1))
+        , schema(std::forward<F2>(f2))
+    {
+    }
 };
 
 class Dispatcher
@@ -71,7 +75,8 @@ private:
         ctx.init();
 
         if (current && current->endpoint) {
-            json::object req_obj = json::parse(ctx.req_.body()).value_or(json::object {}).as_object();
+            json::object req_obj =
+                json::parse(ctx.req_.body()).value_or(json::object {}).as_object();
             json::object res_obj;
             current->endpoint->process(provider, res_obj, req_obj);
             ctx.json_body(res_obj);

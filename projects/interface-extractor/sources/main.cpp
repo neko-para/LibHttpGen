@@ -52,20 +52,26 @@ int main(int argc, char* argv[])
     auto cursor = unit->getCursor();
 
     auto decls = clangpp::select(
-        { cursor }, clangpp::sel_recurse,
+        { cursor },
+        clangpp::sel_recurse,
         [](const clangpp::CXXCursor& cur) { return cur.kind() == CXCursor_FunctionDecl; },
         [](const clangpp::CXXCursor& cur) {
-            return clangpp::select({ cur }, clangpp::sel_direct, [](const clangpp::CXXCursor& cur) {
-                       switch (cur.kind().raw_) {
-                       case CXCursor_VisibilityAttr:
-                           return cur.getSpelling() == "default";
-                       case CXCursor_DLLImport:
-                           return true;
-                       default:
+            return clangpp::select(
+                       { cur },
+                       clangpp::sel_direct,
+                       [](const clangpp::CXXCursor& cur) {
+                           switch (cur.kind().raw_) {
+                           case CXCursor_VisibilityAttr:
+                               return cur.getSpelling() == "default";
+                           case CXCursor_DLLImport:
+                               return true;
+                           default:
+                               return false;
+                           }
                            return false;
-                       }
-                       return false;
-                   }).size() > 0;
+                       })
+                       .size()
+                   > 0;
         });
 
     json::array result;
@@ -77,10 +83,12 @@ int main(int argc, char* argv[])
         auto args = decl.getArguments().value();
         json::array arguments;
         for (auto arg : args) {
-            arguments.push_back(
-                json::object { { "type", arg.getType().getSpelling() }, { "name", arg.getSpelling() } });
+            arguments.push_back(json::object { { "type", arg.getType().getSpelling() },
+                                               { "name", arg.getSpelling() } });
         }
-        result.push_back(json::object { { "name", name }, { "return", ret.getSpelling() }, { "argument", arguments } });
+        result.push_back(json::object { { "name", name },
+                                        { "return", ret.getSpelling() },
+                                        { "argument", arguments } });
     }
 
     json::object output = { { "interface", result } };

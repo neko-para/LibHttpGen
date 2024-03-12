@@ -24,8 +24,10 @@ private:
         T data;
 
         template <typename... Ids>
-        holder(Ids&&... ids) : dep(std::forward<Ids>(ids)...)
-        {}
+        holder(Ids&&... ids)
+            : dep(std::forward<Ids>(ids)...)
+        {
+        }
         holder(const holder&) = delete;
         holder& operator=(const holder&) = delete;
 

@@ -35,7 +35,10 @@ struct get_context<callback_tag, true>
 
     using call_arg_tuple = convert_arg_type<arg_tuple>;
 
-    static context_info* get(const call_arg_tuple& arg) { return get_context<callback_tag, false>::get(arg); }
+    static context_info* get(const call_arg_tuple& arg)
+    {
+        return get_context<callback_tag, false>::get(arg);
+    }
 };
 
 template <typename arg_tuple, size_t index, bool impl>
@@ -44,14 +47,18 @@ struct json_to_arg
     using call_arg_tuple = convert_arg_type<arg_tuple>;
     using call_arg_state_tuple = convert_outer_state<arg_tuple>;
 
-    static bool convert(ManagerProvider& provider, const json::object& res, call_arg_tuple& arg,
-                        call_arg_state_tuple& state)
+    static bool convert(
+        ManagerProvider& provider,
+        const json::object& res,
+        call_arg_tuple& arg,
+        call_arg_state_tuple& state)
     {
         std::ignore = state;
 
         using arg_tag = std::tuple_element_t<index, arg_tuple>;
 
-        if constexpr (!is_output<arg_tag, true>::value || std::is_same_v<typename arg_tag::type, void>) {
+        if constexpr (
+            !is_output<arg_tag, true>::value || std::is_same_v<typename arg_tag::type, void>) {
             return true;
         }
         else {
@@ -61,7 +68,12 @@ struct json_to_arg
             }
 
             const json::value& value = res.at(name);
-            cast::from_json(provider, value, std::get<index>(arg), std::get<index>(state), arg_tag {});
+            cast::from_json(
+                provider,
+                value,
+                std::get<index>(arg),
+                std::get<index>(state),
+                arg_tag {});
             return true;
         }
     }
@@ -73,20 +85,30 @@ struct arg_to_json
     using call_arg_tuple = convert_arg_type<arg_tuple>;
     using call_arg_state_tuple = convert_outer_state<arg_tuple>;
 
-    static void convert(ManagerProvider& provider, json::object& req, call_arg_tuple& arg, call_arg_state_tuple& state)
+    static void convert(
+        ManagerProvider& provider,
+        json::object& req,
+        call_arg_tuple& arg,
+        call_arg_state_tuple& state)
     {
         std::ignore = state;
 
         using arg_tag = std::tuple_element_t<index, arg_tuple>;
 
-        if constexpr (!is_input<arg_tag, true>::value || std::is_same_v<typename arg_tag::type, void>) {
+        if constexpr (
+            !is_input<arg_tag, true>::value || std::is_same_v<typename arg_tag::type, void>) {
             return;
         }
         else {
             auto name = arg_tag::name;
 
             json::value value;
-            cast::to_json(provider, value, std::get<index>(arg), std::get<index>(state), arg_tag {});
+            cast::to_json(
+                provider,
+                value,
+                std::get<index>(arg),
+                std::get<index>(state),
+                arg_tag {});
 
             req[name] = value;
         }
@@ -104,7 +126,9 @@ constexpr auto create_callback() -> callback_tag::func_type
 
     return [](auto... real_arg) {
         // 此处不能直接使用 func_type::ret::type void在convert_arg_type时转化为了monostate
-        call_arg_tuple arg(real_arg..., std::tuple_element_t<func_type::ret::index, call_arg_tuple> {});
+        call_arg_tuple arg(
+            real_arg...,
+            std::tuple_element_t<func_type::ret::index, call_arg_tuple> {});
         call_arg_state_tuple state;
 
         context_info* context = get_context<callback_tag, true>::get(arg);
@@ -118,7 +142,9 @@ constexpr auto create_callback() -> callback_tag::func_type
         context->process(res, req);
 
         bool success = [&]<std::size_t... I>(std::index_sequence<I...>) {
-            return (json_to_arg<arg_tuple, I, true>::convert(*context->provider, res, arg, state) && ...);
+            return (
+                json_to_arg<arg_tuple, I, true>::convert(*context->provider, res, arg, state)
+                && ...);
         }(std::make_index_sequence<std::tuple_size_v<arg_tuple>> {});
 
         if (!success) {

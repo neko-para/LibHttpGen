@@ -2,12 +2,12 @@
 
 #include <iostream>
 
-#include "utils/forward.hpp"
+#include "utils/boost.hpp"
 
 namespace lhg::server
 {
 
-inline void fail(beast::error_code ec, char const* what)
+inline void fail(beast::error_code ec, const char* what)
 {
     std::cerr << what << ": " << ec.message() << std::endl;
 }

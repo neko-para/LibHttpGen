@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utils/forward.hpp"
+#include "utils/boost.hpp"
 
 namespace lhg
 {

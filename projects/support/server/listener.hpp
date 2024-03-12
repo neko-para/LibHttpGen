@@ -4,7 +4,7 @@
 
 #include "server/fail.hpp"
 #include "server/session.hpp"
-#include "utils/forward.hpp"
+#include "utils/boost.hpp"
 
 namespace lhg::server
 {
@@ -16,7 +16,9 @@ class Listener : public std::enable_shared_from_this<Listener>
 {
 public:
     Listener(Dispatcher* dispatcher, asio::io_context& ioc, tcp::endpoint endpoint)
-        : dispatcher_(dispatcher), ioc_(ioc), acceptor_(asio::make_strand(ioc))
+        : dispatcher_(dispatcher)
+        , ioc_(ioc)
+        , acceptor_(asio::make_strand(ioc))
     {
         beast::error_code ec;
 
@@ -56,8 +58,9 @@ private:
     void do_accept()
     {
         // The new connection gets its own strand
-        acceptor_.async_accept(asio::make_strand(ioc_),
-                               beast::bind_front_handler(&Listener::on_accept, shared_from_this()));
+        acceptor_.async_accept(
+            asio::make_strand(ioc_),
+            beast::bind_front_handler(&Listener::on_accept, shared_from_this()));
     }
 
     void on_accept(beast::error_code ec, tcp::socket socket)
