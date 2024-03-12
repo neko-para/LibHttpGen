@@ -10,7 +10,7 @@
 namespace lhg::callback
 {
 
-using callback_processer = void (*)(json::object& res, const json::object& req);
+using callback_processer = void (*)(json::object& res, const json::object& req, void* context);
 
 struct context_info
 {
@@ -123,7 +123,7 @@ auto create_callback() -> callback_tag::func_type
             (arg_to_json<arg_tuple, I, true>::convert(*context->provider, req, arg, state), ...);
         }(std::make_index_sequence<std::tuple_size_v<arg_tuple> - 1> {});
 
-        context->process(res, req);
+        context->process(res, req, context->context);
 
         bool success = [&]<std::size_t... I>(std::index_sequence<I...>) {
             return (json_to_arg<arg_tuple, I, true>::convert(*context->provider, res, arg, state) && ...);

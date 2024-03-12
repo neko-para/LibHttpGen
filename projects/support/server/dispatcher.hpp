@@ -13,14 +13,20 @@ namespace lhg::server
 
 struct Endpoint
 {
-    std::function<void(ManagerProvider& provider, json::object& res, const json::object& req)> process;
-    std::function<void(ManagerProvider& provider, json::object& res, json::object& req)> schema;
+    std::function<void(ManagerProvider& provider, json::object& res, const json::object& req)> process = nullptr;
+    std::function<void(ManagerProvider& provider, json::object& res)> schema = nullptr;
+
+    Endpoint() = default;
+    template <typename F1, typename F2>
+    Endpoint(F1&& f1, F2&& f2) : process(std::forward<F1>(f1)), schema(std::forward<F2>(f2))
+    {}
 };
 
 class Dispatcher
 {
 public:
-    void handle(std::string route, Endpoint endpoint)
+    template <typename... EndpointArgs>
+    void handle(std::string route, EndpointArgs&&... endpoint)
     {
         auto segs = segment_split(route);
 
@@ -34,7 +40,7 @@ public:
             current = &it->second;
         }
 
-        current->endpoint = std::make_shared<Endpoint>(endpoint);
+        current->endpoint = std::make_unique<Endpoint>(std::forward<EndpointArgs>(endpoint)...);
     }
 
 private:
@@ -82,7 +88,7 @@ private:
     struct Node
     {
         std::map<std::string, Node> child;
-        std::shared_ptr<Endpoint> endpoint;
+        std::unique_ptr<Endpoint> endpoint;
     };
 
     ManagerProvider provider;
