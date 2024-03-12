@@ -1,24 +1,17 @@
 #pragma once
 
-#include "callback/cast.hpp"
-#include "callback/interface.hpp"
-#include "manager/manager.hpp"
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <variant>
 
+#include "callback/cast.hpp"
+#include "callback/interface.hpp"
+#include "manager/callback_manager.hpp"
+#include "manager/manager.hpp"
+
 namespace lhg::callback
 {
-
-using callback_processer = void (*)(json::object& res, const json::object& req, void* context);
-
-struct context_info
-{
-    ManagerProvider* provider;
-    callback_processer process;
-    void* context; // used by callback manager
-};
 
 template <typename callback_tag, bool impl>
 struct get_context
@@ -122,7 +115,7 @@ constexpr auto create_callback() -> callback_tag::func_type
             (arg_to_json<arg_tuple, I, true>::convert(*context->provider, req, arg, state), ...);
         }(std::make_index_sequence<std::tuple_size_v<arg_tuple> - 1> {});
 
-        context->process(res, req, context->context);
+        context->process(res, req);
 
         bool success = [&]<std::size_t... I>(std::index_sequence<I...>) {
             return (json_to_arg<arg_tuple, I, true>::convert(*context->provider, res, arg, state) && ...);

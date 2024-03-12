@@ -142,6 +142,7 @@ struct callback_${info.name} {
   using type = func_type_${info.name};
   using func_type = ${type};
   constexpr static size_t context = ${info.self};
+  constexpr static const char* name = "${info.name}";
 };`
     )
 
@@ -168,6 +169,19 @@ struct callback_${info.name} {
     result.push('')
   }
 
+  result.push(`namespace lhg::${cfg.name} {`)
+  result.push('')
+  result.push(
+    `using __callback_list = std::tuple<
+${Object.entries(cfg.callback)
+  .map(info => `  callback_${info[1].name}`)
+  .join(',\n')}
+>;`
+  )
+  result.push('')
+  result.push('}')
+  result.push('')
+
   for (const opaque in cfg.opaque) {
     result.push(
       `namespace lhg::call {
@@ -186,9 +200,28 @@ struct type_is_handle<${opaque} *, false> {
 };
 
 }
+namespace lhg {
+
+template<>
+struct handle_name<${opaque} *> {
+  constexpr static const char* name = "${opaque}";
+};
+
+}
 `
     )
   }
+
+  result.push(`namespace lhg::${cfg.name} {`)
+  result.push('')
+  result.push(
+    `using __handle_list = std::tuple<${Object.keys(cfg.opaque)
+      .map(info => `${info}*`)
+      .join(', ')}>;`
+  )
+  result.push('')
+  result.push('}')
+  result.push('')
 
   fs.writeFile('../info.hpp', result.join('\n'))
 }

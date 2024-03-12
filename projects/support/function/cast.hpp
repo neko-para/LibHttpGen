@@ -59,7 +59,7 @@ inline void from_json(ManagerProvider& p, const json::value& j, type& v, state& 
     static_assert(oper != handle_oper::invalid, "from_json: invalid handle oper is not allowed");
     static_assert(oper != handle_oper::alloc, "from_json: alloc handle oper is not allowed");
 
-    auto manager = p.get<HandleManager<type>, arg_tag>();
+    auto manager = p.get<HandleManager<type>, void>();
 
     if constexpr (oper == handle_oper::normal) {
         v = manager->get(j.as_string());
@@ -111,7 +111,7 @@ inline void to_json(ManagerProvider& p, json::value& j, const type& v, state& s,
     static_assert(oper != handle_oper::invalid, "to_json: invalid handle oper is not allowed");
     static_assert(oper != handle_oper::free, "to_json: free handle oper is not allowed");
 
-    auto manager = p.get<HandleManager<type>, arg_tag>();
+    auto manager = p.get<HandleManager<type>, void>();
 
     if constexpr (oper == handle_oper::normal) {
         j = manager->find(v);
