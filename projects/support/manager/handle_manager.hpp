@@ -14,17 +14,40 @@ struct HandleManager
 {
     struct ScopedHandle
     {
-        HandleManager<handle_t>& manager;
+        HandleManager<handle_t>* manager;
         handle_t handle;
 
-        ScopedHandle(HandleManager<handle_t>& manager, handle_t handle, std::string& id)
-            : manager(manager), handle(handle)
+        ScopedHandle()
         {
-            id = manager.add(handle);
+            manager = nullptr;
+            handle = nullptr;
         }
-        ~ScopedHandle() { manager.del(handle); }
+        ScopedHandle(HandleManager<handle_t>& manager, handle_t handle, std::string& id)
+            : manager(&manager), handle(handle)
+        {
+            id = manager->add(handle);
+        }
+        ~ScopedHandle()
+        {
+            if (handle) {
+                manager->del(handle);
+            }
+        }
         ScopedHandle(const ScopedHandle&) = delete;
         ScopedHandle& operator=(const ScopedHandle&) = delete;
+        ScopedHandle(ScopedHandle&& h) : manager(h.manager), handle(h.handle) { h.handle = nullptr; }
+        ScopedHandle& operator=(ScopedHandle&& h)
+        {
+            if (this == &h) {
+                return *this;
+            }
+            if (handle) {
+                manager->del(handle);
+            }
+            manager = h.manager;
+            handle = h.handle;
+            h.handle = nullptr;
+        }
     };
 
     std::map<std::string, handle_t> handles_;

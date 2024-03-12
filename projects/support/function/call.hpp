@@ -1,10 +1,10 @@
 #pragma once
 
+#include "function/cast.hpp"
 #include "function/interface.hpp"
 #include "manager/manager.hpp"
-#include "function/cast.hpp"
 
-namespace lhg
+namespace lhg::call
 {
 
 template <typename arg_tuple, size_t index, bool impl>
@@ -93,4 +93,4 @@ bool call(ManagerProvider& provider, json::object& res, const json::object& req)
     return true;
 }
 
-} // namespace lhg
+} // namespace lhg::call

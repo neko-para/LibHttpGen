@@ -1,12 +1,13 @@
 #pragma once
 
 #include <meojson/json.hpp>
+#include <type_traits>
 
-#include "function/interface.hpp"
+#include "callback/interface.hpp"
 #include "manager/handle_manager.hpp"
 #include "manager/manager.hpp"
 
-namespace lhg::call::cast
+namespace lhg::callback::cast
 {
 
 template <typename type, typename state, typename arg_tag>
@@ -49,15 +50,12 @@ inline void from_json(ManagerProvider& p, const json::value& j, type& v, state& 
 {
     constexpr auto oper = is_handle<arg_tag, true>::oper;
     static_assert(oper != handle_oper::invalid, "from_json: invalid handle oper is not allowed");
-    static_assert(oper != handle_oper::alloc, "from_json: alloc handle oper is not allowed");
+    static_assert(oper != handle_oper::scope, "from_json: scope handle oper is not allowed");
 
     auto manager = p.get<HandleManager<type>, arg_tag>();
 
     if constexpr (oper == handle_oper::normal) {
         v = manager->get(j.as_string());
-    }
-    else if constexpr (oper == handle_oper::free) {
-        manager->del(j.as_string(), v);
     }
 }
 
@@ -101,16 +99,19 @@ inline void to_json(ManagerProvider& p, json::value& j, const type& v, state& s,
 {
     constexpr auto oper = is_handle<arg_tag, true>::oper;
     static_assert(oper != handle_oper::invalid, "to_json: invalid handle oper is not allowed");
-    static_assert(oper != handle_oper::free, "to_json: free handle oper is not allowed");
 
     auto manager = p.get<HandleManager<type>, arg_tag>();
 
-    if constexpr (oper == handle_oper::normal) {
+    if (oper == handle_oper::normal) {
         j = manager->find(v);
     }
-    else if constexpr (oper == handle_oper::alloc) {
-        j = manager->add(v);
+    else if (oper == handle_oper::scope) {
+        static_assert(std::is_same_v<state, typename HandleManager<type>::ScopedHandle>,
+                      "from_json: scope handle oper require state to be ScopedHandle");
+        std::string id;
+        s = HandleManager<type>::ScopedHandle(manager, v, id);
+        j = id;
     }
 }
 
-} // namespace lhg::call::cast
+} // namespace lhg::callback::cast

@@ -1,19 +1,19 @@
 #pragma once
 
 #include <meojson/json.hpp>
-#include <tuple>
+#include <type_traits>
 
+#include "manager/handle_manager.hpp"
 #include "utils/type.hpp"
 
-namespace lhg::call
+namespace lhg::callback
 {
 
 enum class handle_oper
 {
     invalid,
     normal,
-    alloc,
-    free
+    scope
 };
 
 #pragma region handle
@@ -47,6 +47,9 @@ struct is_handle<arg_tag, true>
 
 template <typename arg_tag>
 concept handle_arg = is_handle<arg_tag, true>::value;
+
+template <typename arg_tag>
+concept scope_handle_arg = is_handle<arg_tag, true>::value && is_handle<arg_tag, true>::oper == handle_oper::scope;
 
 #pragma endregion handle
 
@@ -112,11 +115,11 @@ struct is_outer_state<arg_tag, true>
     using type = is_outer_state<arg_tag, false>::type;
 };
 
-template <>
-struct type_is_outer_state<const char*, false>
+template <scope_handle_arg arg_tag>
+struct is_outer_state<arg_tag, false>
 {
     constexpr static bool value = true;
-    using type = std::string;
+    using type = HandleManager<typename arg_tag::type>::ScopedHandle;
 };
 
 #pragma endregion outer_state
@@ -125,14 +128,22 @@ namespace pri
 {
 
     template <typename arg_tag>
+    concept void_arg_type = std::is_same_v<typename arg_tag::type, void>;
+
+    template <typename arg_tag>
     struct get_arg_impl
     {
         using type = typename arg_tag::type;
     };
 
+    template <void_arg_type arg_tag>
+    struct get_arg_impl<arg_tag>
+    {
+        using type = std::monostate;
+    };
+
     template <typename arg_tag>
     using is_outer_state_impl = is_outer_state<arg_tag, true>;
-
 }
 
 template <typename arg_tuple>
@@ -141,4 +152,4 @@ using convert_arg_type = help::transform_tuple<arg_tuple, pri::get_arg_impl>;
 template <typename arg_tuple>
 using convert_outer_state = help::transform_tuple<arg_tuple, pri::is_outer_state_impl>;
 
-} // namespace lhg::call
+} // namespace lhg::callback

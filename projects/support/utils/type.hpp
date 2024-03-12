@@ -62,6 +62,9 @@ namespace help
         return pri::runtime_remove_last_impl(t, std::make_index_sequence<sizeof...(Args) - 1> {});
     }
 
+    template <typename T>
+    using last_element = typename std::tuple_element_t<std::tuple_size_v<T> - 1, T>;
+
 }
 
 }
