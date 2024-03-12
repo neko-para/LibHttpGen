@@ -4,6 +4,7 @@
 #include <iostream>
 #include <meojson/json.hpp>
 #include <set>
+#include <sstream>
 
 std::string read_file(std::filesystem::path path)
 {
@@ -76,11 +77,10 @@ int main(int argc, char* argv[])
         auto args = decl.getArguments().value();
         json::array arguments;
         for (auto arg : args) {
-            arguments.push_back(json::object { { "type", arg.getType().getCanonicalType().getSpelling() },
-                                               { "name", arg.getSpelling() } });
+            arguments.push_back(
+                json::object { { "type", arg.getType().getSpelling() }, { "name", arg.getSpelling() } });
         }
-        result.push_back(json::object {
-            { "name", name }, { "return", ret.getCanonicalType().getSpelling() }, { "argument", arguments } });
+        result.push_back(json::object { { "name", name }, { "return", ret.getSpelling() }, { "argument", arguments } });
     }
 
     json::object output = { { "interface", result } };
