@@ -1,7 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
 
-import { Regenerator } from './regenerator'
 import { LHGConfig, LHGInterface } from './types'
 
 export const root_path = '..'
@@ -24,26 +23,4 @@ export async function loadConfig() {
 
 export async function loadInterface() {
   return JSON.parse(await fs.readFile(interface_path, 'utf-8')) as LHGInterface
-}
-
-export async function initRegenerator() {
-  const regen = new Regenerator({
-    end: '// LHG SEC END',
-    default: '// LHG SEC DEF',
-    parseId: row => {
-      const m = /\/\/ LHG SEC BEGIN (\S+)/.exec(row.trim())
-      return m ? m[1]! : null
-    },
-    buildId: id => {
-      return `// LHG SEC BEGIN ${id}`
-    }
-  })
-
-  await regen.load(source_path)
-
-  return regen
-}
-
-export async function deinitRegenerator(regen: Regenerator) {
-  await regen.save(source_path)
 }
