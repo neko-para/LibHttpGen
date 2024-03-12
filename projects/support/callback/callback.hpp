@@ -5,6 +5,7 @@
 #include "manager/manager.hpp"
 #include <tuple>
 #include <type_traits>
+#include <utility>
 #include <variant>
 
 namespace lhg::callback
@@ -57,10 +58,7 @@ struct json_to_arg
 
         using arg_tag = std::tuple_element_t<index, arg_tuple>;
 
-        if constexpr (!is_output<arg_tag, true>::value) {
-            return true;
-        }
-        else if constexpr (std::is_same_v<typename arg_tag::type, void>) {
+        if constexpr (!is_output<arg_tag, true>::value || std::is_same_v<typename arg_tag::type, void>) {
             return true;
         }
         else {
@@ -103,7 +101,7 @@ struct arg_to_json
 };
 
 template <typename callback_tag>
-auto create_callback() -> callback_tag::func_type
+constexpr auto create_callback() -> callback_tag::func_type
 {
     using func_type = typename callback_tag::type;
     using arg_tuple = typename func_type::args;
@@ -112,7 +110,8 @@ auto create_callback() -> callback_tag::func_type
     using call_arg_state_tuple = convert_outer_state<arg_tuple>;
 
     return [](auto... real_arg) {
-        call_arg_tuple arg(real_arg..., std::monostate {});
+        // 此处不能直接使用 func_type::ret::type void在convert_arg_type时转化为了monostate
+        call_arg_tuple arg(real_arg..., std::tuple_element_t<func_type::ret::index, call_arg_tuple> {});
         call_arg_state_tuple state;
 
         context_info* context = get_context<callback_tag, true>::get(arg);

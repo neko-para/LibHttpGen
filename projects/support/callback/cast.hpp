@@ -21,6 +21,14 @@ inline void from_json(ManagerProvider& p, const json::value& j, type& v, state& 
     v = j.as<type>();
 }
 
+template <typename state, typename arg_tag>
+inline void from_json(ManagerProvider& p, const json::value& j, unsigned char& v, state& s, arg_tag)
+{
+    std::ignore = p;
+    std::ignore = s;
+    v = static_cast<unsigned char>(j.as<unsigned>());
+}
+
 template <std::floating_point type, typename state, typename arg_tag>
 inline void from_json(ManagerProvider& p, const json::value& j, type& v, state& s, arg_tag)
 {
@@ -102,14 +110,14 @@ inline void to_json(ManagerProvider& p, json::value& j, const type& v, state& s,
 
     auto manager = p.get<HandleManager<type>, arg_tag>();
 
-    if (oper == handle_oper::normal) {
+    if constexpr (oper == handle_oper::normal) {
         j = manager->find(v);
     }
-    else if (oper == handle_oper::scope) {
+    else if constexpr (oper == handle_oper::scope) {
         static_assert(std::is_same_v<state, typename HandleManager<type>::ScopedHandle>,
                       "from_json: scope handle oper require state to be ScopedHandle");
         std::string id;
-        s = HandleManager<type>::ScopedHandle(manager, v, id);
+        s = typename HandleManager<type>::ScopedHandle(manager, v, id);
         j = id;
     }
 }

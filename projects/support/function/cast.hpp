@@ -20,6 +20,14 @@ inline void from_json(ManagerProvider& p, const json::value& j, type& v, state& 
     v = j.as<type>();
 }
 
+template <typename state, typename arg_tag>
+inline void from_json(ManagerProvider& p, const json::value& j, unsigned char& v, state& s, arg_tag)
+{
+    std::ignore = p;
+    std::ignore = s;
+    v = static_cast<unsigned char>(j.as<unsigned>());
+}
+
 template <std::floating_point type, typename state, typename arg_tag>
 inline void from_json(ManagerProvider& p, const json::value& j, type& v, state& s, arg_tag)
 {

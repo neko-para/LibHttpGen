@@ -21,21 +21,6 @@ async function main() {
   const int = await loadInterface()
   const cfg = await loadConfig()
 
-  const result: string[] = []
-
-  result.push('// clang-format off')
-  result.push('#pragma once')
-  result.push('')
-  result.push(`#include "function/interface.hpp"`)
-  result.push(`#include "callback/interface.hpp"`)
-  result.push('')
-  if (cfg.header) {
-    for (const hdr of cfg.header) {
-      result.push(`#include "${hdr}"`)
-    }
-    result.push('')
-  }
-
   int.interface = int.interface.filter(x => {
     for (const rule of cfg.remove) {
       if (rule.startsWith('/')) {
@@ -50,6 +35,21 @@ async function main() {
     }
     return true
   })
+
+  const result: string[] = []
+
+  result.push('// clang-format off')
+  result.push('#pragma once')
+  result.push('')
+  result.push(`#include "function/interface.hpp"`)
+  result.push(`#include "callback/interface.hpp"`)
+  result.push('')
+  if (cfg.header) {
+    for (const hdr of cfg.header) {
+      result.push(`#include "${hdr}"`)
+    }
+    result.push('')
+  }
 
   for (const info of int.interface) {
     result.push(`namespace lhg::${cfg.name} {`)
@@ -168,19 +168,27 @@ struct callback_${info.name} {
     result.push('')
   }
 
-  result.push('namespace lhg::call {')
-
   for (const opaque in cfg.opaque) {
     result.push(
-      `template<>
+      `namespace lhg::call {
+
+template<>
 struct type_is_handle<${opaque} *, false> {
   constexpr static bool value = true;
-};`
+};
+
+}
+namespace lhg::callback {
+
+template<>
+struct type_is_handle<${opaque} *, false> {
+  constexpr static bool value = true;
+};
+
+}
+`
     )
   }
-
-  result.push('')
-  result.push(`}`)
 
   fs.writeFile('../info.hpp', result.join('\n'))
 }
