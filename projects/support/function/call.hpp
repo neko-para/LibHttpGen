@@ -3,9 +3,26 @@
 #include "function/cast.hpp"
 #include "function/interface.hpp"
 #include "manager/manager.hpp"
+#include <type_traits>
 
 namespace lhg::call
 {
+
+template <typename arg_tuple, size_t index, bool impl>
+struct prepare_state
+{
+    using call_arg_tuple = convert_arg_type<arg_tuple>;
+    using call_arg_state_tuple = convert_outer_state<arg_tuple>;
+
+    static void prepare(ManagerProvider& provider, const json::object& req, call_arg_tuple& arg,
+                        call_arg_state_tuple& state)
+    {
+        std::ignore = provider;
+        std::ignore = req;
+        std::ignore = arg;
+        std::ignore = state;
+    }
+};
 
 template <typename arg_tuple, size_t index, bool impl>
 struct json_to_arg
@@ -23,15 +40,16 @@ struct json_to_arg
         if constexpr (!is_input<arg_tag, true>::value) {
             return true;
         }
+        else {
+            auto name = arg_tag::name;
+            if (!req.contains(name)) {
+                return false;
+            }
 
-        auto name = arg_tag::name;
-        if (!req.contains(name)) {
-            return false;
+            const json::value& value = req.at(name);
+            cast::from_json(provider, value, std::get<index>(arg), std::get<index>(state), arg_tag {});
+            return true;
         }
-
-        const json::value& value = req.at(name);
-        cast::from_json(provider, value, std::get<index>(arg), std::get<index>(state), arg_tag {});
-        return true;
     }
 };
 
@@ -47,16 +65,17 @@ struct arg_to_json
 
         using arg_tag = std::tuple_element_t<index, arg_tuple>;
 
-        if constexpr (!is_output<arg_tag, true>::value) {
+        if constexpr (!is_output<arg_tag, true>::value || std::is_same_v<typename arg_tag::type, void>) {
             return;
         }
+        else {
+            auto name = arg_tag::name;
 
-        auto name = arg_tag::name;
+            json::value value;
+            cast::to_json(provider, value, std::get<index>(arg), std::get<index>(state), arg_tag {});
 
-        json::value value;
-        cast::to_json(provider, value, std::get<index>(arg), std::get<index>(state), arg_tag {});
-
-        res[name] = value;
+            res[name] = value;
+        }
     }
 };
 
@@ -73,6 +92,10 @@ bool call(ManagerProvider& provider, json::object& res, const json::object& req)
     call_arg_tuple arg;
     call_arg_state_tuple state;
 
+    [&]<std::size_t... I>(std::index_sequence<I...>) {
+        (prepare_state<arg_tuple, I, true>::prepare(provider, req, arg, state), ...);
+    }(std::make_index_sequence<std::tuple_size_v<arg_tuple> - 1> {});
+
     auto success = [&]<std::size_t... I>(std::index_sequence<I...>) {
         return (json_to_arg<arg_tuple, I, true>::convert(provider, req, arg, state) && ...);
     }(std::make_index_sequence<std::tuple_size_v<arg_tuple> - 1> {});
@@ -82,9 +105,13 @@ bool call(ManagerProvider& provider, json::object& res, const json::object& req)
     }
 
     auto param = help::runtime_remove_last(arg);
-    auto ret = std::apply(func_ptr, std::move(param));
-
-    std::get<std::tuple_size_v<call_arg_tuple> - 1>(arg) = ret;
+    if constexpr (std::is_same_v<typename func_type::ret::type, void>) {
+        ;
+    }
+    else {
+        auto ret = std::apply(func_ptr, std::move(param));
+        std::get<std::tuple_size_v<call_arg_tuple> - 1>(arg) = ret;
+    }
 
     [&]<std::size_t... I>(std::index_sequence<I...>) {
         (arg_to_json<arg_tuple, I, true>::convert(provider, res, arg, state), ...);

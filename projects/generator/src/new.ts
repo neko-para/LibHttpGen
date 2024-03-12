@@ -23,6 +23,7 @@ async function main() {
 
   const result: string[] = []
 
+  result.push('// clang-format off')
   result.push('#pragma once')
   result.push('')
   result.push(`#include "function/interface.hpp"`)

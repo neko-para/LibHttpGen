@@ -88,7 +88,7 @@ struct arg_to_json
 
         using arg_tag = std::tuple_element_t<index, arg_tuple>;
 
-        if constexpr (!is_input<arg_tag, true>::value) {
+        if constexpr (!is_input<arg_tag, true>::value || std::is_same_v<typename arg_tag::type, void>) {
             return;
         }
         else {

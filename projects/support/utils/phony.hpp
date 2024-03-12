@@ -9,7 +9,10 @@
 #include "function/interface.hpp"
 
 #include "manager/handle_manager.hpp"
+#include "manager/manager.hpp"
 
+#include "server/apply.hpp"
+#include "server/context.hpp"
 #include "server/dispatcher.hpp"
 #include "server/fail.hpp"
 #include "server/listener.hpp"

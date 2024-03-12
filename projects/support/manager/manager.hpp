@@ -31,7 +31,7 @@ public:
         std::type_index tag_id(typeid(Tag));
         std::type_index manager_id(typeid(Manager));
 
-        auto sub_manager = managers[manager_id];
+        auto& sub_manager = managers[manager_id];
         auto it = sub_manager.find(tag_id);
         if (it == sub_manager.end()) {
             auto ptr = std::make_unique<holder<Manager>>(new Manager());

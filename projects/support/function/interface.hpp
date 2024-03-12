@@ -125,9 +125,18 @@ namespace pri
 {
 
     template <typename arg_tag>
+    concept void_arg_type = std::is_same_v<typename arg_tag::type, void>;
+
+    template <typename arg_tag>
     struct get_arg_impl
     {
         using type = typename arg_tag::type;
+    };
+
+    template <void_arg_type arg_tag>
+    struct get_arg_impl<arg_tag>
+    {
+        using type = std::monostate;
     };
 
     template <typename arg_tag>
