@@ -107,21 +107,36 @@ struct Builder
         return *this;
     }
 
-    Builder& not_(json::object&& sch)
+    template <typename T>
+    Builder& not_(T&& sch)
     {
-        obj["not"] = sch;
+        obj["not"] = json::object(std::forward<T>(sch));
         return *this;
     }
 
-    Builder& items(json::object&& sch)
+    template <typename T>
+    Builder& items(T&& sch)
     {
-        obj["items"] = sch;
+        obj["items"] = json::object(std::forward<T>(sch));
         return *this;
     }
 
-    Builder& properties(json::object&& sch)
+    template <typename T>
+    Builder& properties(T&& sch)
     {
-        obj["properties"] = sch;
+        obj["properties"] = json::object(std::forward<T>(sch));
+        return *this;
+    }
+
+    Builder& prop(json::object sch)
+    {
+        properties(std::move(sch));
+        const json::object& p = obj["properties"].as_object();
+        std::vector<std::string> keys;
+        for (const auto& pr : p) {
+            keys.push_back(pr.first);
+        }
+        required(keys);
         return *this;
     }
 

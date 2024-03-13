@@ -7,6 +7,7 @@
 #include "server/context.hpp"
 #include "server/url.hpp"
 #include "utils/boost.hpp"
+#include "utils/schema.hpp"
 
 namespace lhg::server
 {
@@ -15,7 +16,7 @@ struct Endpoint
 {
     std::function<void(ManagerProvider& provider, json::object& res, const json::object& req)>
         process = nullptr;
-    std::function<void(ManagerProvider& provider, json::object& res)> schema = nullptr;
+    std::function<void(json::object& req, json::object& res)> schema = nullptr;
 
     Endpoint() = default;
     template <typename F1, typename F2>
@@ -45,6 +46,55 @@ public:
         }
 
         current->endpoint = std::make_unique<Endpoint>(std::forward<EndpointArgs>(endpoint)...);
+    }
+
+    void setup_help(std::string route, std::string title, std::string version)
+    {
+        json::object _info = { { "title", title }, { "version", version } };
+        handle(
+            route,
+            [this, info = std::move(_info)](auto& provider, auto& res, const auto& req) {
+                if (help.has_value()) {
+                    res = help.value();
+                }
+                else {
+                    json::object paths;
+
+                    auto enumerate =
+                        [&](const auto& self, const Node* current, std::string curp) -> void {
+                        if (current->endpoint) {
+                            std::string operId = curp == "" ? "__root" : curp;
+                            json::object req, res;
+                            current->endpoint->schema(req, res);
+
+                            paths[curp == "" ? "/" : curp] = {
+                                { "post",
+                                  { { "operationId", operId },
+                                    { "requestBody",
+                                      { { "content",
+                                          { { "application/json", { { "schema", req } } } } } } },
+                                    { "responses",
+                                      { { "200",
+                                          { { "content",
+                                              { { "application/json",
+                                                  { { "schema", res } } } } } } } } } } }
+                            };
+                        }
+
+                        for (const auto& [sub, subnode] : current->child) {
+                            self(self, &subnode, curp + '/' + sub);
+                        }
+                    };
+                    enumerate(enumerate, &root, "");
+
+                    res = { { "openapi", "3.0.0" }, { "info", info }, { "paths", paths } };
+                    help = res;
+                }
+            },
+            [](auto& req, auto& res) {
+                req = {};
+                res = schema::Builder().type("object").obj;
+            });
     }
 
 private:
@@ -98,6 +148,7 @@ private:
 
     ManagerProvider provider;
     Node root;
+    std::optional<json::object> help;
 };
 
 } // namespace lhg::server

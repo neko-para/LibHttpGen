@@ -2,12 +2,15 @@
 
 #include "function/call.hpp"
 #include "server/dispatcher.hpp"
+#include "utils/schema.hpp"
 
 namespace lhg::server
 {
 
 namespace pri
 {
+
+using S = schema::Builder;
 
 template <typename function_list, size_t index>
 inline void apply_function_impl(Dispatcher* dispatcher)
@@ -18,7 +21,7 @@ inline void apply_function_impl(Dispatcher* dispatcher)
         [](auto& provider, auto& res, const auto& req) {
             call::call<func_tag>(provider, res, req);
         },
-        [](auto& provider, auto& res) {});
+        [](auto& req, auto& res) { call::get_schema<func_tag>(res, req); });
 }
 
 template <typename callback_list, size_t index>
@@ -36,7 +39,10 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
             manager->alloc(id, &provider);
             res["id"] = id;
         },
-        [](auto& provider, auto& res) {});
+        [](auto& req, auto& res) {
+            req = {};
+            res = S().type("object").prop({ { "id", S().type("string").obj } }).obj;
+        });
 
     dispatcher->handle(
         std::format("/callback/{}/free", cb_tag::name),
@@ -46,7 +52,10 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
 
             manager->free(id, &provider);
         },
-        [](auto& provider, auto& res) {});
+        [](auto& req, auto& res) {
+            req = S().type("object").prop({ { "id", S().type("string").obj } }).obj;
+            res = {};
+        });
 
     dispatcher->handle(
         std::format("/callback/{}/query", cb_tag::name),
@@ -59,7 +68,12 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
             ctx->take_wait(ids);
             res["ids"] = ids;
         },
-        [](auto& provider, auto& res) {});
+        [](auto& req, auto& res) {
+            req = S().type("object").prop({ { "id", S().type("string").obj } }).obj;
+            res = S().type("object")
+                      .prop({ { "ids", S().type("array").items(S().type("string").obj).obj } })
+                      .obj;
+        });
 
     dispatcher->handle(
         std::format("/callback/{}/req", cb_tag::name),
@@ -73,7 +87,13 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
             ctx->get_req(cid, data);
             res["arg"] = data;
         },
-        [](auto& provider, auto& res) {});
+        [](auto& req, auto& res) {
+            req = S().type("object")
+                      .prop({ { "id", S().type("string").obj }, { "cid", S().type("string").obj } })
+                      .obj;
+            // TODO: arg
+            res = S().type("object").prop({ { "arg", S().obj } }).obj;
+        });
 
     dispatcher->handle(
         std::format("/callback/{}/req", cb_tag::name),
@@ -86,7 +106,15 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
             auto ctx = manager->query(id);
             ctx->set_res(cid, data);
         },
-        [](auto& provider, auto& res) {});
+        [](auto& req, auto& res) {
+            // TODO: ret
+            req = S().type("object")
+                      .prop({ { "id", S().type("string").obj },
+                              { "cid", S().type("string").obj },
+                              { "ret", S().type("object").obj } })
+                      .obj;
+            res = {};
+        });
 }
 
 }
