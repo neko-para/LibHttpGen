@@ -78,7 +78,7 @@ inline std::optional<std::string> from_base64(std::string_view data)
             pending_bit += 6;
             if (pending_bit >= 8) {
                 int rest_bit = pending_bit - 8;
-                result.push_back(pending >> rest_bit);
+                result.push_back(static_cast<char>((pending >> rest_bit) & 0xFF));
                 pending &= (1 << rest_bit) - 1;
                 pending_bit -= 8;
             }

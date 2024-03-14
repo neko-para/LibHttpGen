@@ -18,8 +18,12 @@ function parseFuncPtr(type: string) {
 }
 
 async function main() {
-  const int = await loadInterface()
-  const cfg = await loadConfig()
+  let interface_path = process.argv[2] ?? '../interface.json'
+  let config_path = process.argv[3] ?? '../config.json'
+  let output_path = process.argv[4] ?? '../info.hpp'
+
+  const int = await loadInterface(interface_path)
+  const cfg = await loadConfig(config_path)
 
   int.interface = int.interface.filter(x => {
     for (const rule of cfg.remove) {
@@ -41,8 +45,9 @@ async function main() {
   result.push('// clang-format off')
   result.push('#pragma once')
   result.push('')
-  result.push(`#include "function/interface.hpp"`)
-  result.push(`#include "callback/interface.hpp"`)
+  result.push('#include "function/interface.hpp"')
+  result.push('#include "callback/interface.hpp"')
+  result.push('#include "utils/general.hpp"')
   result.push('')
   if (cfg.header) {
     for (const hdr of cfg.header) {
@@ -223,7 +228,7 @@ struct handle_name<${opaque} *> {
   result.push('}')
   result.push('')
 
-  fs.writeFile('../info.hpp', result.join('\n'))
+  fs.writeFile(output_path, result.join('\n'))
 }
 
 main()

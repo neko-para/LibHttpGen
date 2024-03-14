@@ -3,12 +3,7 @@ import path from 'path'
 
 import { LHGConfig, LHGInterface } from './types'
 
-export const root_path = '..'
-export const source_path = path.join(root_path, 'wrapper.cpp')
-export const config_path = path.join(root_path, 'config.json')
-export const interface_path = path.join(root_path, 'interface.json')
-
-export async function loadConfig() {
+export async function loadConfig(config_path: string) {
   const obj = JSON.parse(await fs.readFile(config_path, 'utf-8')) as LHGConfig
   return {
     name: obj.name ?? 'unknown',
@@ -21,6 +16,6 @@ export async function loadConfig() {
   }
 }
 
-export async function loadInterface() {
+export async function loadInterface(interface_path: string) {
   return JSON.parse(await fs.readFile(interface_path, 'utf-8')) as LHGInterface
 }

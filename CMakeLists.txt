@@ -35,4 +35,5 @@ if(NOT LHG_EMBEDDED)
     add_subdirectory(projects/interface-extractor)
 endif()
 
+add_subdirectory(projects/generator)
 add_subdirectory(projects/support)

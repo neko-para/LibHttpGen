@@ -32,28 +32,3 @@ export interface LHGInterface {
     }[]
   }[]
 }
-
-export interface LHGInterfaceArgumentInfo {
-  name: string
-  type: string
-  special?:
-    | {
-        type: 'callback'
-        name: string
-        refer: LHGCallbackConfig
-      }
-    | {
-        type: 'callback_context'
-        refer: LHGCallbackConfig
-        param: string
-      }
-    | {
-        type: 'opaque'
-        name: string
-        refer: LHGOpaqueConfig
-      }
-    | {
-        type: 'output'
-        name: string
-      }
-}
