@@ -77,9 +77,9 @@ struct json_to_arg_schema
         else {
             auto name = arg_tag::name;
             schema::Builder b;
-            b.type(cast::schema<arg_tag::type, arg_tag>::value);
-            if constexpr (cast::schema<arg_tag::type, arg_tag>::title) {
-                b.title(cast::schema<arg_tag::type, arg_tag>::title);
+            b.type(cast::schema<typename arg_tag::type, arg_tag>::value);
+            if constexpr (cast::schema<typename arg_tag::type, arg_tag>::title) {
+                b.title(cast::schema<typename arg_tag::type, arg_tag>::title);
             }
             req[name] = b.obj;
         }
@@ -136,9 +136,9 @@ struct arg_to_json_schema
         else {
             auto name = arg_tag::name;
             schema::Builder b;
-            b.type(cast::schema<arg_tag::type, arg_tag>::value);
-            if constexpr (cast::schema<arg_tag::type, arg_tag>::title) {
-                b.title(cast::schema<arg_tag::type, arg_tag>::title);
+            b.type(cast::schema<typename arg_tag::type, arg_tag>::value);
+            if constexpr (cast::schema<typename arg_tag::type, arg_tag>::title) {
+                b.title(cast::schema<typename arg_tag::type, arg_tag>::title);
             }
             res[name] = b.obj;
         }

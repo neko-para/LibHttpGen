@@ -34,7 +34,7 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
         std::format("/callback/{}/new", cb_tag::name),
         [](auto& provider, auto& res, const auto& req) {
             std::string id;
-            manager_type* manager = provider.get<manager_type, void>();
+            manager_type* manager = provider.template get<manager_type, void>();
 
             manager->alloc(id, &provider);
             res["id"] = id;
@@ -48,7 +48,7 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
         std::format("/callback/{}/free", cb_tag::name),
         [](auto& provider, auto& res, const auto& req) {
             std::string id = req.at("id").as_string();
-            manager_type* manager = provider.get<manager_type, void>();
+            manager_type* manager = provider.template get<manager_type, void>();
 
             manager->free(id, &provider);
         },
@@ -61,7 +61,7 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
         std::format("/callback/{}/query", cb_tag::name),
         [](auto& provider, auto& res, const auto& req) {
             std::string id = req.at("id").as_string();
-            manager_type* manager = provider.get<manager_type, void>();
+            manager_type* manager = provider.template get<manager_type, void>();
             std::vector<std::string> ids;
 
             auto ctx = manager->query(id);
@@ -80,7 +80,7 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
         [](auto& provider, auto& res, const auto& req) {
             std::string id = req.at("id").as_string();
             std::string cid = req.at("cid").as_string();
-            manager_type* manager = provider.get<manager_type, void>();
+            manager_type* manager = provider.template get<manager_type, void>();
             json::object data;
 
             auto ctx = manager->query(id);
@@ -101,7 +101,7 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
             std::string id = req.at("id").as_string();
             std::string cid = req.at("cid").as_string();
             json::object data = req.at("ret").as_object();
-            manager_type* manager = provider.get<manager_type, void>();
+            manager_type* manager = provider.template get<manager_type, void>();
 
             auto ctx = manager->query(id);
             ctx->set_res(cid, data);
