@@ -43,7 +43,8 @@ struct json_to_arg
 
         using arg_tag = std::tuple_element_t<index, arg_tuple>;
 
-        if constexpr (!is_input<arg_tag, true>::value) {
+        if constexpr (
+            !is_input<arg_tag, true>::value || std::is_same_v<typename arg_tag::type, void>) {
             return true;
         }
         else {
@@ -71,7 +72,8 @@ struct json_to_arg_schema
     {
         using arg_tag = std::tuple_element_t<index, arg_tuple>;
 
-        if constexpr (!is_input<arg_tag, true>::value) {
+        if constexpr (
+            !is_input<arg_tag, true>::value || std::is_same_v<typename arg_tag::type, void>) {
             ;
         }
         else {
@@ -160,11 +162,11 @@ bool call(ManagerProvider& provider, json::object& res, const json::object& req)
 
     [&]<std::size_t... I>(std::index_sequence<I...>) {
         (prepare_state<arg_tuple, I, true>::prepare(provider, req, arg, state), ...);
-    }(std::make_index_sequence<std::tuple_size_v<arg_tuple> - 1> {});
+    }(std::make_index_sequence<std::tuple_size_v<arg_tuple>> {});
 
     auto success = [&]<std::size_t... I>(std::index_sequence<I...>) {
         return (json_to_arg<arg_tuple, I, true>::convert(provider, req, arg, state) && ...);
-    }(std::make_index_sequence<std::tuple_size_v<arg_tuple> - 1> {});
+    }(std::make_index_sequence<std::tuple_size_v<arg_tuple>> {});
 
     if (!success) {
         return false;

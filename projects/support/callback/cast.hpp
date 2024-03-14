@@ -6,9 +6,50 @@
 #include "callback/interface.hpp"
 #include "manager/handle_manager.hpp"
 #include "manager/manager.hpp"
+#include "utils/general.hpp"
 
 namespace lhg::callback::cast
 {
+
+template <typename type, typename arg_tag>
+struct schema
+{
+};
+
+template <std::integral type, typename arg_tag>
+struct schema<type, arg_tag>
+{
+    static const constexpr char* value = "number";
+    static const constexpr char* title = nullptr;
+};
+
+template <std::floating_point type, typename arg_tag>
+struct schema<type, arg_tag>
+{
+    static const constexpr char* value = "number";
+    static const constexpr char* title = nullptr;
+};
+
+template <typename arg_tag>
+struct schema<bool, arg_tag>
+{
+    static const constexpr char* value = "boolean";
+    static const constexpr char* title = nullptr;
+};
+
+template <typename arg_tag>
+struct schema<const char*, arg_tag>
+{
+    static const constexpr char* value = "string";
+    static const constexpr char* title = nullptr;
+};
+
+template <typename type, handle_arg arg_tag>
+struct schema<type, arg_tag>
+{
+    static const constexpr char* value = "string";
+    static const constexpr char* title = handle_name<type>::name;
+};
 
 template <typename type, typename state, typename arg_tag>
 inline void

@@ -25,17 +25,26 @@ struct context_info : public std::enable_shared_from_this<context_info>
 
         const json::object& req;
         json::object& res;
+        const std::function<bool(const json::object& res)>& check;
         bool ret = false;
 
-        call_context(const json::object& req, json::object& res)
+        call_context(
+            const json::object& req,
+            json::object& res,
+            const std::function<bool(const json::object& res)>& check)
             : req(req)
             , res(res)
+            , check(check)
         {
         }
     };
 
     ManagerProvider* provider = nullptr;
-    std::function<void(json::object& res, const json::object& req)> process;
+    std::function<void(
+        json::object& res,
+        const json::object& req,
+        std::function<bool(const json::object& res)> check)>
+        process;
 
     std::mutex mtx;
     std::map<std::string, std::shared_ptr<call_context>> pending;
@@ -45,11 +54,11 @@ struct context_info : public std::enable_shared_from_this<context_info>
 
     context_info()
     {
-        process = [this](auto& res, const auto& req) {
+        process = [this](auto& res, const auto& req, const auto& check) {
             auto self_holder = this->shared_from_this();
 
             auto cid = make_uuid();
-            auto call_ctx = std::make_shared<call_context>(req, res);
+            auto call_ctx = std::make_shared<call_context>(req, res, check);
 
             {
                 std::unique_lock<std::mutex> lock(mtx);
@@ -122,8 +131,13 @@ struct context_info : public std::enable_shared_from_this<context_info>
         }
         {
             std::unique_lock<std::mutex> lock(call_ctx->mtx);
-            call_ctx->ret = true;
-            call_ctx->res = res;
+            if (call_ctx->check(res)) {
+                call_ctx->ret = true;
+                call_ctx->res = res;
+            }
+            else {
+                return false;
+            }
         }
         call_ctx->cond.notify_one();
         return true;

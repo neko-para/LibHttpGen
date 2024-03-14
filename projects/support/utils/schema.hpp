@@ -121,10 +121,9 @@ struct Builder
         return *this;
     }
 
-    template <typename T>
-    Builder& properties(T&& sch)
+    Builder& properties(json::object sch)
     {
-        obj["properties"] = json::object(std::forward<T>(sch));
+        obj["properties"] = json::object(std::move(sch));
         return *this;
     }
 

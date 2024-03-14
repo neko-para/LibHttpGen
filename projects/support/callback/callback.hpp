@@ -9,6 +9,7 @@
 #include "callback/interface.hpp"
 #include "manager/callback_manager.hpp"
 #include "manager/manager.hpp"
+#include "utils/schema.hpp"
 
 namespace lhg::callback
 {
@@ -80,6 +81,29 @@ struct json_to_arg
 };
 
 template <typename arg_tuple, size_t index, bool impl>
+struct json_to_arg_schema
+{
+    static void get(json::object& req)
+    {
+        using arg_tag = std::tuple_element_t<index, arg_tuple>;
+
+        if constexpr (
+            !is_output<arg_tag, true>::value || std::is_same_v<typename arg_tag::type, void>) {
+            ;
+        }
+        else {
+            auto name = arg_tag::name;
+            schema::Builder b;
+            b.type(cast::schema<typename arg_tag::type, arg_tag>::value);
+            if constexpr (cast::schema<typename arg_tag::type, arg_tag>::title) {
+                b.title(cast::schema<typename arg_tag::type, arg_tag>::title);
+            }
+            req[name] = b.obj;
+        }
+    }
+};
+
+template <typename arg_tuple, size_t index, bool impl>
 struct arg_to_json
 {
     using call_arg_tuple = convert_arg_type<arg_tuple>;
@@ -115,6 +139,29 @@ struct arg_to_json
     }
 };
 
+template <typename arg_tuple, size_t index, bool impl>
+struct arg_to_json_schema
+{
+    static void get(json::object& res)
+    {
+        using arg_tag = std::tuple_element_t<index, arg_tuple>;
+
+        if constexpr (
+            !is_input<arg_tag, true>::value || std::is_same_v<typename arg_tag::type, void>) {
+            ;
+        }
+        else {
+            auto name = arg_tag::name;
+            schema::Builder b;
+            b.type(cast::schema<typename arg_tag::type, arg_tag>::value);
+            if constexpr (cast::schema<typename arg_tag::type, arg_tag>::title) {
+                b.title(cast::schema<typename arg_tag::type, arg_tag>::title);
+            }
+            res[name] = b.obj;
+        }
+    }
+};
+
 template <typename callback_tag>
 constexpr auto create_callback() -> callback_tag::func_type
 {
@@ -137,15 +184,19 @@ constexpr auto create_callback() -> callback_tag::func_type
 
         [&]<std::size_t... I>(std::index_sequence<I...>) {
             (arg_to_json<arg_tuple, I, true>::convert(*context->provider, req, arg, state), ...);
-        }(std::make_index_sequence<std::tuple_size_v<arg_tuple> - 1> {});
-
-        context->process(res, req);
-
-        bool success = [&]<std::size_t... I>(std::index_sequence<I...>) {
-            return (
-                json_to_arg<arg_tuple, I, true>::convert(*context->provider, res, arg, state)
-                && ...);
         }(std::make_index_sequence<std::tuple_size_v<arg_tuple>> {});
+
+        auto try_convert = [&](const json::object& _res) {
+            return [&]<std::size_t... I>(std::index_sequence<I...>) {
+                return (
+                    json_to_arg<arg_tuple, I, true>::convert(*context->provider, _res, arg, state)
+                    && ...);
+            }(std::make_index_sequence<std::tuple_size_v<arg_tuple>> {});
+        };
+
+        context->process(res, req, try_convert);
+
+        bool success = try_convert(res);
 
         if (!success) {
             throw "callback error";
@@ -158,6 +209,36 @@ constexpr auto create_callback() -> callback_tag::func_type
             return std::get<func_type::ret::index>(arg);
         }
     };
+}
+
+template <typename function_tag>
+void get_schema_req(json::object& req)
+{
+    using func_type = typename function_tag::type;
+    using arg_tuple = typename func_type::args;
+
+    json::object req_prop;
+
+    [&]<std::size_t... I>(std::index_sequence<I...>) {
+        (arg_to_json_schema<arg_tuple, I, true>::get(req_prop), ...);
+    }(std::make_index_sequence<std::tuple_size_v<arg_tuple>> {});
+
+    req = schema::Builder().type("object").prop(req_prop).obj;
+}
+
+template <typename function_tag>
+void get_schema_res(json::object& res)
+{
+    using func_type = typename function_tag::type;
+    using arg_tuple = typename func_type::args;
+
+    json::object res_prop;
+
+    [&]<std::size_t... I>(std::index_sequence<I...>) {
+        (json_to_arg_schema<arg_tuple, I, true>::get(res_prop), ...);
+    }(std::make_index_sequence<std::tuple_size_v<arg_tuple>> {});
+
+    res = schema::Builder().type("object").prop(res_prop).obj;
 }
 
 } // namespace lhg::callback

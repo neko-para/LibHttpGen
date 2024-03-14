@@ -1,5 +1,6 @@
 #pragma once
 
+#include "callback/callback.hpp"
 #include "function/call.hpp"
 #include "server/dispatcher.hpp"
 #include "utils/schema.hpp"
@@ -19,9 +20,23 @@ inline void apply_function_impl(Dispatcher* dispatcher)
     dispatcher->handle(
         std::format("/api/{}", func_tag::name),
         [](auto& provider, auto& res, const auto& req) {
-            call::call<func_tag>(provider, res, req);
+            json::object data;
+            if (!call::call<func_tag>(provider, data, req)) {
+                res = { { "error", "syntax error" } };
+            }
+            else {
+                res = { { "data", data } };
+            }
         },
-        [](auto& req, auto& res) { call::get_schema<func_tag>(res, req); });
+        [](auto& req, auto& res) {
+            json::object _res;
+            call::get_schema<func_tag>(_res, req);
+            res = schema::Builder()
+                      .type("object")
+                      .properties(
+                          { { "data", _res }, { "error", schema::Builder().type("string").obj } })
+                      .obj;
+        });
 }
 
 template <typename callback_list, size_t index>
@@ -50,11 +65,16 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
             std::string id = req.at("id").as_string();
             manager_type* manager = provider.template get<manager_type, void>();
 
-            manager->free(id, &provider);
+            if (manager->free(id, &provider)) {
+                res = { { "success", true } };
+            }
+            else {
+                res = { { "success", false } };
+            }
         },
         [](auto& req, auto& res) {
             req = S().type("object").prop({ { "id", S().type("string").obj } }).obj;
-            res = {};
+            res = S().type("object").prop({ { "success", S().type("boolean").obj } }).obj;
         });
 
     dispatcher->handle(
@@ -65,13 +85,20 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
             std::vector<std::string> ids;
 
             auto ctx = manager->query(id);
-            ctx->take_wait(ids);
-            res["ids"] = ids;
+            if (ctx) {
+                ctx->take_wait(ids);
+                res = { { "success", true }, { "ids", json::array(ids) } };
+            }
+            else {
+                res = { { "success", false } };
+            }
         },
         [](auto& req, auto& res) {
             req = S().type("object").prop({ { "id", S().type("string").obj } }).obj;
             res = S().type("object")
-                      .prop({ { "ids", S().type("array").items(S().type("string").obj).obj } })
+                      .properties({ { "ids", S().type("array").items(S().type("string").obj).obj },
+                                    { "success", S().type("boolean").obj } })
+                      .required(std::vector<std::string> { "success" })
                       .obj;
         });
 
@@ -84,19 +111,30 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
             json::object data;
 
             auto ctx = manager->query(id);
-            ctx->get_req(cid, data);
-            res["arg"] = data;
+            if (ctx) {
+                if (ctx->get_req(cid, data)) {
+                    res = { { "success", true }, { "arg", data } };
+                    return;
+                }
+            }
+            res = { { "success", false } };
         },
         [](auto& req, auto& res) {
+            json::object _req;
+            callback::get_schema_req<cb_tag>(_req);
+
             req = S().type("object")
                       .prop({ { "id", S().type("string").obj }, { "cid", S().type("string").obj } })
                       .obj;
-            // TODO: arg
-            res = S().type("object").prop({ { "arg", S().obj } }).obj;
+
+            res = S().type("object")
+                      .properties({ { "success", S().type("boolean").obj }, { "arg", _req } })
+                      .required(std::vector<std::string> { "success" })
+                      .obj;
         });
 
     dispatcher->handle(
-        std::format("/callback/{}/req", cb_tag::name),
+        std::format("/callback/{}/res", cb_tag::name),
         [](auto& provider, auto& res, const auto& req) {
             std::string id = req.at("id").as_string();
             std::string cid = req.at("cid").as_string();
@@ -104,16 +142,24 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
             manager_type* manager = provider.template get<manager_type, void>();
 
             auto ctx = manager->query(id);
-            ctx->set_res(cid, data);
+            if (ctx->set_res(cid, data)) {
+                res = { { "success", true } };
+            }
+            else {
+                res = { { "success", false } };
+            }
         },
         [](auto& req, auto& res) {
-            // TODO: ret
+            json::object _res;
+            callback::get_schema_res<cb_tag>(_res);
+
             req = S().type("object")
                       .prop({ { "id", S().type("string").obj },
                               { "cid", S().type("string").obj },
-                              { "ret", S().type("object").obj } })
+                              { "ret", _res } })
                       .obj;
-            res = {};
+
+            res = S().type("object").properties({ { "success", S().type("boolean").obj } }).obj;
         });
 }
 
