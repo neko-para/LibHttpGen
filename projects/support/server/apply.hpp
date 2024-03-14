@@ -2,7 +2,9 @@
 
 #include "callback/callback.hpp"
 #include "function/call.hpp"
+#include "manager/handle_manager.hpp"
 #include "server/dispatcher.hpp"
+#include "utils/general.hpp"
 #include "utils/schema.hpp"
 
 namespace lhg::server
@@ -13,6 +15,20 @@ namespace pri
 
 using S = schema::Builder;
 
+inline json::object wrap_data(json::object value)
+{
+    return S()
+        .type("object")
+        .properties({ { "data", value }, { "success", S().type("boolean").obj } })
+        .required(std::vector<std::string> { "success" })
+        .obj;
+}
+
+inline json::object wrap_data()
+{
+    return wrap_data(S().obj);
+}
+
 template <typename function_list, size_t index>
 inline void apply_function_impl(Dispatcher* dispatcher)
 {
@@ -22,20 +38,16 @@ inline void apply_function_impl(Dispatcher* dispatcher)
         [](auto& provider, auto& res, const auto& req) {
             json::object data;
             if (!call::call<func_tag>(provider, data, req)) {
-                res = { { "error", "syntax error" } };
+                res = { { "success", false } };
             }
             else {
-                res = { { "data", data } };
+                res = { { "success", true }, { "data", data } };
             }
         },
         [](auto& req, auto& res) {
             json::object _res;
             call::get_schema<func_tag>(_res, req);
-            res = schema::Builder()
-                      .type("object")
-                      .properties(
-                          { { "data", _res }, { "error", schema::Builder().type("string").obj } })
-                      .obj;
+            res = wrap_data(_res);
         });
 }
 
@@ -52,11 +64,11 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
             manager_type* manager = provider.template get<manager_type, void>();
 
             manager->alloc(id, &provider);
-            res["id"] = id;
+            res = { { "success", true }, { "data", { { "id", id } } } };
         },
         [](auto& req, auto& res) {
             req = {};
-            res = S().type("object").prop({ { "id", S().type("string").obj } }).obj;
+            res = wrap_data(S().type("object").prop({ { "id", S().type("string").obj } }).obj);
         });
 
     dispatcher->handle(
@@ -74,7 +86,7 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
         },
         [](auto& req, auto& res) {
             req = S().type("object").prop({ { "id", S().type("string").obj } }).obj;
-            res = S().type("object").prop({ { "success", S().type("boolean").obj } }).obj;
+            res = wrap_data();
         });
 
     dispatcher->handle(
@@ -87,7 +99,7 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
             auto ctx = manager->query(id);
             if (ctx) {
                 ctx->take_wait(ids);
-                res = { { "success", true }, { "ids", json::array(ids) } };
+                res = { { "success", true }, { "data", { { "ids", json::array(ids) } } } };
             }
             else {
                 res = { { "success", false } };
@@ -95,11 +107,10 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
         },
         [](auto& req, auto& res) {
             req = S().type("object").prop({ { "id", S().type("string").obj } }).obj;
-            res = S().type("object")
-                      .properties({ { "ids", S().type("array").items(S().type("string").obj).obj },
-                                    { "success", S().type("boolean").obj } })
-                      .required(std::vector<std::string> { "success" })
-                      .obj;
+            res = wrap_data(
+                S().type("object")
+                    .prop({ { "ids", S().type("array").items(S().type("string").obj).obj } })
+                    .obj);
         });
 
     dispatcher->handle(
@@ -113,7 +124,7 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
             auto ctx = manager->query(id);
             if (ctx) {
                 if (ctx->get_req(cid, data)) {
-                    res = { { "success", true }, { "arg", data } };
+                    res = { { "success", true }, { "data", data } };
                     return;
                 }
             }
@@ -127,10 +138,7 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
                       .prop({ { "id", S().type("string").obj }, { "cid", S().type("string").obj } })
                       .obj;
 
-            res = S().type("object")
-                      .properties({ { "success", S().type("boolean").obj }, { "arg", _req } })
-                      .required(std::vector<std::string> { "success" })
-                      .obj;
+            res = wrap_data(_req);
         });
 
     dispatcher->handle(
@@ -159,7 +167,44 @@ inline void apply_callback_impl(Dispatcher* dispatcher)
                               { "ret", _res } })
                       .obj;
 
-            res = S().type("object").properties({ { "success", S().type("boolean").obj } }).obj;
+            res = wrap_data();
+        });
+
+    dispatcher->handle(
+        std::format("/callback/{}/dump", cb_tag::name),
+        [](auto& provider, auto& res, const auto& req) {
+            manager_type* manager = provider.template get<manager_type, void>();
+            res = { { "success", true }, { "data", { { "ids", manager->dump() } } } };
+        },
+        [](auto& req, auto& res) {
+            req = {};
+
+            res = wrap_data(
+                S().type("object")
+                    .prop({ { "ids", S().type("array").items(S().type("string").obj).obj } })
+                    .obj);
+        });
+}
+
+template <typename handle_list, size_t index>
+inline void apply_handle_impl(Dispatcher* dispatcher)
+{
+    using handle_type = std::tuple_element_t<index, handle_list>;
+    using manager_type = HandleManager<handle_type>;
+
+    dispatcher->handle(
+        std::format("/handle/{}/dump", handle_name<handle_type>::name),
+        [](auto& provider, auto& res, const auto& req) {
+            manager_type* manager = provider.template get<manager_type, void>();
+            res = { { "success", true }, { "data", { { "ids", manager->dump() } } } };
+        },
+        [](auto& req, auto& res) {
+            req = {};
+
+            res = wrap_data(
+                S().type("object")
+                    .prop({ { "ids", S().type("array").items(S().type("string").obj).obj } })
+                    .obj);
         });
 }
 
@@ -179,6 +224,14 @@ inline void apply_callback(Dispatcher* dispatcher)
     [&]<std::size_t... I>(std::index_sequence<I...>) {
         (pri::apply_callback_impl<callback_list, I>(dispatcher), ...);
     }(std::make_index_sequence<std::tuple_size_v<callback_list>> {});
+}
+
+template <typename handle_list>
+inline void apply_handle(Dispatcher* dispatcher)
+{
+    [&]<std::size_t... I>(std::index_sequence<I...>) {
+        (pri::apply_handle_impl<handle_list, I>(dispatcher), ...);
+    }(std::make_index_sequence<std::tuple_size_v<handle_list>> {});
 }
 
 }
