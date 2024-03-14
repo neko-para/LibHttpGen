@@ -1,6 +1,8 @@
 #pragma once
 
+#include <algorithm>
 #include <format>
+#include <iterator>
 #include <meojson/json.hpp>
 
 #include "manager/manager.hpp"
@@ -63,7 +65,14 @@ public:
                     auto enumerate =
                         [&](const auto& self, const Node* current, std::string curp) -> void {
                         if (current->endpoint) {
-                            std::string operId = curp == "" ? "__root" : curp;
+                            std::string operIdWithSlash = curp == "" ? "_" : curp;
+                            std::string operId;
+                            std::transform(
+                                operIdWithSlash.begin(),
+                                operIdWithSlash.end(),
+                                std::back_insert_iterator<std::string>(operId),
+                                [](char ch) { return ch != '/' ? ch : '_'; });
+
                             json::object req, res;
                             current->endpoint->schema(req, res);
 
