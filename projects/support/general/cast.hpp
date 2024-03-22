@@ -1,55 +1,13 @@
 #pragma once
 
 #include <meojson/json.hpp>
-#include <type_traits>
 
-#include "callback/interface.hpp"
+#include "general/traits.hpp"
 #include "manager/handle_manager.hpp"
 #include "manager/manager.hpp"
-#include "utils/general.hpp"
 
-namespace lhg::callback::cast
+namespace lhg::cast
 {
-
-template <typename type, typename arg_tag>
-struct schema
-{
-};
-
-template <std::integral type, typename arg_tag>
-struct schema<type, arg_tag>
-{
-    static const constexpr char* value = "number";
-    static const constexpr char* title = nullptr;
-};
-
-template <std::floating_point type, typename arg_tag>
-struct schema<type, arg_tag>
-{
-    static const constexpr char* value = "number";
-    static const constexpr char* title = nullptr;
-};
-
-template <typename arg_tag>
-struct schema<bool, arg_tag>
-{
-    static const constexpr char* value = "boolean";
-    static const constexpr char* title = nullptr;
-};
-
-template <typename arg_tag>
-struct schema<const char*, arg_tag>
-{
-    static const constexpr char* value = "string";
-    static const constexpr char* title = nullptr;
-};
-
-template <typename type, handle_arg arg_tag>
-struct schema<type, arg_tag>
-{
-    static const constexpr char* value = "string";
-    static const constexpr char* title = handle_name<type>::name;
-};
 
 template <typename type, typename state, typename arg_tag>
 inline void
@@ -96,17 +54,27 @@ inline void
     v = s.c_str();
 }
 
-template <typename type, typename state, handle_arg arg_tag>
+template <typename type, typename state, traits::handle_arg_tag arg_tag>
 inline void from_json(ManagerProvider& p, const json::value& j, type& v, state& s, arg_tag)
 {
-    constexpr auto oper = is_handle<arg_tag, true>::oper;
-    static_assert(oper != handle_oper::invalid, "from_json: invalid handle oper is not allowed");
-    static_assert(oper != handle_oper::scope, "from_json: scope handle oper is not allowed");
+    constexpr auto oper = traits::is_handle<arg_tag>::oper;
+    static_assert(
+        oper != traits::handle_oper::invalid,
+        "from_json: invalid handle oper is not allowed");
+    static_assert(
+        oper != traits::handle_oper::alloc,
+        "from_json: alloc handle oper is not allowed");
+    static_assert(
+        oper != traits::handle_oper::scope,
+        "from_json: scope handle oper is not allowed");
 
     auto manager = p.get<HandleManager<type>, void>();
 
-    if constexpr (oper == handle_oper::normal) {
+    if constexpr (oper == traits::handle_oper::normal) {
         v = manager->get(j.as_string());
+    }
+    else if constexpr (oper == traits::handle_oper::free) {
+        manager->del(j.as_string(), v);
     }
 }
 
@@ -145,25 +113,32 @@ inline void to_json(ManagerProvider& p, json::value& j, const char* const& v, st
     j = v;
 }
 
-template <typename type, typename state, handle_arg arg_tag>
+template <typename type, typename state, traits::handle_arg_tag arg_tag>
 inline void to_json(ManagerProvider& p, json::value& j, const type& v, state& s, arg_tag)
 {
-    constexpr auto oper = is_handle<arg_tag, true>::oper;
-    static_assert(oper != handle_oper::invalid, "to_json: invalid handle oper is not allowed");
+    constexpr auto oper = traits::is_handle<arg_tag>::oper;
+    static_assert(
+        oper != traits::handle_oper::invalid,
+        "to_json: invalid handle oper is not allowed");
+    static_assert(oper != traits::handle_oper::free, "to_json: free handle oper is not allowed");
 
     auto manager = p.get<HandleManager<type>, void>();
 
-    if constexpr (oper == handle_oper::normal) {
+    if constexpr (oper == traits::handle_oper::normal) {
         j = manager->find(v);
     }
-    else if constexpr (oper == handle_oper::scope) {
+    else if constexpr (oper == traits::handle_oper::alloc) {
+        j = manager->add(v);
+    }
+    else if constexpr (oper == traits::handle_oper::scope) {
+        using scope_handle_t = typename HandleManager<type>::ScopedHandle;
         static_assert(
-            std::is_same_v<state, typename HandleManager<type>::ScopedHandle>,
+            std::is_same_v<state, scope_handle_t>,
             "from_json: scope handle oper require state to be ScopedHandle");
         std::string id;
-        s = typename HandleManager<type>::ScopedHandle(manager, v, id);
+        s = scope_handle_t(manager, v, id);
         j = id;
     }
 }
 
-} // namespace lhg::callback::cast
+}

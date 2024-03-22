@@ -1,12 +1,10 @@
 #pragma once
 
-#include "callback/callback.hpp"
-#include "callback/cast.hpp"
-#include "callback/interface.hpp"
-
-#include "function/call.hpp"
-#include "function/cast.hpp"
-#include "function/interface.hpp"
+#include "general/call.hpp"
+#include "general/callback.hpp"
+#include "general/cast.hpp"
+#include "general/lifecycle.hpp"
+#include "general/traits.hpp"
 
 #include "manager/callback_manager.hpp"
 #include "manager/data_manager.hpp"
@@ -21,8 +19,9 @@
 #include "server/server.hpp"
 #include "server/session.hpp"
 
+#include "utils/base64.hpp"
 #include "utils/boost.hpp"
-#include "utils/general.hpp"
+#include "utils/macro.hpp"
 #include "utils/schema.hpp"
 #include "utils/type.hpp"
 #include "utils/uuid.hpp"

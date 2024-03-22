@@ -1,10 +1,10 @@
 #pragma once
 
-#include "callback/callback.hpp"
-#include "function/call.hpp"
+#include "general/call.hpp"
+#include "general/callback.hpp"
+#include "general/traits.hpp"
 #include "manager/handle_manager.hpp"
 #include "server/dispatcher.hpp"
-#include "utils/general.hpp"
 #include "utils/schema.hpp"
 
 namespace lhg::server
@@ -193,7 +193,7 @@ inline void apply_handle_impl(Dispatcher* dispatcher)
     using manager_type = HandleManager<handle_type>;
 
     dispatcher->handle(
-        std::format("/handle/{}/dump", handle_name<handle_type>::name),
+        std::format("/handle/{}/dump", traits::type_handle_name<handle_type>),
         [](auto& provider, auto& res, const auto& req) {
             manager_type* manager = provider.template get<manager_type, void>();
             res = { { "success", true }, { "data", { { "ids", manager->dump() } } } };

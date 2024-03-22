@@ -45,9 +45,8 @@ async function main() {
   result.push('// clang-format off')
   result.push('#pragma once')
   result.push('')
-  result.push('#include "function/interface.hpp"')
-  result.push('#include "callback/interface.hpp"')
-  result.push('#include "utils/general.hpp"')
+  result.push('#include "general/call.hpp"')
+  result.push('#include "general/callback.hpp"')
   result.push('')
   if (cfg.header) {
     for (const hdr of cfg.header) {
@@ -89,17 +88,13 @@ async function main() {
     result.push('')
 
     result.push('}')
-    result.push('namespace lhg::call {')
+    result.push('namespace lhg::traits {')
     result.push('')
 
     result.push('template<>')
-    result.push(`struct is_input<${cfg.name}::func_type_${info.name}::ret, false> {`)
-    result.push('  constexpr static bool value = false;')
-    result.push('};')
+    result.push(`inline constexpr bool is_input<${cfg.name}::func_type_${info.name}::ret> = false;`)
     result.push('template<>')
-    result.push(`struct is_output<${cfg.name}::func_type_${info.name}::ret, false> {`)
-    result.push('  constexpr static bool value = true;')
-    result.push('};')
+    result.push(`inline constexpr bool is_output<${cfg.name}::func_type_${info.name}::ret> = true;`)
 
     result.push('')
     result.push('}')
@@ -153,21 +148,17 @@ struct callback_${info.name} {
 
     result.push('')
     result.push(`}`)
-    result.push('namespace lhg::callback {')
+    result.push('namespace lhg::traits {')
     result.push('')
 
     result.push('template<>')
-    result.push(`struct is_input<${cfg.name}::func_type_${info.name}::_${info.self}_, false> {`)
-    result.push('  constexpr static bool value = false;')
-    result.push('};')
+    result.push(
+      `inline constexpr bool is_input<${cfg.name}::func_type_${info.name}::_${info.self}_> = false;`
+    )
     result.push('template<>')
-    result.push(`struct is_input<${cfg.name}::func_type_${info.name}::ret, false> {`)
-    result.push('  constexpr static bool value = false;')
-    result.push('};')
+    result.push(`inline constexpr bool is_input<${cfg.name}::func_type_${info.name}::ret> = false;`)
     result.push('template<>')
-    result.push(`struct is_output<${cfg.name}::func_type_${info.name}::ret, false> {`)
-    result.push('  constexpr static bool value = true;')
-    result.push('};')
+    result.push(`inline constexpr bool is_output<${cfg.name}::func_type_${info.name}::ret> = true;`)
 
     result.push('')
     result.push('}')
@@ -189,28 +180,13 @@ ${Object.entries(cfg.callback)
 
   for (const opaque in cfg.opaque) {
     result.push(
-      `namespace lhg::call {
+      `namespace lhg::traits {
 
 template<>
-struct type_is_handle<${opaque} *, false> {
-  constexpr static bool value = true;
-};
-
-}
-namespace lhg::callback {
+inline constexpr bool type_is_handle<${opaque} *> = true;
 
 template<>
-struct type_is_handle<${opaque} *, false> {
-  constexpr static bool value = true;
-};
-
-}
-namespace lhg {
-
-template<>
-struct handle_name<${opaque} *> {
-  constexpr static const char* name = "${opaque}";
-};
+inline const constexpr char* type_handle_name<${opaque} *> = "${opaque}";
 
 }
 `
