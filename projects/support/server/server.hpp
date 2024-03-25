@@ -40,6 +40,8 @@ public:
 
     void stop() { ioc.stop(); }
 
+    unsigned short port() { return listener->port(); }
+
 private:
     asio::io_context ioc;
     std::shared_ptr<Listener> listener;

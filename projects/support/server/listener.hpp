@@ -54,6 +54,19 @@ public:
     // Start accepting incoming connections
     void run() { do_accept(); }
 
+    unsigned short port()
+    {
+        beast::error_code ec;
+
+        auto endpoint = acceptor_.local_endpoint(ec);
+        if (ec) {
+            fail(ec, "port");
+            return 0;
+        }
+
+        return endpoint.port();
+    }
+
 private:
     void do_accept()
     {
