@@ -134,11 +134,20 @@ private:
         ctx.init();
 
         if (current && current->endpoint) {
-            json::object req_obj =
-                json::parse(ctx.req_.body()).value_or(json::object {}).as_object();
-            json::object res_obj;
-            current->endpoint->process(provider, res_obj, req_obj);
-            ctx.json_body(res_obj);
+            if (ctx.req_.method() == http::verb::post) {
+                json::object req_obj =
+                    json::parse(ctx.req_.body()).value_or(json::object {}).as_object();
+                json::object res_obj;
+                current->endpoint->process(provider, res_obj, req_obj);
+                ctx.json_body(res_obj);
+            }
+            else if (ctx.req_.method() == http::verb::options) {
+                ctx.res_.set(http::field::accept, "POST");
+                ;
+            }
+            else {
+                ctx.bad_request("only post supported");
+            }
         }
         else {
             ctx.bad_request(std::format("unknown path {}", url));
